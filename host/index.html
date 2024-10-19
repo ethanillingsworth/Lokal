@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lokal - @example</title>
+    <script type="module" src="../js/firebase.js"></script>
+    <script type="module" src="../js/global.js"></script>
+    <script type="module" src="../js/host.js"></script>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/host.css">
+
+</head>
+<body>
+    <div id="sidebar">
+        
+    </div>
+    <div id="content">
+
+        <div class="modal inner">
+            <div class="top">
+                <h2>Add Event</h2>
+            </div>
+            <div class="bottom">
+                <h3>Event Details:</h3>
+                <div class="row">
+                    <label for="name">Event Name:</label>
+                    <input name="name" placeholder="Birthday Party">
+                </div>
+                <div class="row">
+                    <label for="desc">Event Description:</label>
+                    <textarea name="desc" placeholder="Join us at Matt's b-day!!"></textarea>
+                </div>
+                <div class="row">
+                    <label for="cate">Event Category:</label>
+                    <select>
+                        <option>Sports</option>
+                        <option>Birthday</option>
+                        <option>Concert</option>
+                        <option>Other</option>
+
+                    </select>
+                </div>
+                <div class="row">
+                    <label for="tag">Event Tags:</label>
+                    <input name="tag" placeholder="bday, food, fun, hotdogs"></input>
+                </div>
+                <div class="row" id="movebuttons" style="margin-top: auto;">
+                    <button style="margin-left: auto; margin-top: 10px">Date & Time ></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

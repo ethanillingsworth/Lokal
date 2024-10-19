@@ -1,0 +1,40 @@
+#profile {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: calc(100% - 40px);
+    width: 80%;
+    background-color: var(--dark6);
+    padding: 0;
+}
+
+#top {
+    background-color: var(--dark1);
+    width: calc(100% - 40px);
+    border-radius: 15px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+}
+
+#pfp {
+    margin-right: 10px;
+}
+
+#profile #bottom {
+    width: calc(100% - 28px);
+    padding: 10px;
+    height: 100%;
+    margin: 0;
+    
+    border: solid 4px var(--dark1);
+    border-top: none;
+    display: flex;
+    flex-direction: column;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+
+}
