@@ -160,7 +160,6 @@ button:not(.gsi-material-button):hover {
 }
 
 #sidebar {
-    position: fixed;
     left: 0;
     width: fit-content;
     height: 100%;
@@ -210,7 +209,8 @@ button:not(.gsi-material-button):hover {
     display: flex;
     flex-direction: column;
     place-items: center;
-    overflow: auto;
+    overflow-y: auto;
+
 }
 
 #search-box {
@@ -241,13 +241,15 @@ button:not(.gsi-material-button):hover {
     
     margin-top: 20px;
     margin-bottom: 20px;
-    max-width: 70%;
     padding: 0;
     background-color: var(--dark6);
     display: flex;
     flex-direction: column;
     height: auto;
-    min-width: 50%;
+    min-width: 150px;
+    max-width: 700px;
+    margin-right: 20px;
+    margin-left: 20px;
     
 }
 
@@ -298,6 +300,7 @@ button:not(.gsi-material-button):hover {
 
 .event {
     display: flex;
+    width: 100%;
     text-wrap: nowrap;
     flex-direction: column;
     flex-direction: row;
@@ -368,21 +371,47 @@ p {
 }
 
 .event-details {
-    margin-top: 10px;
     display: flex;
     flex-direction: row;
     width: 100%;
 }
 
+.event-details :first-child {
+    margin-left: 0;
+}
+
+
 .actions {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     width: 100%;
-    height: 35px;
+    height: 25px;
+    margin-right: 0px;
+    margin-top: 5px;
+}
+
+.action {
+    display: flex;
+    flex-direction: row;
+    place-items: center;
+    place-content: center;
+    font-size: 12.5pt;
+    width: 100%;
+}
+
+.action span {
+    margin-left: 2.5px;
+    margin-right: 2.5px;
+
 }
 
 .actions img {
     aspect-ratio: 1 / 1;
     width: auto;
     height: 100%;
+}
+
+span {
+    margin-left: 5px;
+    margin-right: 5px;
 }
