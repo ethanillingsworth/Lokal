@@ -14,10 +14,10 @@
 
 html {
     height: 100%;
+    position: relative;
 }
 
 body {
-    position: relative;
     display: flex;
     flex-direction: row;
     width: 100vw;
@@ -166,6 +166,7 @@ button:not(.gsi-material-button):hover {
     background-color: var(--dark1);
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 
@@ -205,11 +206,12 @@ button:not(.gsi-material-button):hover {
 
 #content {
     width: 100%;
-    min-height: 100%;
+    position: relative;
     display: flex;
     flex-direction: column;
     place-items: center;
-    overflow-y: auto;
+    height: 100%;
+    overflow-y: scroll;
 
 }
 
@@ -239,8 +241,7 @@ button:not(.gsi-material-button):hover {
 
 .inner {
     
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin: 20px;
     padding: 0;
     background-color: var(--dark6);
     display: flex;
@@ -248,8 +249,7 @@ button:not(.gsi-material-button):hover {
     height: auto;
     min-width: 150px;
     max-width: 700px;
-    margin-right: 20px;
-    margin-left: 20px;
+    overflow-x: hidden;
     
 }
 
@@ -268,12 +268,8 @@ button:not(.gsi-material-button):hover {
 }
 
 .inner .bottom {
-    width: calc(100% - 20px);
     padding: 10px;
     margin: 0;
-    
-    border: solid 4px var(--dark1);
-    border-top: none;
     display: flex;
     height: 100%;
     flex-direction: column;
@@ -345,9 +341,6 @@ p {
     object-fit: cover;
 }
 
-.bottom {
-    margin-bottom: 15px;
-}
 
 .user-info *:not(.display-name) {
     color: gray;
@@ -374,6 +367,7 @@ p {
     display: flex;
     flex-direction: row;
     width: 100%;
+    margin-top: 5px;
 }
 
 .event-details :first-child {
@@ -408,9 +402,8 @@ p {
 
 .actions img {
     aspect-ratio: 1 / 1;
-    width: auto;
+    width: 25px;
     height: 100%;
-    color: black;
 }
 
 span {
@@ -428,9 +421,5 @@ span {
 }
 
 .action-content:hover {
-    cursor:pointer
-}
-
-.action-content:hover img {
-    scale: 1.1;
+    cursor:pointer;
 }
