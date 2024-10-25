@@ -63,6 +63,12 @@ h3 {
     margin-top: 10px;
 }
 
+input[type="file"] {
+    font-size: 1.25em;
+    background-color: transparent;
+    border-color: transparent;
+}
+
 input, textarea, select {
     font-size: 1.25em;
     border-style: solid;
@@ -247,44 +253,32 @@ button:not(.gsi-material-button):hover {
     display: flex;
     flex-direction: column;
     height: auto;
-    min-width: 150px;
-    max-width: 700px;
-    overflow-x: hidden;
-    
 }
 
-.inner .top {
-    background-color: var(--dark1);
-    width: calc(100% - 40px);
-    border: solid 4px var(--dark1);
-    display: flex;
-
-    border-radius: inherit;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-
-    padding: 20px;
-    margin: 0;
-}
-
-.inner .bottom {
+.inner {
     padding: 10px;
-    margin: 0;
     display: flex;
-    height: 100%;
     flex-direction: column;
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
     background-color: var(--dark1);
+    padding-right: 10px;
+    width: 600px;
 }
 
-.inner .bottom > * {
+.inner > * {
     margin-left: 0;
     margin-right: 0;
+    overflow: hidden;
 }
 
-.inner .bottom .row {
-    margin-top: 10px
+.inner .row {
+    margin-top: 5px;
+    padding-top: 2.5px;
+    padding-bottom: 2.5px;
+
+    place-content: start;
+    width: 100%;
 }
 
 .event .row {
@@ -296,11 +290,8 @@ button:not(.gsi-material-button):hover {
 
 .event {
     display: flex;
-    width: 100%;
     text-wrap: nowrap;
-    flex-direction: column;
     flex-direction: row;
-    position: relative;
     border-radius: 15px;
     padding: 5px;
     padding-right: 15px;
@@ -325,7 +316,7 @@ p {
     width: fit-content
 }
 
-.event .pfp {
+.pfp {
     height: 50px;
     width: 50px;
     margin-right: 5px;
@@ -340,7 +331,6 @@ p {
     aspect-ratio: 16 / 9;
     object-fit: cover;
 }
-
 
 .user-info *:not(.display-name) {
     color: gray;

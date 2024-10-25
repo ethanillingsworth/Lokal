@@ -18,37 +18,33 @@
     <div id="content">
 
         <div class="modal inner">
-            <div class="top">
-                <h2>Add Event</h2>
+            
+            <h2>Add Event</h2>
+            <hr>
+        
+            <div class="row" style="place-items: start;">
+                <img class="pfp border" src="../img/pfp.jpg">
+                <textarea name="name" placeholder="What's going on?" rows="5" maxlength="180"></textarea>
             </div>
-            <div class="bottom">
-                <h3>Event Details:</h3>
-                <div class="row">
-                    <label for="name">Event Name:</label>
-                    <input name="name" placeholder="Birthday Party">
-                </div>
-                <div class="row">
-                    <label for="desc">Event Description:</label>
-                    <textarea name="desc" placeholder="Join us at Matt's b-day!!"></textarea>
-                </div>
-                <div class="row">
-                    <label for="cate">Event Category:</label>
-                    <select>
-                        <option>Sports</option>
-                        <option>Birthday</option>
-                        <option>Concert</option>
-                        <option>Other</option>
+            <div class="row">
+                <label for="image">Image Select:</label>
+                <input type="file" name="image" accept="image/png, image/jpeg">
+                
+            </div>
+            <div class="row">
+                <label for="cate">Event Category:</label>
+                <select id="sel-cate"></select>
+            </div>
+            <div class="row">
+                <label for="tag">Event Tags:</label>
+                <input name="tag" placeholder="bday, food, fun, hotdogs"></input>
+            </div>
+            <div class="row">
+                <label for="date">Event Date:</label>
+                <input type="text" id="date" name="date" value="mm/dd/yyyy">
+            </div>
 
-                    </select>
-                </div>
-                <div class="row">
-                    <label for="tag">Event Tags:</label>
-                    <input name="tag" placeholder="bday, food, fun, hotdogs"></input>
-                </div>
-                <div class="row" id="movebuttons" style="margin-top: auto;">
-                    <button style="margin-left: auto; margin-top: 10px">Date & Time ></button>
-                </div>
-            </div>
+
         </div>
     </div>
 </body>
