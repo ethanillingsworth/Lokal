@@ -41,5 +41,3 @@ date.onblur = (e) => {
         date.value = today.toLocaleDateString('en-US')
     }
 }
-
-
