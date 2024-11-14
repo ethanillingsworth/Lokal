@@ -1,3 +1,6 @@
+import { signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { auth } from "./firebase.js";
+
 // debug only version
 const ver = document.createElement("span")
 ver.id = "ver"
@@ -11,6 +14,14 @@ sidebar.id = "sidebar"
 
 document.body.append(sidebar)
 
+const expand = document.createElement("div")
+expand.id = "expand"
+
+document.body.append(expand)
+
+const bottom = document.createElement("div")
+bottom.id = "bottom"
+
 const heading = document.createElement("h1")
 
 heading.innerText = "Lokal"
@@ -18,11 +29,17 @@ heading.id = "heading"
 
 sidebar.append(heading)
 
+let currentlyExpanded = false;
 
-export function addItem(label, img, href, id) {
+
+export function addItem(label, img, href, id, parent, expanded, expandedContent) {
     const link = document.createElement("a")
-    link.id = id
+    if (id != null) link.id = id
     if (href != null) {link.href = href}
+
+    if (parent == null) {
+        parent = sidebar
+    }
     
     link.classList.add("item")
 
@@ -36,16 +53,67 @@ export function addItem(label, img, href, id) {
     link.append(image)
     link.append(lab)
 
+    if (expanded) {
 
-    sidebar.append(link)
+        // add expanded content
+        Object.keys(expandedContent).forEach((key) => {
+            addItem(key, expandedContent[key].image, null, key, expand)
+
+            document.getElementById(key).onclick = function () {
+                console.log(expandedContent[key].func())
+            }
+
+            
+        })
+
+        link.onclick = function() {
+            if (currentlyExpanded) {
+                // close
+                expand.style.minWidth = "0"
+                expand.style.padding = "0"
+                expand.style.height = "100%"
+                expand.style.borderRight = "0px solid var(--dark2)"
+
+                currentlyExpanded = false
+                link.classList.remove("border")
+
+            }
+            else {
+                // open
+                currentlyExpanded = true;
+                expand.style.minWidth = "calc(100% / 5)"
+                expand.style.borderRight = "4px solid var(--dark2)"
+                expand.style.padding = "5px"
+                expand.style.height = "calc(100% - 10px)"
+                link.classList.add("border")
+            }
+            
+        }
+    }
+
+    parent.append(link)
 }
 
 addItem("Home", "../img/icons/home.png", "../")
-addItem("Host Event", "../img/icons/plus.png", "../host")
 addItem("My Events", "../img/icons/party.png", "../events")
+addItem("Host", "../img/icons/plus.png", "../host")
 // use user pfp
-addItem("Profile", "../img/pfp.jpg", "../user", "user")
+addItem("Profile", "../img/pfp.jpg", "../user", "user", bottom)
+addItem("More", "../img/icons/more.png", null, null, bottom, true, {
+    "Log out": {
+        image: "../img/icons/logout.png",
+        func: function() {
+            signOut(auth).then(() => {
+                // Sign-out successful.
+                location.href = "../login"
+            }).catch((error) => {
+                // An error happened.
+            });
+        }
+    }
+})
 
+sidebar.append(bottom)
 
 const content = document.createElement("div")
 content.id = "content"

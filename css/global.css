@@ -39,10 +39,6 @@ body {
 h1 {
     font-size: 2.5em;
     text-align: center;
-    margin-bottom: 0;
-    margin-top: 0;
-    margin-right: 20px;
-    margin-left: 20px;
 }
 
 h2 {
@@ -177,35 +173,54 @@ button:not(.gsi-material-button):hover {
 
 }
 
+
+
 #heading {
     margin: 20px;
     width: 100%;
     text-align: left;
 }
 
-#sidebar {
-    left: 0;
-    width: fit-content;
+#sidebar, #expand {
+    width: auto;
     height: calc(100% - 10px);
-    background-color: var(--dark1);
     display: flex;
     flex-direction: column;
-    position: relative;
     padding: 5px;
-    width: calc(100%/5);
-    border-right: 4px solid var(--dark2)
+    border-right: 4px solid var(--dark2);
+    text-wrap: nowrap;
 }
 
-#sidebar .item {
+#expand {
+    overflow: hidden;
+    width: 0;
+    min-width: 0;
+    padding: 0;
+    border-right: 0px solid var(--dark2);
+    transition: all 0.25s ease-in-out;
+    place-content: end;
+}
+
+#sidebar {
+    min-width: calc(100%/5);
+    position: relative;
+    left: 0;
+}
+
+
+.item {
 
     display: flex;
     flex-direction: row;
     place-items:center;
     margin: 5px;
     text-wrap: nowrap;
+    transition: all 0.25s ease-in-out;
+    width: auto;
+    padding-right: auto;
 }
 
-#sidebar .item img {
+.item img {
     height: 32px;
     width: 32px;
     aspect-ratio: 1 / 1;
@@ -213,10 +228,16 @@ button:not(.gsi-material-button):hover {
 }
 
 
-#sidebar .item:hover {
+#sidebar .item:hover, #expand .item:hover {
     cursor:pointer;
 }
 
+#bottom {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+}
 
 
 #content {
@@ -233,10 +254,7 @@ button:not(.gsi-material-button):hover {
 .border {
     border-style: solid;
     border-color: var(--accent);
-
-
     border-radius: 15px;
-    border-width: 4px;
 }
 
 .border-hov:hover {

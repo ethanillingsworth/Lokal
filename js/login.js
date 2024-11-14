@@ -15,6 +15,7 @@ const password = document.getElementById("password")
 const usernameValidate = /^(?=.{5,30}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/
 
 
+
 // get exisitng usernames
 const usernames = []
 
@@ -43,7 +44,7 @@ function generateUsername() {
         rC = Math.floor(Math.random() * 1000)
 
     }
-    return a[rA] + b[rB] + rC
+    return (a[rA] + b[rB] + rC).toLowerCase()
 }
 
 // google sign in
@@ -65,19 +66,23 @@ googleButton.onclick = function () {
             await setDoc(doc(db, "usernames", user.uid), {
                 username: tempUsername
             });
+
+            await setDoc(doc(db, "users", user.uid, "data", "public"), {
+                test: "hello world"
+            })
+
+            await setDoc(doc(db, "users", user.uid, "data", "private"), {
+                testPrivate: "this is private!"
+            })
         }
         console.log(user)
 
         window.location.href = "../"
+
+        
         // IdP data available using getAdditionalUserInfo(result)
         // ...
-    }).catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorMessage)
-        // ...
-    });
+    })
 }
 
 // normal sign up
@@ -120,16 +125,3 @@ signIn.onclick = function() {
         const errorMessage = error.message;
     });
 }
-// redirect to home if logged in already
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/auth.user
-      const uid = user.uid;
-      window.location.href = "../"
-      // ...
-    } else {
-      // User is signed out
-      // ...
-    }
-  });
