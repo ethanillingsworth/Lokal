@@ -1,10 +1,13 @@
-import { signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-import { auth } from "./firebase.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { getDoc, doc, setDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+import { auth, db } from "./firebase.js";
+
 
 // debug only version
 const ver = document.createElement("span")
 ver.id = "ver"
-ver.innerText = "build 24M11D13"
+ver.innerText = "DEV BUILD"
 document.body.append(ver)
 
 
@@ -81,7 +84,7 @@ export function addItem(label, img, href, id, parent, expanded, expandedContent)
             else {
                 // open
                 currentlyExpanded = true;
-                expand.style.minWidth = "calc(100% / 5)"
+                expand.style.minWidth = "20%"
                 expand.style.borderRight = "4px solid var(--dark2)"
                 expand.style.padding = "5px"
                 expand.style.height = "calc(100% - 10px)"
@@ -94,75 +97,149 @@ export function addItem(label, img, href, id, parent, expanded, expandedContent)
     parent.append(link)
 }
 
-addItem("Home", "../img/icons/home.png", "../")
-addItem("My Events", "../img/icons/party.png", "../events")
-addItem("Host", "../img/icons/plus.png", "../host")
-// use user pfp
-addItem("Profile", "../img/pfp.jpg", "../user", "user", bottom)
-addItem("More", "../img/icons/more.png", null, null, bottom, true, {
-    "Log out": {
-        image: "../img/icons/logout.png",
-        func: function() {
-            signOut(auth).then(() => {
-                // Sign-out successful.
-                location.href = "../login"
-            }).catch((error) => {
-                // An error happened.
-            });
-        }
-    }
-})
-
-sidebar.append(bottom)
 
 const content = document.createElement("div")
 content.id = "content"
 
 document.body.append(content)
 
-export function addEvent(username) {
-    // get data from username with firebase
-
-    // make event
-    const event = document.createElement("div")
-    event.classList.append("event")
-
-    event.innerHTML = `
-    <img class="pfp border" src="../img/pfp.jpg">
-    <div class="event-content">
-        <div class="user-info row">
-            <h4 class="display-name">Elk Grove High School</h4>
-            <h4 class="username">@eghs</h4>
-            <span class="bullet">•</span>
-            <h4 class="category">Sports</h4>
-        </div>
-        <p>
-            EGHS is hosting a football game this friday! Go Grens!!
-        </p>
-        <div class="event-details">
-            <span>Jan 21, 2024</span>
-            |
-            <span>
-                <a href="https://www.google.com/maps/place/500+W+Elk+Grove+Blvd" target="_blank">500 W Elk Grove Blvd</a>
-            </span>
-            |
-            <span>Free Admission</span>
-        </div>
-        <img class="event-image" src="../img/sample.jpg">
+export async function displayEvent(eventId) {
+    // get data from eid
     
-        <div class="actions">
-            <div class="action">
-                <div class="action-content">
-                    <img src="img/icons/star-outline.png" class="star">
-                    <span class="count">25K</span>
+    let e = await getDoc(doc(db, "posts", eventId)) 
+
+    if (e.exists()) {
+        let eventData = e.data()
+        let u = await getDoc(doc(db, "users", eventData.creator, "data", "public"))
+
+        if (u.exists()) {
+            let userData = u.data()
+            display(eventData, userData)
+
+        };
+    }
+
+    function display(event, user) {
+
+        let cost = "Free admission";
+
+        if (event.cost > 0) {
+            cost = `$${event.cost} per person`
+        }
+        // make event
+        const ev = document.createElement("div")
+        ev.classList.add("event")
+
+        ev.innerHTML = `
+        <img class="pfp border" src="../img/pfp.jpg">
+        <div class="event-content">
+            <div class="user-info row">
+                <h4 class="display-name">${user.displayName}</h4>
+                <h4 class="username">@${user.username}</h4>
+                <span class="bullet">•</span>
+                <h4 class="category">${event.category}</h4>
+            </div>
+            <p>
+                ${event.desc}
+            </p>
+            <div class="event-details">
+                <span>${event.date}</span>
+                |
+                <span>${event.location}</span>
+                |
+                <span>${cost}</span>
+            </div>
+            <img class="event-image" src="../img/sample.jpg">
+        
+            <div class="actions">
+                <div class="action">
+                    
+                    <img src="img/icons/profile.png">
+                    <span class="count">43 RSVPs</span>
+                    
                 </div>
             </div>
-        </div>
+                
             
-        
-    </div>
-    <hr>
-    `
+        </div>
+        `
 
-    content.append(event)
+        content.append(ev)
+    }
+}
+
+export async function createEvent(uid, cate, desc, date, location, cost) {
+    const event = await addDoc(collection(db, "posts"), {
+        creator: uid,
+        category: cate,
+        desc: desc,
+        date: date.toLocaleDateString("en-US"),
+        location: location,
+        cost: cost
+
+    })
+    return event.id;
+}
+
+addItem("Home", "../img/icons/home.png", "../")
+addItem("My Events", "../img/icons/party.png", "../events")
+addItem("Host", "../img/icons/plus.png", "../host")
+
+if (localStorage.getItem("displayName")) {
+    addBottom()
+}
+
+export function checkInCache(name, value, after) {
+    if (!localStorage.getItem(name)) {
+        localStorage.setItem(name, value)
+        if (after != null) after()
+    }
+
+}
+
+export function removeFromCache(name, after) {
+    if (localStorage.getItem(name)) {
+        localStorage.removeItem(name)
+        if (after != null) after()
+    }
+}
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+          
+        location.href = "../login"
+
+    } 
+    const uid = user.uid;
+
+    const pub = await getDoc(doc(db, "users", uid, "data", "public"))
+
+    if (pub.exists()) {
+        const data = pub.data()
+        checkInCache("displayName", data.displayName, addBottom)
+        checkInCache("username", data.username)
+
+
+
+        // use user pfp
+    }
+    
+});
+
+function addBottom() {
+    addItem(localStorage.getItem("displayName"), "../img/pfp.jpg", `../user/index.html?u=${localStorage.getItem("username")}`, "user", bottom)
+    addItem("More", "../img/icons/more.png", null, null, bottom, true, {
+        "Log out": {
+            image: "../img/icons/logout.png",
+            func: function() {
+                signOut(auth).then(() => {
+                    // Sign-out successful.
+                    location.href = "../login"
+                }).catch((error) => {
+                    // An error happened.
+                });
+            }
+        }
+    })
+    sidebar.append(bottom)
 }

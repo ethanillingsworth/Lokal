@@ -44,7 +44,24 @@ function generateUsername() {
         rC = Math.floor(Math.random() * 1000)
 
     }
-    return (a[rA] + b[rB] + rC).toLowerCase()
+    return (a[rA] + b[rB] + rC)
+}
+
+async function setUserData(user, username) {
+    await setDoc(doc(db, "usernames", user.uid), {
+        username: username.toLowerCase()
+    });
+
+    await setDoc(doc(db, "users", user.uid, "data", "public"), {
+        displayName: username,
+        username: username.toLowerCase(),
+        hostEvents: []
+    })
+
+    await setDoc(doc(db, "users", user.uid, "data", "private"), {
+        rsvps: []
+    })
+
 }
 
 // google sign in
@@ -63,17 +80,9 @@ googleButton.onclick = function () {
             console.log("New User")
             let tempUsername = generateUsername()
 
-            await setDoc(doc(db, "usernames", user.uid), {
-                username: tempUsername
-            });
+            await setUserData(user, tempUsername)
 
-            await setDoc(doc(db, "users", user.uid, "data", "public"), {
-                test: "hello world"
-            })
-
-            await setDoc(doc(db, "users", user.uid, "data", "private"), {
-                testPrivate: "this is private!"
-            })
+            
         }
         console.log(user)
 
@@ -96,9 +105,8 @@ signUp.onclick = function() {
         if (usernameValidate.test(username.value) && !usernames.includes(username.value)) {
             finalUsername = username.value
         }
-        await setDoc(doc(db, "usernames", user.uid), {
-            username: finalUsername
-        });
+        
+        await setUserData(user, finalUsername)
 
         window.location.href = "../"
         // ...

@@ -177,7 +177,6 @@ button:not(.gsi-material-button):hover {
 
 #heading {
     margin: 20px;
-    width: 100%;
     text-align: left;
 }
 
@@ -246,8 +245,11 @@ button:not(.gsi-material-button):hover {
     display: flex;
     flex-direction: column;
     place-items: center;
-    height: 100%;
+    height: calc(100% - 40px);
     overflow-y: scroll;
+    padding-top: 20px;
+    padding-bottom: 20px;
+
 }
 
 
@@ -276,11 +278,10 @@ button:not(.gsi-material-button):hover {
     display: flex;
     text-wrap: nowrap;
     flex-direction: row;
+    width: 50%;
+    padding: 20px;
     border-radius: 15px;
-    padding: 5px;
-    padding-right: 15px;
-    padding-bottom: 15px;
-
+    border: 4px solid var(--dark2);
 }
 
 
@@ -304,7 +305,7 @@ p {
     height: 50px;
     width: 50px;
     margin-right: 5px;
-    border-radius: 15px;
+    border-radius: 100%;
 }
 
 .event .event-image {
@@ -374,6 +375,10 @@ p {
 
 }
 
+.action:hover {
+    cursor: pointer;
+}
+
 .actions img {
     aspect-ratio: 1 / 1;
     width: 25px;
@@ -383,19 +388,6 @@ p {
 span {
     margin-left: 5px;
     margin-right: 5px;
-}
-
-.action-content {
-    display: flex;
-    flex-direction: row;
-    place-items: center;
-    place-content: center;
-    width: fit-content;
-    height: 100%;
-}
-
-.action-content:hover {
-    cursor:pointer;
 }
 
 #user img {
