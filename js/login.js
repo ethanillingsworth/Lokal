@@ -2,7 +2,6 @@ import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, createUserWith
 import { auth, google, db } from "./firebase.js";
 import { setDoc, doc, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-
 // elements
 const googleButton = document.getElementById("google")
 const signUp = document.getElementById("signup")
@@ -48,18 +47,21 @@ function generateUsername() {
 }
 
 async function setUserData(user, username) {
+    localStorage.clear()
     await setDoc(doc(db, "usernames", user.uid), {
         username: username.toLowerCase()
     });
 
+    await setDoc(doc(db, "uids", username.toLowerCase()), {
+        userId: user.uid
+    })
+
     await setDoc(doc(db, "users", user.uid, "data", "public"), {
         displayName: username,
-        username: username.toLowerCase(),
-        hostEvents: []
     })
 
     await setDoc(doc(db, "users", user.uid, "data", "private"), {
-        rsvps: []
+        likedTags: []
     })
 
 }
@@ -75,6 +77,8 @@ googleButton.onclick = function () {
         // The signed-in user info.
         const user = result.user;
         const {isNewUser} = getAdditionalUserInfo(result)
+        localStorage.clear()
+
 
         if (isNewUser) {
             console.log("New User")
@@ -122,6 +126,8 @@ signUp.onclick = function() {
 signIn.onclick = function() {
     signInWithEmailAndPassword(auth, email.value, password.value)
     .then((userCredential) => {
+        localStorage.clear()
+
         // Signed in 
         const user = userCredential.user;
         window.location.href = "../"

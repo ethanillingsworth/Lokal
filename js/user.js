@@ -1,0 +1,139 @@
+import { getDoc, doc, query, collection, getDocs, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { displayEvent } from "./global.js";
+import { db } from "./firebase.js";
+
+const urlParams = new URLSearchParams(window.location.search);
+
+const pageUser = urlParams.get("u")
+
+const content = document.getElementById("content")
+
+const modal = document.createElement("div")
+modal.classList.add("modal")
+
+const top = document.createElement("div")
+top.classList.add("row")
+
+const pfp = document.createElement("img")
+pfp.src = "../img/pfp.jpg"
+pfp.id = "pfp"
+pfp.classList.add("border")
+
+const userDetails = document.createElement("div")
+userDetails.classList.add("col")
+userDetails.id = "userDetails"
+
+
+const displayName = document.createElement("h2");
+displayName.innerText = "Loading..."
+displayName.id = "displayName"
+displayName.style.marginRight = "10px"
+
+
+
+const usrname = document.createElement("h3");
+usrname.innerText = "Loading..."
+usrname.id = "username"
+
+const desc = document.createElement("p");
+
+desc.innerText = "Loading..."
+
+const tabs = document.createElement("div")
+
+tabs.classList.add("row")
+
+tabs.style.gap = "20px"
+tabs.style.marginBottom = "0"
+tabs.style.marginTop = "20px"
+
+function createTab(name, current) {
+    const tab = document.createElement("h4")
+    tab.classList.add("tab")
+    if (current) tab.classList.add("current")
+
+    tab.innerText = name
+
+    tabs.append(tab)
+
+    const pageContent = document.createElement("div")
+    pageContent.classList.add("pageContent")
+    pageContent.id = name
+    if (current) pageContent.classList.add("currentPage")
+    
+
+    tab.onclick = function() {
+
+        document.querySelectorAll(".pageContent").forEach((c) => {
+            c.classList.remove("currentPage")
+        })
+
+        document.querySelectorAll(".tab").forEach((t) => {
+            t.classList.remove("current")
+        })
+        tab.classList.add("current")
+        document.getElementById(name).classList.add("currentPage")
+
+    }
+
+    modal.append(pageContent)
+    
+
+}
+
+const divider = document.createElement("hr")
+
+
+top.append(pfp)
+
+userDetails.append(displayName)
+userDetails.append(usrname)
+userDetails.append(desc)
+
+top.append(userDetails)
+modal.append(top)
+modal.append(tabs)
+modal.append(divider)
+
+
+
+content.append(modal)
+
+createTab("Hosting", true)
+createTab("Attending")
+
+async function hosting(uid) {
+    const hostingTab = document.getElementById("Hosting")
+
+    const q = query(collection(db, "posts"), where("creator", "==", uid))
+
+    const get = await getDocs(q)
+
+    get.forEach((event) => {
+        displayEvent(event.id, hostingTab)
+    })
+}
+
+
+function updateProfile(data) {
+    usrname.innerText = `(@${pageUser})`
+    document.title = `Lokal - @${pageUser}`
+    displayName.innerText = data.displayName
+    desc.innerText = data.desc.replaceAll("<br>", "\n")
+}
+
+const uidData = await getDoc(doc(db, "uids", pageUser))
+
+if (uidData.exists()) {
+    const uid = uidData.data().userId
+    // get actual data
+    const pub = await getDoc(doc(db, "users", uid, "data", "public"))
+    
+    if (pub.exists()) {
+        const data = pub.data()
+        updateProfile(data)
+        hosting(uid)
+    }
+}
+
+
