@@ -20,7 +20,8 @@
 }
 
 #userDetails p {
-    font-size: 1.1em
+    font-size: 1.1em;
+    margin-top: 10px;
 }
 
 #displayName {
@@ -29,10 +30,6 @@
 
 #username {
     color: gray
-}
-
-p {
-    margin-top: 10px;
 }
 
 .tab {

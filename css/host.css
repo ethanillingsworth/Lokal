@@ -1,8 +1,59 @@
+.row {
+    width: 100%;
+    flex-wrap: nowrap;
+}
 
-.inner {
+.row h3 {
+    font-size: 1.25em;
     text-wrap: nowrap;
 }
 
-input, select, textarea {
-    width: 100%;
+.page {
+    display: none;
+}
+
+.current {
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    margin: 0;
+}
+
+#preview {
+    object-fit: cover;
+    aspect-ratio: 16 / 9;
+    width: calc(1280px / 3);
+    height: auto;
+    border-radius: 15px;
+}
+
+.cont {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+button {
+    background-color: var(--dark2);
+}
+
+#next {
+    margin-left: auto;
+}
+
+#prev {
+    margin-right: auto;
+}
+
+#search:hover {
+    cursor: pointer;
+}
+
+textarea {
+    font-size: 1em
+}
+
+#tags {
+    font-size: 1.25em;
 }
