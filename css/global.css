@@ -529,10 +529,12 @@ p {
 
 .grid input {
     height: 100%;
+    width: 25px !important;
 }
 
 input[type=checkbox] {
     accent-color: var(--accent);
+    width: fit-content
 }
 
 @media (max-width: 1080px) {

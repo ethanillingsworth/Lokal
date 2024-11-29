@@ -260,6 +260,7 @@ if (d.exists()) {
             const usernameElem = document.createElement("h4")
             const displayElem = document.createElement("h4")
             const attendingElem = document.createElement("div")
+            attendingElem.classList.add("row")
 
             const here = document.createElement("input")
 
