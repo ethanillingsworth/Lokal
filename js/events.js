@@ -5,5 +5,9 @@ import { db } from "./firebase.js";
 const events = await getDocs(query(collection(db, "posts"), orderBy("timestamp", "desc")))
 
 events.forEach(async ev => {
-    await displayEvent(ev.id)
+    const data = ev.data()
+
+    if (new Date(data.date).getDate() >= new Date(Date.now()).getDate()) {
+        await displayEvent(ev.id)
+    }
 });

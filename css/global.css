@@ -514,6 +514,27 @@ p {
 
 }
 
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-auto-rows: 45px;
+}
+
+.grid > * {
+    border: 3px solid var(--dark2);
+    display: flex;
+    place-items: center;
+    padding: 10px;
+}
+
+.grid input {
+    height: 100%;
+}
+
+input[type=checkbox] {
+    accent-color: var(--accent);
+}
+
 @media (max-width: 1080px) {
     .modal {
         width: 75%;

@@ -1,4 +1,4 @@
-import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, addDoc, Timestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where, Timestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
 
@@ -238,14 +238,75 @@ if (d.exists()) {
         page.append(agenda)
     }, true)
 
-    addPage("Attendance", (page) => {})
+    addPage("Attendance", async (page) => {
+        const grid = document.createElement("div")
+        grid.classList.add("grid")
+
+        const displayNameHeading = document.createElement("h4")
+        const usernameHeading = document.createElement("h4")
+        const attendingStatusHeading = document.createElement("h4")
+
+        displayNameHeading.innerText = "Display Name:"
+        usernameHeading.innerText = "Username:"
+        attendingStatusHeading.innerText = "Here:"
+
+        grid.append(displayNameHeading)
+        grid.append(usernameHeading)
+        grid.append(attendingStatusHeading)
+
+        const uData = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData"), where("attending", "==", true)))
+
+        uData.forEach(async (d) => {
+            const usernameElem = document.createElement("h4")
+            const displayElem = document.createElement("h4")
+            const attendingElem = document.createElement("div")
+
+            const here = document.createElement("input")
+
+            here.type = "checkbox"
+
+            if (d.data().here) {
+                here.checked = true;
+            }
+
+            here.onchange = async () => {
+                await setDoc(doc(db, "posts", urlParams.get("e"), "uData", d.id), {
+                    here: here.checked
+                }, {merge: true})
+            }
+
+            usernameElem.style.fontWeight = "normal"
+            displayElem.style.fontWeight = "normal"
+
+
+            usernameElem.innerText = "N/A"
+
+
+            const usernameRef = await getDoc(doc(db, "usernames", d.id))
+
+            if (usernameRef.exists()) {
+                
+                usernameElem.innerText = "@" + usernameRef.data().username
+            }
+            const publicRef = await getDoc(doc(db, "users", d.id, "data", "public"))
+
+            if (publicRef.exists()) {
+                displayElem.innerText = publicRef.data().displayName
+            }
+
+            attendingElem.append(here)
+
+            grid.append(displayElem)
+
+            grid.append(usernameElem)
+            grid.append(attendingElem)
+
+
+        })
+
+        page.append(grid)
+    })
 
     
 
-}
-
-window.test = async function() {
-    await setDoc(doc(db, "posts", urlParams.get("e"), "uData", "1"), {
-        test: true
-    })
 }

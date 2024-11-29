@@ -350,7 +350,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (username.exists()) {
         const data = username.data()
-        checkInCache("username", data.username)
+        localStorage.setItem("username", data.username)
     }
 
     const data = await getDoc(doc(db, "users", uid))
@@ -421,7 +421,8 @@ onAuthStateChanged(auth, async (user) => {
         const data = pub.data()
 
         
-        checkInCache("displayName", data.displayName, addBottom)
+        localStorage.setItem("displayName", data.displayName)
+        addBottom()
 
     }
 
