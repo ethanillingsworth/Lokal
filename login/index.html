@@ -16,14 +16,18 @@
         <h2>Welcome to Lokal!</h2>
         <hr>
         <div id="inputs">
-            <div class="row" style="gap: 0px; flex-wrap: nowrap;">
+            <div class="row" style="gap: 0px; flex-wrap: nowrap; border-radius: 15px;" id="usernameDiv">
                 <div class="icon">
                     <span>@</span>
                 </div>
                 <input type="text" placeholder="username" id="username">
             </div>
+            <span id="usernameError" style="color: var(--red)"></span>
             <input type="email" placeholder="email" id="email" style="width: auto">
+            <span id="emailError" style="color: var(--red)"></span>
             <input type="password" placeholder="password" id="password" style="width: auto">
+            <span id="passwordError" style="color: var(--red)"></span>
+
         </div>
         <div class="row">
             <button id="signin">Login</button>

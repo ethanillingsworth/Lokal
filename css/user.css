@@ -40,3 +40,6 @@ hr {
 }
 
 
+#edit:hover {
+    cursor: pointer;
+}

@@ -11,7 +11,15 @@ const email = document.getElementById("email")
 const username = document.getElementById("username")
 const password = document.getElementById("password")
 
-const usernameValidate = /^(?=.{5,30}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/
+const usernameDiv = document.getElementById("usernameDiv")
+const usernameError = document.getElementById("usernameError")
+const emailError = document.getElementById("emailError")
+const passwordError = document.getElementById("passwordError")
+
+
+
+
+const usernameValidate = /^(?=.{5,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/
 
 
 
@@ -67,6 +75,86 @@ async function setUserData(user, username) {
 
 }
 
+
+function nameChecks() {
+
+    const value = username.value
+
+    const name = "Username"
+
+    if (value.length < 5) {
+        return name + " must be atleast 5 chars long"
+    }
+
+    if (value.length > 15) {
+        return name + " cannot be over 15 chars long"
+    }
+
+    if (value.startsWith("_") || value.endsWith("_")) {
+        return name + " cannot have an _ at the start or end"
+    }
+    if (value.startsWith("-") || value.endsWith("-")) {
+        return name + " cannot have a - at the start or end"
+    }
+
+    if (!value.match(/^[A-Za-x0-9._.-]+$/)) {
+        return name + " can only contain Alphanumric chars\n Along with chars such as '_' or '-'"
+    }
+
+
+    return "Good"
+}
+
+function emailChecks() {
+    if (!email.value.includes("@") || !email.value.includes(".")) {
+        return "Email isnt valid"
+    }
+    return "Good"
+}
+
+function passwordChecks() {
+    if (password.value.length < 6) {
+        return "Password must have atleast 6 chars"
+    }
+    return "Good"
+}
+
+username.oninput = function() {
+    if (nameChecks() != "Good") {
+        usernameDiv.style.border = "2px solid var(--red)"
+        usernameError.innerText = nameChecks()
+    }
+    else {
+        usernameDiv.style.border = "none"
+        usernameError.innerText = ""
+        
+    }
+}
+
+email.oninput = function() {
+    if (emailChecks() != "Good") {
+        email.style.border = "2px solid var(--red)"
+        emailError.innerText = emailChecks()
+    }
+    else {
+        email.style.border = "none"
+        emailError.innerText = ""
+        
+    }
+}
+
+password.oninput = function() {
+    if (passwordChecks() != "Good") {
+        password.style.border = "2px solid var(--red)"
+        passwordError.innerText = passwordChecks()
+    }
+    else {
+        password.style.border = "none"
+        passwordError.innerText = ""
+        
+    }
+}
+
 // google sign in
 googleButton.onclick = function () {
 
@@ -101,13 +189,15 @@ googleButton.onclick = function () {
 
 // normal sign up
 signUp.onclick = function() {
-    console.log(usernameValidate.test(username.value))
+    
     createUserWithEmailAndPassword(auth, email.value, password.value)
     .then(async (userCredential) => {
         // Signed up 
         const user = userCredential.user;
         var finalUsername = generateUsername()
-        if (usernameValidate.test(username.value) && !usernames.includes(username.value)) {
+        if (username.value)
+
+        if (!usernames.includes(username.value) && nameChecks()) {
             finalUsername = username.value
         }
         

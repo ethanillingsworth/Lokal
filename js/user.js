@@ -1,4 +1,6 @@
 import { getDoc, doc, query, collection, getDocs, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
 import { displayEvent } from "./global.js";
 import { db } from "./firebase.js";
 
@@ -13,6 +15,8 @@ modal.classList.add("modal")
 
 const top = document.createElement("div")
 top.classList.add("row")
+top.style.width = "100%"
+top.style.placeContent = "start"
 
 const pfp = document.createElement("img")
 pfp.src = "../img/pfp.jpg"
@@ -93,6 +97,21 @@ userDetails.append(usrname)
 userDetails.append(desc)
 
 top.append(userDetails)
+
+const edit = document.createElement("img")
+edit.id = "edit"
+edit.src = "../img/icons/edit.png"
+edit.style.marginLeft = "auto"
+edit.width = "35"
+
+
+edit.onclick = function() {
+    window.location.href = "../edit/index.html?u=" + urlParams.get("u")    
+
+}
+
+top.append(edit)
+
 modal.append(top)
 modal.append(tabs)
 modal.append(divider)

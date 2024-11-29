@@ -1,0 +1,13 @@
+input {
+    width: 100%;
+}
+
+.row {
+    flex-wrap: nowrap;
+    text-wrap: nowrap;
+    width: 100%;
+}
+
+.modal {
+    width: auto;
+}

@@ -43,6 +43,7 @@ export function toTitleCase(str) {
 
 export function addItem(label, img, href, id, parent, expanded, expandedContent, placeContent="end", params={}) {
     let link = document.createElement("a")
+    link.id = label
     if (href != null) {link.href = href}
     
     link.tabIndex = 0
@@ -464,3 +465,4 @@ function addBottom() {
 document.querySelectorAll("label").forEach((e) => {
     document.getElementById(e.htmlFor).click()
 })
+
