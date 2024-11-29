@@ -7,7 +7,6 @@
 }
 
 .modal {
-    max-width: 50%;
     place-items: start;
 }
 
@@ -32,17 +31,6 @@
     color: gray
 }
 
-.tab {
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    padding: 10px;
-    padding-right: 20px;
-    padding-left: 20px;
-    border: 4px solid var(--dark0);
-    border-bottom: 4px solid var(--dark1);
-    cursor: pointer;
-    margin: 0;
-}
 
 hr {
     position: relative;
@@ -51,22 +39,4 @@ hr {
     
 }
 
-.current {
-    z-index: 100;
-    border: 4px solid var(--dark2);
-    border-bottom: 4px solid var(--dark1);
-}
 
-.pageContent {
-    display: none;
-}
-
-.currentPage {
-    display: flex;
-    flex-direction: column;
-    place-items: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    gap: 40px;
-    width: 100%;
-}

@@ -1,3 +1,9 @@
 .event {
     width: 50%;
 }
+
+@media (max-width: 1080px) {
+    .event {
+        width: 75%;
+    }
+}

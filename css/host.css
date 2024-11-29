@@ -8,11 +8,11 @@
     text-wrap: nowrap;
 }
 
-.page {
+.pageh {
     display: none;
 }
 
-.current {
+.currenth {
     display: flex;
     gap: 20px;
     flex-direction: column;
@@ -56,4 +56,17 @@ textarea {
 
 #tags {
     font-size: 1.25em;
+}
+
+.modal {
+    width: fit-content;
+}
+
+#agenda {
+    border: 3px solid var(--accent);
+}
+
+#buttons {
+    top: 2px;
+    position: relative;
 }

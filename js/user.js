@@ -46,6 +46,8 @@ tabs.classList.add("row")
 tabs.style.gap = "20px"
 tabs.style.marginBottom = "0"
 tabs.style.marginTop = "20px"
+tabs.style.position = "relative"
+tabs.style.top = "10px"
 
 function createTab(name, current) {
     const tab = document.createElement("h4")
@@ -114,6 +116,26 @@ async function hosting(uid) {
     })
 }
 
+async function uDataStuff(uid) {
+    const attendingTab = document.getElementById("Attending")
+
+    const q = query(collection(db, "posts"))
+
+    const get = await getDocs(q)
+
+    get.forEach(async (event) => {
+        
+        const uData = await getDoc(doc(db, "posts", event.id, "uData", uid))
+        if (uData.exists()) {
+            const data = uData.data()
+            // check if user is attending
+            if (data.attending) {
+                displayEvent(event.id, attendingTab)
+            }
+        }
+    })
+}
+
 
 function updateProfile(data) {
     usrname.innerText = `(@${pageUser})`
@@ -132,7 +154,8 @@ if (uidData.exists()) {
     if (pub.exists()) {
         const data = pub.data()
         updateProfile(data)
-        hosting(uid)
+        await hosting(uid)
+        await uDataStuff(uid)
     }
 }
 

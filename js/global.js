@@ -101,23 +101,18 @@ export function addItem(label, img, href, id, parent, expanded, expandedContent,
 
             if (currentlyExpanded) {
                 // close
-                expand.style.minWidth = "0"
-                expand.style.padding = "0"
-                expand.style.height = "100%"
-                expand.style.borderRight = "0px solid var(--dark2)"
 
                 currentlyExpanded = false
+                expand.classList.remove("showExpand")
+
                 link.classList.remove("border")
 
             }
             else {
                 // open
                 currentlyExpanded = true;
-                expand.style.minWidth = "20%"
                 expand.style.placeContent = placeContent
-                expand.style.borderRight = "4px solid var(--dark2)"
-                expand.style.padding = "5px"
-                expand.style.height = "calc(100% - 10px)"
+                expand.classList.add("showExpand")
                 link.classList.add("border")
             }
             
@@ -168,6 +163,8 @@ export async function displayEvent(eventId, content=document.getElementById("con
         let cost = "Free admission";
 
         let attending = 0
+        
+        let selfAttend = false
 
         const uData = await getDocs(query(collection(db, "posts", id, "uData")))
 
@@ -177,6 +174,7 @@ export async function displayEvent(eventId, content=document.getElementById("con
             if (data.attending) {
                 attending += 1
             }
+            if (doc.id == auth.currentUser.uid && data.attending) selfAttend = true;
         })
 
         if (event.cost > 0) {
@@ -242,12 +240,37 @@ export async function displayEvent(eventId, content=document.getElementById("con
 
             left.append(action)
 
-            func()
+            if (auth.currentUser.uid != event.creator) func(action, label)
 
         }
 
-        addAction(`${attending} Attending`, "../img/icons/profile.png", () => {
-
+        addAction(`${attending} Attending`, "../img/icons/profile.png", (button, span) => {
+            if (selfAttend) {
+                button.style.border = "3px solid var(--accent)"
+            }
+    
+            button.onclick = async function() {
+                if (selfAttend) {
+                    selfAttend = false
+                    button.style.border = "3px solid transparent"
+                    attending -= 1
+    
+                }
+                else {
+                    selfAttend = true
+                    button.style.border = "3px solid var(--accent)"
+                    attending += 1
+    
+                }
+                
+                span.innerText = `${attending} Attending`;
+                await setDoc(doc(db, "posts", id, "uData", auth.currentUser.uid), {
+                    attending: selfAttend
+                })
+                
+            }
+    
+            
         })
 
 
@@ -337,6 +360,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     const priv = await getDoc(doc(db, "users", uid, "data", "private"))
+
 
     if (priv.exists()) {
         const data = priv.data()

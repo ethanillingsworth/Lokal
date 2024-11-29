@@ -82,6 +82,7 @@ input, textarea, select, input[type="file"] + label, p.inp {
     border-radius: 15px;
     resize: none;
     transition: all 0.25s ease-in-out;
+    margin: 0;
 }
 
 
@@ -152,9 +153,9 @@ a:hover {
 
 button {
     font-size: 1.25em;
-    background-color: transparent;
+    background-color: var(--dark2);
     border-style: solid;
-    border-width: 4px;
+    border-width: 3px;
     border-color: transparent;
     border-color: var(--accent);
     border-radius: 15px;
@@ -164,6 +165,7 @@ button {
     transition: all 0.25s ease-in-out;
 
 }
+
 
 button:not(.gsi-material-button):hover {
     cursor: pointer;
@@ -178,6 +180,7 @@ button:not(.gsi-material-button):hover {
     place-self: center;
     place-items: center;
     padding: 20px;
+    width: 50%;
 
     border: 4px solid var(--dark2);
     margin-top: 20px;
@@ -232,6 +235,13 @@ button:not(.gsi-material-button):hover {
     z-index: 1000;
 }
 
+.showExpand {
+    min-width: 20vw !important;
+    border-right: 4px solid var(--dark2) !important;
+    padding: 5px !important;
+    height: calc(100% - 10px) !important
+}
+
 #sidebar {
     min-width: calc(100%/5);
     position: relative;
@@ -277,7 +287,7 @@ button:not(.gsi-material-button):hover {
     flex-direction: column;
     place-items: center;
     height: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     gap: 40px;
 
 }
@@ -412,6 +422,7 @@ p {
 .action {
     font-size: 12.5pt;
     display: flex;
+    border: 3px solid transparent;
     flex-direction: row;
     place-items: center;
     place-content: center;
@@ -424,6 +435,40 @@ p {
     
 }
 
+.tab {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    padding: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+    border: 4px solid var(--dark0);
+    border-bottom: 4px solid var(--dark1);
+    cursor: pointer;
+    margin: 0;
+}
+
+.current {
+    z-index: 100;
+    border: 4px solid var(--dark2);
+    border-bottom: 4px solid var(--dark1);
+}
+
+.page {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pageContent {
+    display: none;
+}
+
+.currentPage {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
 
 .action:hover {
     cursor: pointer;
@@ -469,22 +514,21 @@ p {
 
 }
 
-@media (max-width: 512px) {
-    .item h4 {
-        display: none;
-        width: fit-content
+@media (max-width: 1080px) {
+    .modal {
+        width: 75%;
     }
 
-    .item .icon {
-        margin: 0;
+    #sidebar {
+        min-width: calc(100vw / 4)
     }
 
-    #heading {
-        margin: 0;
-        font-size: 1em;
-        margin: 5px;
-        padding: 5px;
-        padding-right: 10px;
-        padding-left: 10px;
+    #expand {
+        position: absolute;
+        left: calc((100vw / 4) + 18px)
+    }
+
+    .showExpand {
+        min-width: 25vw !important;
     }
 }

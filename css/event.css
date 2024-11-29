@@ -1,4 +1,11 @@
 .modal {
-    width: 50%;
     place-items: start;
+}
+
+#edit {
+    margin-left: auto;
+}
+
+#edit:hover, #del:hover {
+    cursor: pointer;
 }

@@ -1,6 +1,9 @@
 import { createEvent, toTitleCase } from "./global.js"
-import { auth } from "./firebase.js"
+import { auth, db } from "./firebase.js"
+import { getDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
+
+const urlParams = new URLSearchParams(window.location.search)
 
 const content = document.getElementById("content")
 
@@ -25,24 +28,24 @@ function addField(page, label, customFunc) {
 }
 
 function switchPage(name) {
-    document.querySelectorAll(".page").forEach((page) => {
-        page.classList.remove("current")
+    document.querySelectorAll(".pageh").forEach((page) => {
+        page.classList.remove("currenth")
     })
 
-    document.getElementById(name).classList.add("current")
+    document.getElementById(name).classList.add("currenth")
 }
 
 function addPage(name, prev=null, next=null, current=false) {
     const page = document.createElement("div")
     page.id = name
-    page.classList.add("page");
+    page.classList.add("pageh");
 
     const content = document.createElement("div")
     content.classList.add("cont")
 
     page.append(content)
 
-    if (current) page.classList.add("current");
+    if (current) page.classList.add("currenth");
 
     const buttons = document.createElement("div")
     buttons.classList.add("row")
@@ -78,11 +81,27 @@ function addPage(name, prev=null, next=null, current=false) {
 
 
                 // upload
-                await createEvent(auth.currentUser.uid, cate.value, desc.value, new Date(date.value), 
-                toTitleCase(loc.value), cost.valueAsNumber, [], 
-                title.value, agenda.value.replaceAll("\n", "<br>"))
+                if (urlParams.get("e")) {
+                    await setDoc(doc(db, "posts", urlParams.get("e")), {
+                        title: title.value,
+                        desc: desc.value,
+                        category: cate.value,
+                        date: date.value,
+                        location: toTitleCase(loc.value),
+                        cost: cost.valueAsNumber,
+                        agenda: agenda.value.replaceAll("\n", "<br>")
+                    }, {merge: true})
 
-                window.location.href = "../"
+                    window.location.href = "../event/index.html?e=" + urlParams.get("e");
+
+                }
+                else {
+                    const id = await createEvent(auth.currentUser.uid, cate.value, desc.value, new Date(date.value), 
+                    toTitleCase(loc.value), cost.valueAsNumber, [], 
+                    title.value, agenda.value.replaceAll("\n", "<br>"))
+                    window.location.href = "../event/index.html?e=" + id
+                }
+
 
             }
             else {
@@ -297,6 +316,7 @@ addField(age, "Agenda:", (row) => {
 
     const buttons = document.createElement('div')
     buttons.classList.add("row")
+    buttons.id = "buttons"
     buttons.style.marginLeft = "auto"
     buttons.style.placeContent = "end"
 
@@ -306,6 +326,7 @@ addField(age, "Agenda:", (row) => {
         button.style.fontSize = "1em"
         button.style.borderBottomLeftRadius = "0"
         button.style.borderBottomRightRadius = "0"
+        button.style.borderBottom = "none"
 
 
         buttons.append(button)
@@ -328,10 +349,11 @@ Use the formmating tools to make it look pretty.`
     txtP.classList.add("inp")
     txtP.style.width = "500px"
     txtP.style.height = "400px"
-    txtP.style.overflowY = "scroll"
+    txtP.style.overflowY = "auto"
     txtP.style.display = "none"
     txtP.style.fontSize = "1em"
     txtP.style.borderTopRightRadius = "0"
+    txtP.style.border = "3px solid var(--accent)";
 
 
 
@@ -480,3 +502,32 @@ addField(loc, "Address:", (row) => {
 content.append(modal)
 
 
+if (urlParams.get("e")) {
+
+    const title = document.getElementById("title")
+    const desc = document.getElementById("desc")
+    const category = document.getElementById("cate")
+    const date = document.getElementById("date")
+    const cost = document.getElementById("cost")
+    const agenda = document.getElementById("agenda")
+    const location = document.getElementById("location")
+
+
+
+
+    const ref = await getDoc(doc(db, "posts", urlParams.get("e")))
+    if (ref.exists()) {
+        const data = ref.data()
+        title.value = data.title
+        desc.value = data.desc
+        category.value = data.category
+        date.value = data.date
+        cost.value = data.cost
+        agenda.value = data.agenda.replaceAll("<br>", "\n")
+        location.value = data.location
+
+    }
+    
+
+
+}

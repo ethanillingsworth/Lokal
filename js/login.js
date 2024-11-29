@@ -58,10 +58,11 @@ async function setUserData(user, username) {
 
     await setDoc(doc(db, "users", user.uid, "data", "public"), {
         displayName: username,
+        desc: "Set a description"
     })
 
     await setDoc(doc(db, "users", user.uid, "data", "private"), {
-        likedTags: []
+        prevRes: []
     })
 
 }
@@ -115,11 +116,6 @@ signUp.onclick = function() {
         window.location.href = "../"
         // ...
     })
-    .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ..
-    });
 }
 
 // normal sign in
