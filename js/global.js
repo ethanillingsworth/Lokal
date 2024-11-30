@@ -10,6 +10,9 @@ ver.id = "ver"
 ver.innerText = "BETA v1"
 document.body.append(ver)
 
+window.getVersion = function() {
+    console.log(ver.innerText)
+}
 
 // elements
 const sidebar = document.createElement("div")
