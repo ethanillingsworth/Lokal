@@ -340,7 +340,7 @@ export function clearCache() {
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
           
-        location.href = "../login"
+        location.href = "../login/index.html?r=" + window.location.href
 
     } 
     const uid = user.uid;
@@ -451,7 +451,8 @@ function addBottom() {
             func: function() {
                 signOut(auth).then(() => {
                     // Sign-out successful.
-                    location.href = "../login"
+                    location.href = "../login/index.html?r=" + window.location.href
+
                 }).catch((error) => {
                     // An error happened.
                 });

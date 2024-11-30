@@ -2,10 +2,10 @@
     place-items: start;
 }
 
-#edit {
+#share {
     margin-left: auto;
 }
 
-#edit:hover, #del:hover {
+#edit:hover, #del:hover, #share:hover {
     cursor: pointer;
 }

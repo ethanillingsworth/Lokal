@@ -56,6 +56,17 @@ if (d.exists()) {
     tabs.style.gap = "20px"
 
     if (auth.currentUser.uid == data.creator) {
+        const share = document.createElement("img")
+        share.id = "share"
+        share.src = "../img/icons/share.png"
+        share.onclick = async function() {
+            await navigator.clipboard.writeText(window.location.href)
+            alert("Link copied to clipboard")
+        }
+        share.height = 35
+
+        row.append(share)
+
         const edit = document.createElement("img")
         edit.id = "edit"
         edit.src = "../img/icons/edit.png"

@@ -17,6 +17,7 @@ const emailError = document.getElementById("emailError")
 const passwordError = document.getElementById("passwordError")
 
 
+const urlParams = new URLSearchParams(window.location.search)
 
 
 const usernameValidate = /^(?=.{5,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/
@@ -119,6 +120,15 @@ function passwordChecks() {
     return "Good"
 }
 
+function redirect() {
+    if (urlParams.get("r")) {
+        window.location.href = urlParams.get("r")
+    }
+    else {
+        window.location.href = "../"
+    }
+}
+
 username.oninput = function() {
     if (nameChecks() != "Good") {
         usernameDiv.style.border = "2px solid var(--red)"
@@ -179,7 +189,7 @@ googleButton.onclick = function () {
         }
         console.log(user)
 
-        window.location.href = "../"
+        redirect()
 
         
         // IdP data available using getAdditionalUserInfo(result)
@@ -203,7 +213,7 @@ signUp.onclick = function() {
         
         await setUserData(user, finalUsername)
 
-        window.location.href = "../"
+        redirect()
         // ...
     })
 }
@@ -216,7 +226,7 @@ signIn.onclick = function() {
 
         // Signed in 
         const user = userCredential.user;
-        window.location.href = "../"
+        redirect()
 
         // ...
     })
