@@ -7,7 +7,7 @@ import { auth, db } from "./firebase.js";
 // debug only version
 const ver = document.createElement("span")
 ver.id = "ver"
-ver.innerText = "DEV BUILD"
+ver.innerText = "BETA v1"
 document.body.append(ver)
 
 
