@@ -264,6 +264,11 @@ export async function getEvent(eventId) {
     return eventData
 }
 
+export async function updateUserData(uid, data, type) {
+    await setDoc(doc(db, "users", uid, "data", type), data, { merge: true })
+
+}
+
 export async function getUserData(uid) {
 
     let u = await getDoc(doc(db, "users", uid, "data", "public"))
@@ -275,6 +280,12 @@ export async function getUserData(uid) {
     return userData
 }
 
+export async function updateUsername(uid, newUsername) {
+    await setDoc(doc(db, "usernames", uid), {
+        username: newUsername
+    })
+}
+
 export async function getUsername(uid) {
     let usernameRef = await getDoc(doc(db, "usernames", uid))
 
@@ -283,6 +294,22 @@ export async function getUsername(uid) {
     }
 
     return usernameRef.data().username
+}
+
+export async function updateUID(username, newUID) {
+    await setDoc(doc(db, "uids", username), {
+        userId: newUID
+    })
+}
+
+export async function getUID(username) {
+    let userIdRef = await getDoc(doc(db, "uids", username))
+
+    if (!userIdRef.exists()) {
+        console.error("Could not load uid from username: " + username)
+    }
+
+    return userIdRef.data().userId
 }
 
 export function toTitleCase(str) {
