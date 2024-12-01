@@ -1,4 +1,4 @@
-import { createEvent, toTitleCase } from "./global.js"
+import { createEvent, toTitleCase } from "./funcs.js"
 import { auth, db } from "./firebase.js"
 import { getDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 

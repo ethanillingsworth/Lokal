@@ -1,7 +1,7 @@
 import { getDoc, doc, getDocs, deleteDoc, limit, setDoc, query, collection, where, Timestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
-import { displayEvent } from "./global.js"
+import { displayEvent } from "./funcs.js"
 
 const content = document.getElementById("content")
 

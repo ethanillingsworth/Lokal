@@ -1,7 +1,7 @@
 import { getDoc, doc, query, collection, getDocs, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-import { displayEvent } from "./global.js";
+import { displayEvent } from "./funcs.js";
 import { db } from "./firebase.js";
 
 const urlParams = new URLSearchParams(window.location.search);
