@@ -3,17 +3,17 @@ import { getDoc, doc, setDoc, getDocs, updateDoc, collection, addDoc, Timestamp,
 
 import { auth, db } from "./firebase.js";
 
-import { addItem,  } from "./funcs.js";
+import { addItem, getVersion } from "./funcs.js";
 
 
 // debug only version
-const ver = document.createElement("span")
-ver.id = "ver"
-ver.innerText = "BETA v1"
-document.body.append(ver)
+// const ver = document.createElement("span")
+// ver.id = "ver"
+// ver.innerText = "BETA v1"
+// document.body.append(ver)
 
-window.getVersion = function() {
-    console.log(ver.innerText)
+window.getVersion = function () {
+    console.log(getVersion())
 }
 
 // elements
@@ -37,48 +37,42 @@ heading.id = "heading"
 
 sidebar.append(heading)
 
-
-
-
 const content = document.createElement("div")
 content.id = "content"
 
 document.body.append(content)
 
-
-
 //addItem("Home", "../img/icons/home.png", "../")
 addItem("Connect", "../img/icons/party.png", "../")
 
+// export function checkInCache(name, value, after) {
+//     if (!localStorage.getItem(name)) {
+//         localStorage.setItem(name, value)
+//     }
+//     if (after != null) after()
 
-export function checkInCache(name, value, after) {
-    if (!localStorage.getItem(name)) {
-        localStorage.setItem(name, value)
-    }
-    if (after != null) after()
+// }
 
-}
+// export function removeFromCache(name, after) {
+//     if (localStorage.getItem(name)) {
+//         localStorage.removeItem(name)
+//     }
+//     if (after != null) after()
+// }
 
-export function removeFromCache(name, after) {
-    if (localStorage.getItem(name)) {
-        localStorage.removeItem(name)
-    }
-    if (after != null) after()
-}
-
-export function clearCache() {
-    localStorage.clear();
-}
+// export function clearCache() {
+//     localStorage.clear();
+// }
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
-          
+
         location.href = "../login/index.html?r=" + window.location.href
 
-    } 
+    }
     const uid = user.uid;
 
-    //createEvent(uid, "Sports", "Verrat de marde de mosus de doux Jésus de charrue de saint-ciboire de sacristi de crucifix de colon d'étole de maudite marde.", new Date(), "Elk Grove High School", 0, [])
+    // createEvent(uid, "Sports", "Verrat de marde de mosus de doux Jésus de charrue de saint-ciboire de sacristi de crucifix de colon d'étole de maudite marde.", new Date(), "Elk Grove High School", 0, [])
 
     const username = await getDoc(doc(db, "usernames", uid))
 
@@ -87,19 +81,13 @@ onAuthStateChanged(auth, async (user) => {
         localStorage.setItem("username", data.username)
     }
 
-    const data = await getDoc(doc(db, "users", uid))
-
-    if (data.exists()) {
-        console.log(data.data())
-    }
-
     const priv = await getDoc(doc(db, "users", uid, "data", "private"))
 
 
     if (priv.exists()) {
         const data = priv.data()
 
-        
+
         const prevRes = {
             searchArea: {
                 params: {
@@ -115,8 +103,8 @@ onAuthStateChanged(auth, async (user) => {
                         </div>
                     `,
                     afterFunc: () => {
-                        
-                        document.getElementById("search-icon").onclick = async function() {
+
+                        document.getElementById("search-icon").onclick = async function () {
                             if (document.getElementById('search').value) {
                                 const s = document.getElementById('search').value.replaceAll('-', '\-').replaceAll(' ', '-')
                                 await updateDoc(doc(db, "users", uid, "data", "private"), {
@@ -145,7 +133,7 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         addItem("Search", "../img/icons/search.png", null, null, null, true, prevRes, "start")
-        
+
         addItem("Host", "../img/icons/plus.png", "../host")
     }
 
@@ -154,14 +142,12 @@ onAuthStateChanged(auth, async (user) => {
     if (pub.exists()) {
         const data = pub.data()
 
-        
+
         localStorage.setItem("displayName", data.displayName)
         addBottom()
 
     }
 
-    
-    
 });
 
 function addBottom() {
@@ -175,13 +161,13 @@ function addBottom() {
         //             await setDoc(doc(db, "users", auth.currentUser.uid), {
         //                 org: true
         //             }, {merge: true})
-                    
+
         //         }
         //     }
         // },
         "Log out": {
             image: "../img/icons/logout.png",
-            func: function() {
+            func: function () {
                 signOut(auth).then(() => {
                     // Sign-out successful.
                     location.href = "../login/index.html?r=" + window.location.href

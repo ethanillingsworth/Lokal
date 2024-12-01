@@ -1,6 +1,6 @@
-import { createEvent, toTitleCase } from "./funcs.js"
-import { auth, db } from "./firebase.js"
-import { getDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { createEvent, getEvent, toTitleCase, updateEvent } from "./funcs.js"
+import { auth } from "./firebase.js"
+import { Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 
 const urlParams = new URLSearchParams(window.location.search)
@@ -24,7 +24,7 @@ function addField(page, label, customFunc) {
     customFunc(row)
 
     page.querySelector(".cont").append(row)
-    
+
 }
 
 function switchPage(name) {
@@ -35,7 +35,7 @@ function switchPage(name) {
     document.getElementById(name).classList.add("currenth")
 }
 
-function addPage(name, prev=null, next=null, current=false) {
+function addPage(name, prev = null, next = null, current = false) {
     const page = document.createElement("div")
     page.id = name
     page.classList.add("pageh");
@@ -55,19 +55,19 @@ function addPage(name, prev=null, next=null, current=false) {
         p.id = "prev"
 
         p.innerText = "< " + prev
-        p.onclick = function() {
+        p.onclick = function () {
             switchPage(prev)
         }
 
         buttons.append(p)
     }
-    
+
     if (next) {
         const n = document.createElement("button")
         n.id = "next"
 
         n.innerText = next + " >"
-        n.onclick = async function() {
+        n.onclick = async function () {
             if (next == "Done") {
                 const title = document.getElementById("title")
                 const desc = document.getElementById("desc")
@@ -79,35 +79,38 @@ function addPage(name, prev=null, next=null, current=false) {
 
                 const agenda = document.getElementById("agenda")
 
+                const data = {
+                    title: title.value,
+                    desc: desc.value,
+                    category: cate.value,
+                    date: date.value,
+                    location: toTitleCase(loc.value),
+                    cost: cost.valueAsNumber,
+                    agenda: agenda.value.replaceAll("\n", "<br>")
+                }
+
 
                 // upload
                 if (urlParams.get("e")) {
-                    await setDoc(doc(db, "posts", urlParams.get("e")), {
-                        title: title.value,
-                        desc: desc.value,
-                        category: cate.value,
-                        date: date.value,
-                        location: toTitleCase(loc.value),
-                        cost: cost.valueAsNumber,
-                        agenda: agenda.value.replaceAll("\n", "<br>")
-                    }, {merge: true})
+                    await updateEvent(urlParams.get("e"), data)
 
                     window.location.href = "../event/index.html?e=" + urlParams.get("e");
 
                 }
                 else {
-                    const id = await createEvent(auth.currentUser.uid, cate.value, desc.value, new Date(date.value), 
-                    toTitleCase(loc.value), cost.valueAsNumber, [], 
-                    title.value, agenda.value.replaceAll("\n", "<br>"))
+                    data.timestamp = Timestamp.fromDate(new Date())
+                    data.creator = auth.currentUser.uid
+                    const id = await createEvent(data)
+
                     window.location.href = "../event/index.html?e=" + id
                 }
 
 
             }
             else {
-                
+
                 switchPage(next)
-                
+
             }
         }
 
@@ -153,17 +156,17 @@ addField(init, "Summary:", (row) => {
     txtArea.value = "A summary for the event\n(displayed in the event preview)"
     txtArea.maxLength = "250"
     txtArea.id = "desc"
-    
+
     txtArea.style.minWidth = "300px"
 
-    
+
     const txtLimit = document.createElement("h5")
     txtLimit.style.textAlign = "right"
     txtLimit.style.color = "gray"
-    
+
     txtLimit.innerHTML = '<span id="count" style="color: gray">0</span>/250'
     txtArea.oninput = () => {
-       txtLimit.querySelector("span").innerText = txtArea.textLength
+        txtLimit.querySelector("span").innerText = txtArea.textLength
     }
     txtLimit.querySelector("span").innerText = txtArea.textLength
 
@@ -177,54 +180,51 @@ addField(init, "Summary:", (row) => {
 
     txtDiv.append(txtArea)
     txtDiv.append(txtLimit)
-    
+
     row.append(txtDiv)
-    
+
 })
-
-
-
 
 addField(init, "Category:", (row) => {
     const cate = document.createElement("select")
     cate.id = "cate"
-    
+
     const favs = ["Club Activity", "Sports", "Tech"]
-    
-    
-    let categorys = ["Arts", "Community", "Club Activity", "Food & Drink", "Fitness", 
-        "Sports", "Music", "Workshops / Classes", "Family / Kids", "Tech", "Holidays", 
-        "Networking", "Activism", "Travel", "Conference", "Charity", 
+
+
+    let categorys = ["Arts", "Community", "Club Activity", "Food & Drink", "Fitness",
+        "Sports", "Music", "Workshops / Classes", "Family / Kids", "Tech", "Holidays",
+        "Networking", "Activism", "Travel", "Conference", "Charity",
         "Community Service"]
-    
+
     const fav = document.createElement("optgroup")
     fav.label = "Favorites"
-    
+
     favs.forEach((e) => {
         categorys = categorys.filter(item => item !== e)
-        
+
         const opt = document.createElement("option")
         opt.innerText = e
         fav.append(opt)
     })
-    
+
     const group = document.createElement("optgroup")
     group.label = "Other Categorys"
-    
+
     categorys.sort()
-    
+
     categorys.forEach(element => {
-        
+
         const opt = document.createElement("option")
         opt.innerText = element
         group.append(opt)
-    
+
     });
-    
+
     cate.append(fav)
     cate.append(group)
-    
-    cate.onchange = function() {
+
+    cate.onchange = function () {
         console.log(cate.value)
     }
 
@@ -236,8 +236,8 @@ addField(init, "Date:", (row) => {
     date.id = "date"
 
     date.value = new Date().toLocaleDateString("en-US")
-    
-    date.onchange = function() {
+
+    date.onchange = function () {
         if (new Date(date.value) < new Date() || new Date(date.value) == "Invalid Date") {
             date.value = new Date().toLocaleDateString("en-US")
         }
@@ -245,7 +245,7 @@ addField(init, "Date:", (row) => {
             date.value = new Date(date.value).toLocaleDateString("en-US")
         }
     }
-    
+
     row.append(date)
 })
 
@@ -256,7 +256,7 @@ addField(init, "Cost:", (row) => {
     inp.value = "0"
     inp.type = "number"
 
-    inp.onchange = function() {
+    inp.onchange = function () {
         if (inp.valueAsNumber < 0) inp.value = 0;
         if (inp.valueAsNumber > 1000) inp.value = 1000;
     }
@@ -272,7 +272,7 @@ addField(init, "Cost:", (row) => {
 //     const inp = document.createElement("textarea");
 
 //     inp.rows = 3;
-    
+
 //     inp.id = "tags"
 //     inp.placeholder = "football, sports, pizza"
 
@@ -304,7 +304,7 @@ function wrapText(textarea, startTag, endTag) {
 
     // Focus back on the textarea
     textarea.focus();
-  
+
 }
 
 addField(age, "Agenda:", (row) => {
@@ -330,7 +330,7 @@ addField(age, "Agenda:", (row) => {
 
 
         buttons.append(button)
-        button.onclick = function() {func()}
+        button.onclick = function () { func() }
     }
 
     const txtArea = document.createElement("textarea")
@@ -339,7 +339,7 @@ addField(age, "Agenda:", (row) => {
     
 Use the formmating tools to make it look pretty.`
     txtArea.maxLength = "1000"
-    
+
     txtArea.style.width = "500px"
     txtArea.style.height = "400px"
 
@@ -365,7 +365,7 @@ Use the formmating tools to make it look pretty.`
             txtArea.disabled = true
             txtP.style.display = "block"
             txtP.innerHTML = txtArea.value.replaceAll("\n", "<br>")
-            
+
             showFinal = true
         }
         else {
@@ -386,15 +386,15 @@ Use the formmating tools to make it look pretty.`
         wrapText(txtArea, "<u>", "</u>")
     })
 
-    
+
     const txtLimit = document.createElement("h5")
     txtLimit.style.textAlign = "right"
     txtLimit.style.color = "gray"
-    
+
     txtLimit.innerHTML = '<span id="count" style="color: gray">0</span>/1000'
 
     txtArea.oninput = () => {
-       txtLimit.querySelector("span").innerText = txtArea.textLength
+        txtLimit.querySelector("span").innerText = txtArea.textLength
     }
     txtLimit.querySelector("span").innerText = txtArea.textLength
 
@@ -410,7 +410,7 @@ Use the formmating tools to make it look pretty.`
     txtDiv.append(txtP)
 
     txtDiv.append(txtLimit)
-    
+
     row.append(txtDiv)
 })
 
@@ -438,7 +438,7 @@ Use the formmating tools to make it look pretty.`
 //     const label = document.createElement("label")
 //     label.innerText = "Browse..."
 //     label.htmlFor = "upload"
-    
+
 
 //     row.append(input)
 //     row.append(label)
@@ -486,7 +486,7 @@ addField(loc, "Address:", (row) => {
     search.style.borderBottomRightRadius = "15px"
     search.id = "search"
 
-    search.onclick = function() {
+    search.onclick = function () {
         map.src = `https://www.google.com/maps/embed/v1/place?q=${input.value.replaceAll(" ", "+")}&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8`
     }
 
@@ -495,13 +495,13 @@ addField(loc, "Address:", (row) => {
     newRow.append(search)
 
     row.append(newRow)
-    
+
 })
 
 
 content.append(modal)
 
-
+// load data if event id is present
 if (urlParams.get("e")) {
 
     const title = document.getElementById("title")
@@ -515,19 +515,14 @@ if (urlParams.get("e")) {
 
 
 
-    const ref = await getDoc(doc(db, "posts", urlParams.get("e")))
-    if (ref.exists()) {
-        const data = ref.data()
-        title.value = data.title
-        desc.value = data.desc
-        category.value = data.category
-        date.value = data.date
-        cost.value = data.cost
-        agenda.value = data.agenda.replaceAll("<br>", "\n")
-        location.value = data.location
+    const data = await getEvent(urlParams.get("e"))
 
-    }
-    
-
+    title.value = data.title
+    desc.value = data.desc
+    category.value = data.category
+    date.value = data.date
+    cost.value = data.cost
+    agenda.value = data.agenda.replaceAll("<br>", "\n")
+    location.value = data.location
 
 }

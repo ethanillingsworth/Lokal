@@ -55,7 +55,8 @@ h3 {
     margin: 0;
 }
 
-h4, h5 {
+h4,
+h5 {
     margin: 0;
 }
 
@@ -71,7 +72,11 @@ input[type="file"] {
 }
 
 
-input, textarea, select, input[type="file"] + label, p.inp {
+input,
+textarea,
+select,
+input[type="file"]+label,
+p.inp {
     font-size: 1.25em;
 
     border-color: transparent;
@@ -87,11 +92,12 @@ input, textarea, select, input[type="file"] + label, p.inp {
 }
 
 
-input[type="file"] + label {
+input[type="file"]+label {
     width: auto;
 }
 
-input[type="file"] + label:hover, select:hover {
+input[type="file"]+label:hover,
+select:hover {
     cursor: pointer;
 }
 
@@ -136,7 +142,7 @@ a.no-hov {
 
 a.no-hov:hover {
     cursor: default;
-    
+
 }
 
 a {
@@ -187,8 +193,9 @@ button:not(.gsi-material-button):hover {
     margin-top: 20px;
     margin-bottom: 20px;
     gap: 10px;
-    
+
 }
+
 .row {
     display: flex;
     place-content: center;
@@ -212,7 +219,9 @@ button:not(.gsi-material-button):hover {
     text-align: left;
 }
 
-#sidebar, #expand {
+
+#sidebar,
+#expand {
     width: auto;
     height: calc(100% - 10px);
     display: flex;
@@ -233,6 +242,8 @@ button:not(.gsi-material-button):hover {
     /*position: absolute;
     left: calc(20% + 14px); */
     background-color: var(--dark1);
+    position: absolute;
+    left: calc((100vw / 5) + 18px);
     z-index: 1000;
 }
 
@@ -254,7 +265,7 @@ button:not(.gsi-material-button):hover {
 
     display: flex;
     flex-direction: row;
-    place-items:center;
+    place-items: center;
     margin: 5px;
     text-wrap: nowrap;
     transition: all 0.25s ease-in-out;
@@ -270,7 +281,7 @@ button:not(.gsi-material-button):hover {
 }
 
 .item:hover {
-    cursor:pointer;
+    cursor: pointer;
 }
 
 #bottom {
@@ -340,7 +351,6 @@ button:not(.gsi-material-button):hover {
     flex-direction: column;
     width: 100%;
     gap: 10px
-
 }
 
 p {
@@ -433,7 +443,6 @@ p {
     border-radius: 15px;
     transition: all 0.25s ease-in-out;
     gap: 5px
-    
 }
 
 .tab {
@@ -521,7 +530,7 @@ p {
     grid-auto-rows: 45px;
 }
 
-.grid > * {
+.grid>* {
     border: 3px solid var(--dark2);
     display: flex;
     place-items: center;
@@ -543,13 +552,12 @@ input[type=checkbox] {
         width: 75%;
     }
 
-    #sidebar {
-        min-width: calc(100vw / 4)
+    #expand {
+        left: calc((100vw / 4) + 18px)
     }
 
-    #expand {
-        position: absolute;
-        left: calc((100vw / 4) + 18px)
+    #sidebar {
+        min-width: calc(100vw / 4)
     }
 
     .showExpand {

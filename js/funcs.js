@@ -4,11 +4,11 @@ import { auth, db } from "./firebase.js";
 
 let currentlyExpanded = false;
 
-export function addItem(label, img, href, id, parent, expanded, expandedContent, placeContent="end", params={}) {
+export function addItem(label, img, href, id, parent, expanded, expandedContent, placeContent = "end", params = {}) {
     let link = document.createElement("a")
     link.id = label
-    if (href != null) {link.href = href}
-    
+    if (href != null) { link.href = href }
+
     link.tabIndex = 0
 
 
@@ -26,7 +26,7 @@ export function addItem(label, img, href, id, parent, expanded, expandedContent,
     if (!params.hideLabel) {
         const lab = document.createElement("h4")
         lab.innerText = label
-        
+
         link.append(lab)
     }
 
@@ -34,8 +34,8 @@ export function addItem(label, img, href, id, parent, expanded, expandedContent,
         link.innerHTML = params.customHtml
     }
 
-    if (id != null) {link.id = id}
-    
+    if (id != null) { link.id = id }
+
     link.classList.add("item")
 
     if (params.noHov) {
@@ -44,7 +44,7 @@ export function addItem(label, img, href, id, parent, expanded, expandedContent,
 
     if (expanded) {
         // add expanded content
-        link.onclick = function() {
+        link.onclick = function () {
             expand.innerHTML = ""
             Object.keys(expandedContent).forEach((key) => {
                 const element = expandedContent[key]
@@ -54,14 +54,14 @@ export function addItem(label, img, href, id, parent, expanded, expandedContent,
                         expandedContent[key].func()
                     }
                 }
-    
-                
+
+
             })
 
             document.querySelectorAll(".item.border").forEach((el) => {
                 el.classList.remove("border")
             })
-            
+
 
             if (currentlyExpanded) {
                 // close
@@ -79,9 +79,9 @@ export function addItem(label, img, href, id, parent, expanded, expandedContent,
                 expand.classList.add("showExpand")
                 link.classList.add("border")
             }
-            
+
         }
-        
+
     }
 
     parent.append(link)
@@ -92,8 +92,8 @@ export function addItem(label, img, href, id, parent, expanded, expandedContent,
 
 }
 
-export async function displayEvent(id, content=document.getElementById("content")) {
-    
+export async function displayEvent(id, content = document.getElementById("content")) {
+
     const event = await getEvent(id)
 
     const user = await getUserData(event.creator)
@@ -147,7 +147,7 @@ export async function displayEvent(id, content=document.getElementById("content"
     // actions
 
     let attending = 0
-    
+
     let selfAttend = false
 
     const uData = await getEventUData(id)
@@ -192,7 +192,7 @@ export async function displayEvent(id, content=document.getElementById("content"
             button.style.border = "3px solid var(--accent)"
         }
 
-        button.onclick = async function() {
+        button.onclick = async function () {
             if (selfAttend) {
                 selfAttend = false
                 button.style.border = "3px solid transparent"
@@ -205,15 +205,15 @@ export async function displayEvent(id, content=document.getElementById("content"
                 attending += 1
 
             }
-            
+
             span.innerText = `${attending} Attending`;
             await setDoc(doc(db, "posts", id, "uData", auth.currentUser.uid), {
                 attending: selfAttend
             })
-            
+
         }
 
-        
+
     })
 
 
@@ -225,36 +225,29 @@ export async function displayEvent(id, content=document.getElementById("content"
     openImage.src = "../img/icons/arrow.png"
 
     open.append(openImage)
-    
-    open.onclick = function() {
+
+    open.onclick = function () {
         window.location.href = "../event/index.html?e=" + id
     }
 
     actions.append(open)
 
-        
-    
+
+
 }
 
 export async function getEventUData(eventId) {
     return await getDocs(query(collection(db, "posts", eventId, "uData")))
 }
 
-export async function createEvent(uid, cate, desc, date, location, cost, tags, title, agenda) {
-    const event = await addDoc(collection(db, "posts"), {
-        title: title,
-        agenda: agenda,
-        creator: uid,
-        category: cate,
-        desc: desc,
-        date: date.toLocaleDateString("en-US"),
-        location: location,
-        cost: cost,
-        tags: tags,
-        timestamp: Timestamp.fromDate(new Date())
-
-    })
+export async function createEvent(data) {
+    const event = await addDoc(collection(db, "posts"), data)
     return event.id;
+}
+
+export async function updateEvent(eventId, data) {
+    await setDoc(doc(db, "posts", eventId), data, { merge: true })
+
 }
 
 export async function getEvent(eventId) {
@@ -265,7 +258,7 @@ export async function getEvent(eventId) {
         return {}
     }
 
-    
+
     let eventData = e.data()
 
     return eventData
@@ -293,7 +286,11 @@ export async function getUsername(uid) {
 }
 
 export function toTitleCase(str) {
-    return str.replace(/\w\S*/g, function(txt){
+    return str.replace(/\w\S*/g, function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1);
     });
+}
+
+export function getVersion() {
+    return "Lokal v1 (MVP)"
 }
