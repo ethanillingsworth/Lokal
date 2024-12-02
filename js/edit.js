@@ -3,37 +3,13 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/f
 
 import { db, auth } from "./firebase.js";
 
+import { updateUserData, updateUsername, Validation } from "./funcs.js";
+
 const content = document.getElementById("content")
 
 const modal = document.createElement("div")
 modal.classList.add("modal")
 modal.style.placeItems = "start"
-
-
-function nameChecks(value, name) {
-
-    if (value.length < 5) {
-        return name + " must be atleast 5 chars long"
-    }
-
-    if (value.length > 15) {
-        return name + " cannot be over 15 chars long"
-    }
-
-    if (value.startsWith("_") || value.endsWith("_")) {
-        return name + " cannot have an _ at the start or end"
-    }
-    if (value.startsWith("-") || value.endsWith("-")) {
-        return name + " cannot have a - at the start or end"
-    }
-
-    if (!value.match(/^[A-Za-x0-9._.-]+$/)) {
-        return name + " can only contain Alphanumric chars\n Along with chars such as '_' or '-'"
-    }
-
-
-    return "Good"
-}
 
 
 function addField(head, action) {
@@ -70,24 +46,24 @@ function addButton(label, onclick) {
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
-          
+
         location.href = "../login"
 
-    } 
+    }
     addField("Username:", (row) => {
         const inp = document.createElement("input")
         inp.id = "username"
-    
+
         row.append(inp)
     })
-    
+
     addField("Display Name:", (row) => {
         const inp = document.createElement("input")
         inp.id = "displayName"
-    
+
         row.append(inp)
     })
-    
+
     addField("Description:", (row) => {
         row.style.placeItems = "start"
         row.style.flexDirection = "column"
@@ -95,7 +71,7 @@ onAuthStateChanged(auth, async (user) => {
         inp.rows = 5;
         inp.id = "desc"
         inp.maxLength = "50"
-    
+
         row.append(inp)
     })
 
@@ -105,41 +81,42 @@ onAuthStateChanged(auth, async (user) => {
 
     if (usernameRef.exists()) {
         const oldUsername = usernameRef.data().username
+
         addButton("Cancel", () => {
             window.location.href = "../user/index.html?u=" + oldUsername
         })
 
         addButton("Done", async () => {
-            if (nameChecks(document.getElementById("username").value, "Username") != "Good") {
-                alert(nameChecks(document.getElementById("username").value, "Username"))
+            const usernameVal = document.getElementById("username").value
+            const displayNameVal = document.getElementById("displayName").value
+            const data = {
+
+                displayName: displayNameVal,
+                desc: document.getElementById("desc").value
+
+            }
+
+
+            if (Validation.username(usernameVal) != true) {
+                alert(Validation.username(usernameVal))
                 return
             }
 
-            if (document.getElementById("displayName").value.length > 20) {
-                alert("Display name cannot be over 20 chars")
+            if (usernameVal != oldUsername && await Validation.finalUsername(usernameVal) != true) {
+                alert(await Validation.finalUsername(usernameVal))
                 return
             }
 
-            if (document.getElementById("displayName").value.length < 5) {
-                alert("Display name must be over 5 chars")
+            if (Validation.displayName(displayNameVal) != true) {
+                alert(Validation.displayName(displayNameVal))
                 return
             }
 
-            await setDoc(doc(db, "usernames", uid), {
-                username: document.getElementById("username").value
-            })
+            await updateUsername(user.uid, usernameVal)
 
-            await deleteDoc(doc(db, "uids", oldUsername))
+            await updateUserData(user.uid, data, "public")
 
-            await setDoc(doc(db, "uids", document.getElementById("username").value), {
-                userId: uid
-            })
 
-            await setDoc(doc(db, "users", uid, "data", "public"), {
-                displayName: document.getElementById("displayName").value,
-                desc: document.getElementById("desc").value,
-
-            }, {merge: true})
 
             window.location.href = "../user/index.html?u=" + document.getElementById("username").value
         })
@@ -160,8 +137,8 @@ onAuthStateChanged(auth, async (user) => {
 
     modal.append(buttons)
 
-    
-    
+
+
 });
 
 

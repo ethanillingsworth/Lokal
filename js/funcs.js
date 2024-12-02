@@ -1,4 +1,4 @@
-import { getDoc, doc, setDoc, getDocs, updateDoc, collection, addDoc, Timestamp, arrayUnion, query } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, setDoc, getDocs, collection, deleteDoc, addDoc, query } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
 
@@ -284,6 +284,11 @@ export async function updateUsername(uid, newUsername) {
     await setDoc(doc(db, "usernames", uid), {
         username: newUsername
     })
+
+
+    await setDoc(doc(db, "uids", newUsername), {
+        userId: uid
+    })
 }
 
 export async function getUsername(uid) {
@@ -294,12 +299,6 @@ export async function getUsername(uid) {
     }
 
     return usernameRef.data().username
-}
-
-export async function updateUID(username, newUID) {
-    await setDoc(doc(db, "uids", username), {
-        userId: newUID
-    })
 }
 
 export async function getUID(username) {
@@ -320,4 +319,88 @@ export function toTitleCase(str) {
 
 export function getVersion() {
     return "Lokal v1 (MVP)"
+}
+
+
+export class Validation {
+    static username(value) {
+        // validation
+
+        const name = "Username"
+
+        if (value.length < 5) {
+            return name + " must be atleast 5 chars long"
+        }
+
+        if (value.length > 15) {
+            return name + " cannot be over 15 chars long"
+        }
+
+        if (value.startsWith("_") || value.endsWith("_")) {
+            return name + " cannot have an _ at the start or end"
+        }
+        if (value.startsWith("-") || value.endsWith("-")) {
+            return name + " cannot have a - at the start or end"
+        }
+
+        if (!value.match(/^[A-Za-z0-9._.-]+$/)) {
+            return name + " can only contain Alphanumric chars\n Along with chars such as '_' or '-'"
+        }
+
+
+        return true
+    }
+
+    static async finalUsername(value) {
+        // get exisitng usernames
+        const usernames = []
+
+        const q = query(collection(db, "usernames"));
+
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+            console.log(doc.id, " => ", doc.data());
+            usernames.push(doc.data()["username"])
+        });
+
+        const name = "Username"
+
+        if (usernames.includes(value)) {
+            return name + ` with value of @${value} is already taken`
+        }
+
+        return true
+    }
+
+    static email(value) {
+        if (!value.includes("@") || !value.includes(".")) {
+            return "Email isnt valid"
+        }
+        return true
+    }
+
+    static displayName(value) {
+        const name = "Display Name"
+
+        if (value.length < 5) {
+            return name + " must be atleast 5 chars long"
+        }
+
+        if (value.length > 20) {
+            return name + " cannot be over 20 chars long"
+        }
+
+        return true
+    }
+
+    static password(value) {
+        const name = "Password"
+
+        if (value.length < 6) {
+            return name + " must be atleast 6 chars long"
+        }
+
+        return true
+    }
 }
