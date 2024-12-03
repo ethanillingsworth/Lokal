@@ -1,4 +1,4 @@
-import { getDoc, doc, setDoc, getDocs, collection, deleteDoc, addDoc, query } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, setDoc, getDocs, collection, addDoc, query } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
 
@@ -96,9 +96,11 @@ export async function displayEvent(id, content = document.getElementById("conten
 
     const event = await getEvent(id)
 
-    const user = await getUserData(event.creator)
+    const u = new User(event.creator)
 
-    const username = await getUsername(event.creator)
+    const user = await u.getData()
+
+    const username = await u.getUsername()
 
     let cost = "Free admission";
 
@@ -264,51 +266,55 @@ export async function getEvent(eventId) {
     return eventData
 }
 
-export async function updateUserData(uid, data, type) {
-    await setDoc(doc(db, "users", uid, "data", type), data, { merge: true })
-
-}
-
-export async function getUserData(uid) {
-
-    let u = await getDoc(doc(db, "users", uid, "data", "public"))
-    if (!u.exists()) {
-        console.error("Could not load userData with creator id: " + uid)
-    };
-
-    let userData = u.data()
-    return userData
-}
-
-export async function updateUsername(uid, newUsername) {
-    await setDoc(doc(db, "usernames", uid), {
-        username: newUsername
-    })
-
-
-    await setDoc(doc(db, "uids", newUsername), {
-        userId: uid
-    })
-}
-
-export async function getUsername(uid) {
-    let usernameRef = await getDoc(doc(db, "usernames", uid))
-
-    if (!usernameRef.exists()) {
-        console.error("Could not load username from uid: " + uid)
+export class User {
+    constructor(uid) {
+        this.uid = uid
     }
 
-    return usernameRef.data().username
-}
+    async updateData(data, type) {
+        await setDoc(doc(db, "users", this.uid, "data", type), data, { merge: true })
+    }
+    async getData(type = "public") {
 
-export async function getUID(username) {
-    let userIdRef = await getDoc(doc(db, "uids", username))
+        let u = await getDoc(doc(db, "users", this.uid, "data", type))
+        if (!u.exists()) {
+            console.error("Could not load userData with creator id: " + this.uid)
+            return
+        };
 
-    if (!userIdRef.exists()) {
-        console.error("Could not load uid from username: " + username)
+        let userData = u.data()
+        return userData
+    }
+    async updateUsername(newUsername) {
+        await setDoc(doc(db, "usernames", this.uid), {
+            username: newUsername
+        })
+
+        await setDoc(doc(db, "uids", newUsername), {
+            userId: this.uid
+        })
+    }
+    async getUsername() {
+        let usernameRef = await getDoc(doc(db, "usernames", this.uid))
+
+        if (!usernameRef.exists()) {
+            console.error("Could not load username from uid: " + this.uid)
+            return
+        }
+
+        return usernameRef.data().username
     }
 
-    return userIdRef.data().userId
+    static async getUID(username) {
+        let userIdRef = await getDoc(doc(db, "uids", username))
+
+        if (!userIdRef.exists()) {
+            console.error("Could not load uid from username: " + username)
+            return
+        }
+
+        return userIdRef.data().userId
+    }
 }
 
 export function toTitleCase(str) {
@@ -318,7 +324,7 @@ export function toTitleCase(str) {
 }
 
 export function getVersion() {
-    return "Lokal v1 (MVP)"
+    return "Lokal v1.5 (Reconsolidation)"
 }
 
 

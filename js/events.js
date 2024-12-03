@@ -1,4 +1,4 @@
-import { getDoc, doc, getDocs, query, setDoc, collection, orderBy, addDoc, Timestamp, limit } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDocs, query, collection, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { displayEvent } from "./funcs.js";
 import { db } from "./firebase.js";
 

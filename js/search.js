@@ -1,6 +1,6 @@
-import { getDoc, doc, getDocs, deleteDoc, limit, setDoc, query, collection, where, Timestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDocs, limit, query, collection } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-import { auth, db } from "./firebase.js";
+import { db } from "./firebase.js";
 import { displayEvent } from "./funcs.js"
 
 const content = document.getElementById("content")
@@ -20,11 +20,11 @@ const q = query(collection(db, "posts"), limit(100))
 
 const ref = await getDocs(q)
 
-ref.forEach((d) => {
+ref.forEach(async (d) => {
     const data = d.data()
     if (data.title.toLowerCase().includes(search) || data.desc.toLowerCase().includes(search) || data.category.toLowerCase().includes(search)
         || data.date.toLowerCase().includes(search) || data.location.toLowerCase().includes(search)) {
-        displayEvent(d.id, modal)
+        await displayEvent(d.id, modal)
     }
 });
 

@@ -1,9 +1,9 @@
-import { getDoc, doc, query, collection, setDoc, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 import { db, auth } from "./firebase.js";
 
-import { updateUserData, updateUsername, Validation } from "./funcs.js";
+import { User, Validation } from "./funcs.js";
 
 const content = document.getElementById("content")
 
@@ -77,63 +77,61 @@ onAuthStateChanged(auth, async (user) => {
 
     const uid = user.uid;
 
-    const usernameRef = await getDoc(doc(db, "usernames", uid))
+    const u = new User(uid)
 
-    if (usernameRef.exists()) {
-        const oldUsername = usernameRef.data().username
-
-        addButton("Cancel", () => {
-            window.location.href = "../user/index.html?u=" + oldUsername
-        })
-
-        addButton("Done", async () => {
-            const usernameVal = document.getElementById("username").value
-            const displayNameVal = document.getElementById("displayName").value
-            const data = {
-
-                displayName: displayNameVal,
-                desc: document.getElementById("desc").value
-
-            }
+    const oldUsername = await u.getUsername()
 
 
-            if (Validation.username(usernameVal) != true) {
-                alert(Validation.username(usernameVal))
-                return
-            }
+    addButton("Cancel", () => {
+        window.location.href = "../user/index.html?u=" + oldUsername
+    })
 
-            if (usernameVal != oldUsername && await Validation.finalUsername(usernameVal) != true) {
-                alert(await Validation.finalUsername(usernameVal))
-                return
-            }
+    addButton("Done", async () => {
+        const usernameVal = document.getElementById("username").value
+        const displayNameVal = document.getElementById("displayName").value
+        const data = {
 
-            if (Validation.displayName(displayNameVal) != true) {
-                alert(Validation.displayName(displayNameVal))
-                return
-            }
+            displayName: displayNameVal,
+            desc: document.getElementById("desc").value
 
-            await updateUsername(user.uid, usernameVal)
-
-            await updateUserData(user.uid, data, "public")
+        }
 
 
+        if (Validation.username(usernameVal) != true) {
+            alert(Validation.username(usernameVal))
+            return
+        }
 
-            window.location.href = "../user/index.html?u=" + document.getElementById("username").value
-        })
+        if (usernameVal != oldUsername && await Validation.finalUsername(usernameVal) != true) {
+            alert(await Validation.finalUsername(usernameVal))
+            return
+        }
 
-        document.getElementById("username").value = oldUsername
-    }
+        if (Validation.displayName(displayNameVal) != true) {
+            alert(Validation.displayName(displayNameVal))
+            return
+        }
 
-    const pub = await getDoc(doc(db, "users", uid, "data", "public"))
+        await u.updateUsername(usernameVal)
 
-    if (pub.exists()) {
-        const data = pub.data()
-        document.getElementById("displayName").value = data.displayName
-
-        document.getElementById("desc").value = data.desc
+        await u.updateData(data, "public")
 
 
-    }
+
+        window.location.href = "../user/index.html?u=" + document.getElementById("username").value
+    })
+
+    document.getElementById("username").value = oldUsername
+
+
+    const data = await u.getData("public")
+
+    document.getElementById("displayName").value = data.displayName
+
+    document.getElementById("desc").value = data.desc
+
+
+
 
     modal.append(buttons)
 

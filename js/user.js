@@ -1,8 +1,7 @@
 import { getDoc, doc, query, collection, getDocs, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-import { displayEvent } from "./funcs.js";
 import { db } from "./firebase.js";
+import { User, displayEvent } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -66,9 +65,9 @@ function createTab(name, current) {
     pageContent.classList.add("pageContent")
     pageContent.id = name
     if (current) pageContent.classList.add("currentPage")
-    
 
-    tab.onclick = function() {
+
+    tab.onclick = function () {
 
         document.querySelectorAll(".pageContent").forEach((c) => {
             c.classList.remove("currentPage")
@@ -83,7 +82,7 @@ function createTab(name, current) {
     }
 
     modal.append(pageContent)
-    
+
 
 }
 
@@ -105,8 +104,8 @@ edit.style.marginLeft = "auto"
 edit.width = "35"
 
 
-edit.onclick = function() {
-    window.location.href = "../edit/index.html?u=" + urlParams.get("u")    
+edit.onclick = function () {
+    window.location.href = "../edit/index.html?u=" + urlParams.get("u")
 
 }
 
@@ -130,8 +129,8 @@ async function hosting(uid) {
 
     const get = await getDocs(q)
 
-    get.forEach((event) => {
-        displayEvent(event.id, hostingTab)
+    get.forEach(async (event) => {
+        await displayEvent(event.id, hostingTab)
     })
 }
 
@@ -143,13 +142,13 @@ async function uDataStuff(uid) {
     const get = await getDocs(q)
 
     get.forEach(async (event) => {
-        
+
         const uData = await getDoc(doc(db, "posts", event.id, "uData", uid))
         if (uData.exists()) {
             const data = uData.data()
             // check if user is attending
             if (data.attending) {
-                displayEvent(event.id, attendingTab)
+                await displayEvent(event.id, attendingTab)
             }
         }
     })
@@ -163,19 +162,15 @@ function updateProfile(data) {
     desc.innerText = data.desc.replaceAll("<br>", "\n")
 }
 
-const uidData = await getDoc(doc(db, "uids", pageUser))
+const uid = await User.getUID(pageUser)
+const user = new User(uid)
 
-if (uidData.exists()) {
-    const uid = uidData.data().userId
-    // get actual data
-    const pub = await getDoc(doc(db, "users", uid, "data", "public"))
-    
-    if (pub.exists()) {
-        const data = pub.data()
-        updateProfile(data)
-        await hosting(uid)
-        await uDataStuff(uid)
-    }
-}
+// get actual data
+const data = await user.getData("public")
+
+updateProfile(data)
+await hosting(uid)
+await uDataStuff(uid)
+
 
 

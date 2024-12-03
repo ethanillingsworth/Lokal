@@ -13,7 +13,7 @@ import { addItem, getVersion } from "./funcs.js";
 // document.body.append(ver)
 
 window.getVersion = function () {
-    console.log(getVersion())
+    return getVersion()
 }
 
 // elements
