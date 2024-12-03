@@ -79,6 +79,8 @@ function addPage(name, prev = null, next = null, current = false) {
 
                 const agenda = document.getElementById("agenda")
 
+                if (!loc.value) loc.value = "None"
+
                 const data = {
                     title: title.value,
                     desc: desc.value,
@@ -316,7 +318,7 @@ addField(age, "Agenda:", (row) => {
 
     const buttons = document.createElement('div')
     buttons.classList.add("row")
-    buttons.id = "buttons"
+    buttons.className = "buttons"
     buttons.style.marginLeft = "auto"
     buttons.style.placeContent = "end"
 
@@ -511,8 +513,6 @@ if (urlParams.get("e")) {
     const cost = document.getElementById("cost")
     const agenda = document.getElementById("agenda")
     const location = document.getElementById("location")
-
-
 
 
     const data = await getEvent(urlParams.get("e"))
