@@ -473,8 +473,8 @@ export class Validation {
 
         const name = "Username"
 
-        if (value.length < 5) {
-            return name + " must be atleast 5 chars long"
+        if (value.length < 4) {
+            return name + " must be atleast 4 chars long"
         }
 
         if (value.length > 15) {
@@ -528,8 +528,8 @@ export class Validation {
     static displayName(value) {
         const name = "Display Name"
 
-        if (value.length < 5) {
-            return name + " must be atleast 5 chars long"
+        if (value.length < 4) {
+            return name + " must be atleast 4 chars long"
         }
 
         if (value.length > 20) {
