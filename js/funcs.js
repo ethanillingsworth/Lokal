@@ -426,10 +426,10 @@ export class User {
     }
     async updateUsername(newUsername) {
         await setDoc(doc(db, "usernames", this.uid), {
-            username: newUsername
+            username: newUsername.toLowerCase()
         })
 
-        await setDoc(doc(db, "uids", newUsername), {
+        await setDoc(doc(db, "uids", newUsername.toLowerCase()), {
             userId: this.uid
         })
     }
