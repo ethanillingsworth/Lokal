@@ -75,8 +75,6 @@ async function setUserData(user, username) {
 
 }
 
-
-
 function redirect() {
     if (urlParams.get("r")) {
         window.location.href = urlParams.get("r")

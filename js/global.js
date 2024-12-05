@@ -3,7 +3,7 @@ import { getDoc, doc, setDoc, getDocs, updateDoc, collection, addDoc, Timestamp,
 
 import { auth, db } from "./firebase.js";
 
-import { addItem, getVersion } from "./funcs.js";
+import { addItem, CustomItem, getVersion, Item, Menu, Sidebar, User } from "./funcs.js";
 
 
 // debug only version
@@ -17,10 +17,6 @@ window.getVersion = function () {
 }
 
 // elements
-const sidebar = document.createElement("div")
-sidebar.id = "sidebar"
-
-document.body.append(sidebar)
 
 const expand = document.createElement("div")
 expand.id = "expand"
@@ -35,34 +31,17 @@ const heading = document.createElement("h1")
 heading.innerText = "Lokal"
 heading.id = "heading"
 
-sidebar.append(heading)
-
 const content = document.createElement("div")
 content.id = "content"
 
+const sidebar = new Sidebar()
+
+sidebar.menu.addItem(new Item("Connect", "../img/icons/party.png", "../"))
+
 document.body.append(content)
 
+
 //addItem("Home", "../img/icons/home.png", "../")
-addItem("Connect", "../img/icons/party.png", "../")
-
-// export function checkInCache(name, value, after) {
-//     if (!localStorage.getItem(name)) {
-//         localStorage.setItem(name, value)
-//     }
-//     if (after != null) after()
-
-// }
-
-// export function removeFromCache(name, after) {
-//     if (localStorage.getItem(name)) {
-//         localStorage.removeItem(name)
-//     }
-//     if (after != null) after()
-// }
-
-// export function clearCache() {
-//     localStorage.clear();
-// }
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -72,113 +51,115 @@ onAuthStateChanged(auth, async (user) => {
     }
     const uid = user.uid;
 
+    const u = new User(uid)
+
     // createEvent(uid, "Sports", "Verrat de marde de mosus de doux Jésus de charrue de saint-ciboire de sacristi de crucifix de colon d'étole de maudite marde.", new Date(), "Elk Grove High School", 0, [])
 
-    const username = await getDoc(doc(db, "usernames", uid))
-
-    if (username.exists()) {
-        const data = username.data()
-        localStorage.setItem("username", data.username)
-    }
-
-    const priv = await getDoc(doc(db, "users", uid, "data", "private"))
+    const username = await u.getUsername()
 
 
-    if (priv.exists()) {
-        const data = priv.data()
+    const priv = await u.getData("private")
 
+    const searchMenu = new Menu(expand)
 
-        const prevRes = {
-            searchArea: {
-                params: {
-                    hideImage: true,
-                    hideLabel: true,
-                    noHov: true,
-                    customHtml: `
-                        <div class="row" style="gap: 0px; flex-wrap: nowrap; place-items: center">
-                            <input placeholder="Search" id="search"></input>
-                            <div id="search-icon">
-                                <img src="../img/icons/search.png" style="margin: 0;">
-                            </div>
-                        </div>
-                    `,
-                    afterFunc: () => {
+    const searchBar = new CustomItem(`
+        <div class= "row" style = "gap: 0px; flex-wrap: nowrap; place-items: center" >
+            <input placeholder="Search" id="search"></input>
+            <div id="search-icon">
+                <img src="../img/icons/search.png" style="margin: 0;">
+            </div>
+        </div>`,
+        () => {
 
-                        document.getElementById("search-icon").onclick = async function () {
-                            if (document.getElementById('search').value) {
-                                const s = document.getElementById('search').value.replaceAll('-', '\-').replaceAll(' ', '-')
-                                await updateDoc(doc(db, "users", uid, "data", "private"), {
-                                    "prevRes": arrayUnion(s)
-                                });
-                                window.location.href = '../search/index.html?q=' + s
+            document.getElementById("search-icon").onclick = async function () {
+                if (document.getElementById('search').value) {
+                    const s = document.getElementById('search').value.replaceAll('-', '\-').replaceAll(' ', '-')
 
-                            }
-                        }
-                    }
+                    await updateDoc(doc(db, "users", uid, "data", "private"), {
+                        "prevRes": arrayUnion(s)
+                    });
+                    window.location.href = '../search/index.html?q=' + s
+
                 }
             }
-        }
+        })
 
-        if (data.prevRes) {
-            let count = 0
-            data.prevRes.reverse().forEach(res => {
-                if (count <= 10) {
-                    prevRes[res] = {
-                        image: "../img/icons/prev.png",
-                        href: `../search/index.html?q=${res.replaceAll("-", "\-").replaceAll(" ", "-")}`
-                    }
-                }
-                count++
-            })
-        }
+    searchBar.noHover = true
 
-        addItem("Search", "../img/icons/search.png", null, null, null, true, prevRes, "start")
+    searchMenu.addItem(searchBar)
+    // prev searches
+    if (priv.prevRes) {
+        let count = 0
+        priv.prevRes.reverse().forEach(res => {
+            if (count <= 10) {
 
-        addItem("Host", "../img/icons/plus.png", "../host")
+                searchMenu.addItem(new Item(res, "../img/icons/prev.png", `../search/index.html?q=${res.replaceAll("-", "\-").replaceAll(" ", "-")}`))
+
+            }
+            count++
+        })
     }
 
-    const pub = await getDoc(doc(db, "users", uid, "data", "public"))
+    sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
 
-    if (pub.exists()) {
-        const data = pub.data()
+    sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
 
 
-        localStorage.setItem("displayName", data.displayName)
-        addBottom()
+    const pub = await u.getData("public")
 
-    }
+    const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
+    dName.id = "user"
+
+    sidebar.menu.addItem(dName, true)
+
+    const moreMenu = new Menu(expand)
+
+    moreMenu.addItem(new Item("Log Out", "../img/icons/logout.png", () => {
+        signOut(auth).then(() => {
+            // Sign-out successful.
+            location.href = "../login/index.html?r=" + window.location.href
+
+        }).catch((error) => {
+            // An error happened.
+        });
+    }), true)
+
+    sidebar.menu.addItem(new Item("More", "../img/icons/more.png", moreMenu), true)
+
+    addBottom()
+
+
 
 });
 
 function addBottom() {
-    addItem(localStorage.getItem("displayName"), "../img/pfp.jpg", `../user/index.html?u=${localStorage.getItem("username")}`, "user", bottom)
-    addItem("More", "../img/icons/more.png", null, null, bottom, true, {
-        // "Switch to Organization": {
-        //     func: async function() {
-        //         if (confirm("This action cannot be undone, are you sure?")) {
-        //             console.log(auth.currentUser.uid)
+    // addItem("More", "../img/icons/more.png", null, null, bottom, true, {
+    //     // "Switch to Organization": {
+    //     //     func: async function() {
+    //     //         if (confirm("This action cannot be undone, are you sure?")) {
+    //     //             console.log(auth.currentUser.uid)
 
-        //             await setDoc(doc(db, "users", auth.currentUser.uid), {
-        //                 org: true
-        //             }, {merge: true})
+    //     //             await setDoc(doc(db, "users", auth.currentUser.uid), {
+    //     //                 org: true
+    //     //             }, {merge: true})
 
-        //         }
-        //     }
-        // },
-        "Log out": {
-            image: "../img/icons/logout.png",
-            func: function () {
-                signOut(auth).then(() => {
-                    // Sign-out successful.
-                    location.href = "../login/index.html?r=" + window.location.href
+    //     //         }
+    //     //     }
+    //     // },
+    //     "Log out": {
+    //         image: "../img/icons/logout.png",
+    //         func: function () {
+    //             signOut(auth).then(() => {
+    //                 // Sign-out successful.
+    //                 location.href = "../login/index.html?r=" + window.location.href
 
-                }).catch((error) => {
-                    // An error happened.
-                });
-            }
-        },
-    })
-    sidebar.append(bottom)
+    //             }).catch((error) => {
+    //                 // An error happened.
+    //             });
+    //         }
+    //     },
+    // })
+    // sidebar.append(bottom)
 }
 
 

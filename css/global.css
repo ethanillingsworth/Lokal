@@ -135,12 +135,12 @@ hr {
     text-decoration: none;
 }
 
-a.no-hov {
+.no-hov {
     border: none;
     transition: none;
 }
 
-a.no-hov:hover {
+.no-hov:hover {
     cursor: default;
 
 }
@@ -291,6 +291,10 @@ button:not(.gsi-material-button):hover {
     margin-top: auto;
 }
 
+
+.menu {
+    height: 100%;
+}
 
 #content {
     width: 100%;

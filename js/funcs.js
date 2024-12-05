@@ -2,6 +2,145 @@ import { getDoc, doc, setDoc, getDocs, collection, addDoc, query } from "https:/
 
 import { auth, db } from "./firebase.js";
 
+export class Item {
+    constructor(label, img, click) {
+        this.label = label
+        this.img = img
+        this.click = click
+        this.id = null
+        this.bottom = false
+        this.noHover = false
+    }
+}
+
+export class CustomItem extends Item {
+    constructor(customHtml, after) {
+        super("", "", "")
+        this.customHtml = customHtml
+        this.after = () => { after() }
+    }
+}
+
+export class Sidebar {
+    constructor(heading = "Lokal") {
+        this.element = document.createElement("div")
+        this.element.id = "sidebar"
+
+        document.body.append(this.element)
+
+        this.heading = document.createElement("h1")
+        this.heading.id = "heading"
+        this.setHeading(heading)
+
+        this.element.append(this.heading)
+
+        this.itemsElement = document.createElement("div")
+        this.itemsElement.classList.add("menu")
+        this.itemsElement.classList.add("col")
+        this.itemsElement.style.gap = "5px"
+
+        this.element.append(this.itemsElement)
+
+        this.menu = new Menu(this.itemsElement)
+    }
+
+    setHeading(label) {
+        this.heading.innerText = label
+    }
+
+}
+
+export class Menu {
+
+    static clicked = false
+
+    constructor(parent) {
+        this.element = parent
+        this.items = []
+    }
+
+    refresh() {
+        this.element.innerHTML = ""
+
+        const bottom = document.createElement("div")
+        bottom.id = "bottom"
+
+
+        this.items.forEach((item) => {
+            let e = this.element
+
+            if (item.bottom) e = bottom
+
+            const i = document.createElement("div")
+            i.classList.add("item")
+
+            if (item.noHover) i.classList.add("no-hov")
+
+
+            if (item.id != null) i.id = item.id
+
+            e.append(i)
+
+            if (item.customHtml) {
+                i.innerHTML = item.customHtml
+
+
+                item.after()
+
+            }
+            else {
+                if (item.click instanceof Menu) {
+                    const element = item.click.element
+
+                    i.onclick = function () {
+                        item.click.refresh()
+                        if (Menu.clicked == false) {
+                            element.classList.add("showExpand")
+
+                            Menu.clicked = true
+                        }
+                        else {
+                            element.classList.remove("showExpand")
+                            Menu.clicked = false
+                        }
+                    }
+
+
+                }
+                else if (item.click instanceof Function) {
+                    i.onclick = function () {
+                        item.click()
+                    }
+                }
+                else {
+                    i.onclick = function () {
+                        window.location.href = item.click
+                    }
+                }
+
+                const img = document.createElement("img")
+                img.src = item.img
+                img.classList.add("icon")
+
+                const label = document.createElement("h4")
+                label.innerText = item.label
+
+                i.append(img)
+                i.append(label)
+            }
+        })
+        this.element.append(bottom)
+
+    }
+
+    addItem(item, bottom = false) {
+        item.bottom = bottom
+        this.items.push(item)
+
+        this.refresh()
+    }
+}
+
 let currentlyExpanded = false;
 
 export function addItem(label, img, href, id, parent, expanded, expandedContent, placeContent = "end", params = {}) {
