@@ -382,9 +382,17 @@ p {
     border-radius: 15px;
     margin-top: 10px;
     aspect-ratio: 16 / 9;
-    object-fit: cover;
+    object-fit: contain;
 
 }
+
+#pfp,
+#user .icon {
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    background-color: var(--dark0);
+}
+
 
 .event p {
     text-wrap: wrap;
@@ -561,6 +569,11 @@ input[type=checkbox] {
     height: 150px
 }
 
+#heading:hover {
+    cursor: pointer;
+    user-select: none;
+}
+
 
 @media (max-width: 1080px) {
     .modal {
@@ -684,11 +697,25 @@ input[type=checkbox] {
     #edit,
     #del {
         height: 25px;
+        width: 25px;
+    }
+
+    input,
+    textarea,
+    select,
+    label {
+        font-size: 1em
     }
 
     .showExpand {
         min-width: calc(100vw - 10px) !important;
         border: none !important;
+    }
+
+    #pfp {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px
     }
 
 

@@ -14,7 +14,9 @@
 
 
 @media (max-width: 512px) {
-    .grid h4 {
+
+    h4,
+    p {
         font-size: 0.75em
     }
 }

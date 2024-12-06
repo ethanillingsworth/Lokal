@@ -37,9 +37,6 @@ hr {
 }
 
 @media (max-width: 512px) {
-    #pfp {
-        width: 100px;
-    }
 
     #top {
         place-content: center !important;

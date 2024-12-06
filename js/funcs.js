@@ -31,6 +31,9 @@ export class Sidebar {
         this.heading = document.createElement("h1")
         this.heading.id = "heading"
         this.setHeading(heading)
+        this.heading.onclick = () => {
+            window.location.href = "../"
+        }
 
         this.element.append(this.heading)
 
@@ -46,6 +49,7 @@ export class Sidebar {
 
     setHeading(label) {
         this.heading.innerText = label
+
     }
 
 }
@@ -141,96 +145,6 @@ export class Menu {
     }
 }
 
-
-let currentlyExpanded = false;
-
-export function addItem(label, img, href, id, parent, expanded, expandedContent, placeContent = "end", params = {}) {
-    let link = document.createElement("a")
-    link.id = label
-    if (href != null) { link.href = href }
-
-    link.tabIndex = 0
-
-
-    if (parent == null) {
-        parent = sidebar
-    }
-
-    if (!params.hideImage) {
-        const image = document.createElement("img")
-        image.src = img
-        image.classList.add("icon")
-        link.append(image)
-    }
-
-    if (!params.hideLabel) {
-        const lab = document.createElement("h4")
-        lab.innerText = label
-
-        link.append(lab)
-    }
-
-    if (params.customHtml) {
-        link.innerHTML = params.customHtml
-    }
-
-    if (id != null) { link.id = id }
-
-    link.classList.add("item")
-
-    if (params.noHov) {
-        link.classList.add("no-hov")
-    }
-
-    if (expanded) {
-        // add expanded content
-        link.onclick = function () {
-            expand.innerHTML = ""
-            Object.keys(expandedContent).forEach((key) => {
-                const element = expandedContent[key]
-                addItem(key, element.image, element.href, key, expand, null, null, null, element.params)
-                if (element.func != null) {
-                    document.getElementById(key).onclick = function () {
-                        expandedContent[key].func()
-                    }
-                }
-
-
-            })
-
-            document.querySelectorAll(".item.border").forEach((el) => {
-                el.classList.remove("border")
-            })
-
-
-            if (currentlyExpanded) {
-                // close
-
-                currentlyExpanded = false
-                expand.classList.remove("showExpand")
-
-                link.classList.remove("border")
-
-            }
-            else {
-                // open
-                currentlyExpanded = true;
-                expand.style.placeContent = placeContent
-                expand.classList.add("showExpand")
-                link.classList.add("border")
-            }
-
-        }
-
-    }
-
-    parent.append(link)
-
-    if (params.afterFunc) {
-        params.afterFunc()
-    }
-
-}
 
 export async function displayEvent(id, content = document.getElementById("content")) {
 

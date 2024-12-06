@@ -3,7 +3,7 @@ import { getDoc, doc, setDoc, getDocs, updateDoc, collection, addDoc, Timestamp,
 
 import { auth, db } from "./firebase.js";
 
-import { addItem, CustomItem, getVersion, Item, Menu, Sidebar, User } from "./funcs.js";
+import { CustomItem, getVersion, Item, Menu, Sidebar, User } from "./funcs.js";
 
 
 // debug only version
