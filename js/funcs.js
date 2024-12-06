@@ -466,7 +466,7 @@ export function toTitleCase(str) {
 }
 
 export function getVersion() {
-    return "Lokal v1.5 (Reconsolidation)"
+    return "Lokal v2 (The Mobile Update)"
 }
 
 
