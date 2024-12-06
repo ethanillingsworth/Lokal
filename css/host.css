@@ -75,3 +75,42 @@ textarea {
     display: flex;
     position: relative;
 }
+
+@media (max-width: 512px) {
+
+    input,
+    select,
+    h3 {
+        font-size: 1em !important;
+    }
+
+    button {
+        font-size: 1em;
+    }
+
+    .buttons button {
+        font-size: 0.65em;
+    }
+
+    #agenda {
+        border-top-left-radius: 0;
+    }
+
+    .currenth {
+        width: calc(100% - 20px);
+    }
+
+    textarea {
+        font-size: 0.75em;
+        max-width: calc(100% - 20px);
+    }
+
+    #map {
+        width: auto
+    }
+
+    #search {
+        width: 20px !important;
+        height: auto !important;
+    }
+}

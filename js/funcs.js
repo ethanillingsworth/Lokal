@@ -141,6 +141,7 @@ export class Menu {
     }
 }
 
+
 let currentlyExpanded = false;
 
 export function addItem(label, img, href, id, parent, expanded, expandedContent, placeContent = "end", params = {}) {
@@ -256,19 +257,21 @@ export async function displayEvent(id, content = document.getElementById("conten
     <img class="pfp border" src="../img/pfp.jpg">
     <div class="event-content">
         <div class="user-info row" style="gap: 5px;">
+            
             <h4 class="display-name">${user.displayName}</h4>
-            <div class="row" style="gap: 5px;">
-                <h4 class="username">@${username}</h4>
-                <span class="bullet">•</span>
-                <h4 class="category">${event.category}</h4>
-            </div>
+            <h4 class="username">@${username}</h4>
+                
+            
+            <span class="bullet hide">•</span>
+            <h4 class="category">${event.category}</h4>
+                
 
         </div>
         <div class="event-details row">
             <span><b>${event.date}</b></span>
-            |
+            <span class="hide">|</span>
             <span><b>${event.location}</b></span>
-            |
+            <span class="hide">|</span>
             <span><b>${cost}</b></span>
         </div>
         <p>

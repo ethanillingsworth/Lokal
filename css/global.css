@@ -259,7 +259,6 @@ button:not(.gsi-material-button):hover {
     left: 0;
 }
 
-
 .item {
 
     display: flex;
@@ -277,6 +276,7 @@ button:not(.gsi-material-button):hover {
     width: 32px;
     aspect-ratio: 1 / 1;
     margin-right: 10px;
+    user-select: none;
 }
 
 .item:hover {
@@ -550,9 +550,14 @@ input[type=checkbox] {
     width: fit-content
 }
 
+
 @media (max-width: 1080px) {
     .modal {
         width: 75%;
+    }
+
+    .hide {
+        display: none;
     }
 
     #expand {
@@ -566,4 +571,115 @@ input[type=checkbox] {
     .showExpand {
         min-width: 25vw !important;
     }
+}
+
+@media (max-width: 512px) {
+
+
+    .modal {
+        width: 75% !important;
+    }
+
+    #expand {
+        left: 0
+    }
+
+    #sidebar {
+        min-width: auto;
+    }
+
+    #sidebar h4 {
+        display: none;
+    }
+
+    #sidebar .icon {
+        margin: 0;
+    }
+
+    #sidebar .item {
+        width: auto
+    }
+
+    #heading {
+        font-size: 1.75em;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+        text-align: center;
+    }
+
+    h2 {
+        font-size: 1.25em
+    }
+
+    h3,
+    h4,
+    p {
+        font-size: 1em;
+    }
+
+    .row {
+        gap: 5px;
+    }
+
+    .pfp {
+        width: 32px;
+        height: 32px;
+        aspect-ratio: 1/1;
+    }
+
+    .event {
+        padding: 10px
+    }
+
+    .user-info,
+    .event-details,
+    .event p {
+        font-size: 0.75em;
+    }
+
+    .user-info * {
+        width: 100%;
+    }
+
+    .action span {
+        font-size: 0.75em;
+    }
+
+    .action {
+        padding: 5px;
+    }
+
+    .showExpand {
+        min-width: 25vw !important;
+    }
+
+    .action img {
+        width: 20px;
+        height: 20px;
+    }
+
+    .tabList {
+        flex-wrap: nowrap;
+        width: 100%;
+    }
+
+    .tab {
+        font-size: 0.75em;
+        width: 100%;
+    }
+
+    #share,
+    #edit,
+    #del {
+        height: 25px;
+    }
+
+    .showExpand {
+        min-width: calc(100vw - 10px) !important;
+        border: none !important;
+    }
+
+
+
 }

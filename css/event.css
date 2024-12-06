@@ -6,6 +6,15 @@
     margin-left: auto;
 }
 
-#edit:hover, #del:hover, #share:hover {
+#edit:hover,
+#del:hover,
+#share:hover {
     cursor: pointer;
+}
+
+
+@media (max-width: 512px) {
+    .grid h4 {
+        font-size: 0.75em
+    }
 }

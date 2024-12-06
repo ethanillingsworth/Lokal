@@ -49,6 +49,7 @@ modal.append(row)
 
 const tabs = document.createElement("div")
 tabs.classList.add("row")
+tabs.classList.add("tabList")
 tabs.style.placeContent = "start"
 tabs.style.position = "relative"
 tabs.style.top = "10px"

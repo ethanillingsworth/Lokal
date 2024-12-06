@@ -159,8 +159,6 @@ addField(init, "Summary:", (row) => {
     txtArea.maxLength = "250"
     txtArea.id = "desc"
 
-    txtArea.style.minWidth = "300px"
-
 
     const txtLimit = document.createElement("h5")
     txtLimit.style.textAlign = "right"
@@ -325,7 +323,6 @@ addField(age, "Agenda:", (row) => {
     function addButton(name, func) {
         const button = document.createElement("button")
         button.innerText = name
-        button.style.fontSize = "1em"
         button.style.borderBottomLeftRadius = "0"
         button.style.borderBottomRightRadius = "0"
         button.style.borderBottom = "none"

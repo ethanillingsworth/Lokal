@@ -14,6 +14,7 @@ modal.classList.add("modal")
 
 const top = document.createElement("div")
 top.classList.add("row")
+top.id = "top"
 top.style.width = "100%"
 top.style.placeContent = "start"
 
@@ -45,6 +46,7 @@ desc.innerText = "Loading..."
 const tabs = document.createElement("div")
 
 tabs.classList.add("row")
+tabs.classList.add("tabList")
 
 tabs.style.gap = "20px"
 tabs.style.marginBottom = "0"

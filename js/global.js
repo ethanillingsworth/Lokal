@@ -26,15 +26,27 @@ document.body.append(expand)
 const bottom = document.createElement("div")
 bottom.id = "bottom"
 
-const heading = document.createElement("h1")
-
-heading.innerText = "Lokal"
-heading.id = "heading"
-
 const content = document.createElement("div")
 content.id = "content"
 
 const sidebar = new Sidebar()
+
+function resizeChecks() {
+    if (window.innerWidth < 512) {
+        sidebar.heading.innerText = "L"
+    }
+    else {
+        sidebar.heading.innerText = "Lokal"
+    }
+}
+
+
+document.body.onresize = function () {
+
+    resizeChecks()
+}
+
+resizeChecks()
 
 sidebar.menu.addItem(new Item("Connect", "../img/icons/party.png", "../"))
 
@@ -63,7 +75,7 @@ onAuthStateChanged(auth, async (user) => {
     const searchMenu = new Menu(expand)
 
     const searchBar = new CustomItem(`
-        <div class= "row" style = "gap: 0px; flex-wrap: nowrap; place-items: center" >
+        <div class= "row" style = "gap: 0px; flex-wrap: nowrap; place-items: center; width: 100%;" >
             <input placeholder="Search" id="search"></input>
             <div id="search-icon">
                 <img src="../img/icons/search.png" style="margin: 0;">
@@ -123,6 +135,32 @@ onAuthStateChanged(auth, async (user) => {
             // An error happened.
         });
     }), true)
+
+    function resizeChecks() {
+        if (window.innerWidth < 512) {
+            sidebar.heading.innerText = "L"
+            moreMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                expand.classList.remove("showExpand")
+                Menu.clicked = false
+            }), true)
+
+            searchMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                expand.classList.remove("showExpand")
+                Menu.clicked = false
+            }), true)
+        }
+        else {
+            sidebar.heading.innerText = "Lokal"
+        }
+    }
+
+
+    document.body.onresize = function () {
+
+        resizeChecks()
+    }
+
+    resizeChecks()
 
     sidebar.menu.addItem(new Item("More", "../img/icons/more.png", moreMenu), true)
 

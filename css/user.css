@@ -36,10 +36,28 @@ hr {
     position: relative;
     bottom: 4px;
     margin: 0 !important;
-    
+
 }
 
 
 #edit:hover {
     cursor: pointer;
+}
+
+@media (max-width: 512px) {
+    #pfp {
+        width: 100px;
+    }
+
+    #top {
+        place-content: center !important;
+    }
+
+    h2 {
+        font-size: 1em;
+    }
+
+    #userDetails p {
+        font-size: 1em
+    }
 }
