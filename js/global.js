@@ -119,7 +119,12 @@ onAuthStateChanged(auth, async (user) => {
 
     const pub = await u.getData("public")
 
+
     const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
+
+    if (pub.pfp) {
+        dName.img = pub.pfp
+    }
     dName.id = "user"
 
     sidebar.menu.addItem(dName, true)

@@ -162,6 +162,10 @@ function updateProfile(data) {
     document.title = `Lokal - @${pageUser}`
     displayName.innerText = data.displayName
     desc.innerText = data.desc.replaceAll("<br>", "\n")
+
+    if (data.pfp) {
+        document.getElementById("pfp").src = data.pfp
+    }
 }
 
 const uid = await User.getUID(pageUser)

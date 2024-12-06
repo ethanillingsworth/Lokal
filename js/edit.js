@@ -3,13 +3,12 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/f
 
 import { db, auth } from "./firebase.js";
 
-import { User, Validation } from "./funcs.js";
+import { User, Validation, getBase64 } from "./funcs.js";
 
 const content = document.getElementById("content")
 
 const modal = document.createElement("div")
 modal.classList.add("modal")
-modal.style.placeItems = "start"
 
 
 function addField(head, action) {
@@ -75,6 +74,47 @@ onAuthStateChanged(auth, async (user) => {
         row.append(inp)
     })
 
+    const preview = document.createElement("img")
+    preview.id = "pfp"
+    preview.classList.add("border")
+    preview.src = "../img/pfp.jpg"
+
+    modal.append(preview)
+
+
+    addField("Upload:", (row) => {
+
+        row.style.placeContent = "center"
+
+        const inp = document.createElement("input")
+        inp.type = "file"
+        inp.name = "fileUpload"
+
+        const lab = document.createElement("label")
+        lab.innerText = "Select Image"
+        lab.htmlFor = "fileUpload"
+
+
+
+        lab.onclick = function () {
+            inp.click()
+        }
+
+        inp.onchange = async function (event) {
+
+            if (event.target.files[0].size > 1000000) {
+                alert("That image is over 1 megabyte, please upload one under that size!")
+                return
+            }
+
+
+            preview.src = await getBase64(event.target.files[0])
+        }
+
+        row.append(lab)
+        row.append(inp)
+    })
+
     const uid = user.uid;
 
     const u = new User(uid)
@@ -92,7 +132,8 @@ onAuthStateChanged(auth, async (user) => {
         const data = {
 
             displayName: displayNameVal,
-            desc: document.getElementById("desc").value
+            desc: document.getElementById("desc").value,
+            pfp: document.getElementById("pfp").src
 
         }
 
@@ -129,6 +170,10 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("displayName").value = data.displayName
 
     document.getElementById("desc").value = data.desc
+
+    if (data.pfp) {
+        document.getElementById("pfp").src = data.pfp
+    }
 
 
 
