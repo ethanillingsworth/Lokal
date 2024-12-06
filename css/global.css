@@ -376,7 +376,7 @@ p {
     border-radius: 100%;
 }
 
-.event .event-image {
+.event-image {
     width: 100%;
     height: auto;
     border-radius: 15px;

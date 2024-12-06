@@ -1,4 +1,4 @@
-import { createEvent, getEvent, toTitleCase, updateEvent } from "./funcs.js"
+import { createEvent, getBase64, getEvent, toTitleCase, updateEvent } from "./funcs.js"
 import { auth } from "./firebase.js"
 import { Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
@@ -9,6 +9,8 @@ const content = document.getElementById("content")
 
 const modal = document.createElement("div")
 modal.classList.add("modal")
+
+let isPlaceholder = true
 
 
 function addField(page, label, customFunc) {
@@ -76,6 +78,8 @@ function addPage(name, prev = null, next = null, current = false) {
                 const date = document.getElementById("date")
                 const loc = document.getElementById("location")
                 const cost = document.getElementById("cost")
+                const preview = document.getElementById("preview")
+
 
                 const agenda = document.getElementById("agenda")
 
@@ -88,7 +92,14 @@ function addPage(name, prev = null, next = null, current = false) {
                     date: date.value,
                     location: toTitleCase(loc.value),
                     cost: cost.valueAsNumber,
-                    agenda: agenda.value.replaceAll("\n", "<br>")
+                    agenda: agenda.value.replaceAll("\n", "<br>"),
+
+                }
+
+
+
+                if (!isPlaceholder) {
+                    data.preview = preview.src
                 }
 
 
@@ -280,7 +291,7 @@ addField(init, "Cost:", (row) => {
 //     row.append(inp)
 // })
 
-const age = addPage("Agenda", "Details", "Location")
+const age = addPage("Agenda", "Details", "Image")
 
 function wrapText(textarea, startTag, endTag) {
     const start = textarea.selectionStart;
@@ -413,37 +424,44 @@ Use the formmating tools to make it look pretty.`
     row.append(txtDiv)
 })
 
-// const preview = document.createElement("img")
-// preview.id = "preview"
-// preview.src = "../img/placeholder.png"
-
-// const addImage = addPage("Image", "Details", "Location")
-
-// addImage.querySelector(".cont").append(preview)
-
-// addField(addImage, "Image Upload:", (row) => {
-//     const input = document.createElement("input")
-//     input.type = "file"
-//     input.accept = "image/png, image/jpeg"
-//     input.name = "upload"
-//     input.id = "upload"
-
-//     input.onchange = function() {
-//         const file = input.files[0]
-
-//         preview.src = URL.createObjectURL(file)
-//     }
-
-//     const label = document.createElement("label")
-//     label.innerText = "Browse..."
-//     label.htmlFor = "upload"
+const preview = document.createElement("img")
+preview.id = "preview"
+preview.src = "../img/placeholder.png"
 
 
-//     row.append(input)
-//     row.append(label)
-// })
+const addImage = addPage("Image", "Agenda", "Location")
 
-const loc = addPage("Location", "Agenda", "Done")
+addImage.querySelector(".cont").append(preview)
+
+addField(addImage, "Image Upload:", (row) => {
+    const input = document.createElement("input")
+    input.type = "file"
+    input.accept = "image/png, image/jpeg"
+    input.name = "upload"
+    input.id = "upload"
+
+    input.onchange = async function () {
+        const file = input.files[0]
+
+        preview.src = await getBase64(file)
+
+        isPlaceholder = false
+    }
+
+    const label = document.createElement("label")
+    label.innerText = "Browse..."
+
+    label.onclick = function () {
+        input.click()
+    }
+    label.htmlFor = "upload"
+
+
+    row.append(input)
+    row.append(label)
+})
+
+const loc = addPage("Location", "Image", "Done")
 
 const map = document.createElement("iframe")
 map.id = "map"
@@ -521,5 +539,10 @@ if (urlParams.get("e")) {
     cost.value = data.cost
     agenda.value = data.agenda.replaceAll("<br>", "\n")
     location.value = data.location
+    if (data.preview) {
+        preview.src = data.preview
+
+        isPlaceholder = false
+    }
 
 }

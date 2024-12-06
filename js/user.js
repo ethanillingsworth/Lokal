@@ -166,6 +166,8 @@ function updateProfile(data) {
     if (data.pfp) {
         document.getElementById("pfp").src = data.pfp
     }
+
+
 }
 
 const uid = await User.getUID(pageUser)

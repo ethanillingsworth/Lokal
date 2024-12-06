@@ -89,6 +89,8 @@ onAuthStateChanged(auth, async (user) => {
         const inp = document.createElement("input")
         inp.type = "file"
         inp.name = "fileUpload"
+        inp.accept = "image/png, image/jpeg"
+
 
         const lab = document.createElement("label")
         lab.innerText = "Select Image"

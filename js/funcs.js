@@ -277,7 +277,7 @@ export async function displayEvent(id, content = document.getElementById("conten
         <p>
             ${event.desc}
         </p>
-        <!-- <img class="event-image" src="../img/sample.jpg"> -->
+        <img class="event-image" src="../img/sample.jpg">
     
         <div class="actions">
             
@@ -287,6 +287,13 @@ export async function displayEvent(id, content = document.getElementById("conten
     </div>
     `
     content.appendChild(ev)
+
+    if (event.preview) {
+        ev.querySelector(".event-image").src = event.preview
+    }
+    else {
+        ev.querySelector(".event-image").style.display = "none"
+    }
 
     if (user.pfp) {
         ev.querySelector(".pfp").src = user.pfp

@@ -47,6 +47,14 @@ row.append(uname)
 
 modal.append(row)
 
+const preview = document.createElement("img")
+preview.classList.add("event-image")
+
+if (data.preview) {
+    preview.src = data.preview
+    modal.append(preview)
+}
+
 const tabs = document.createElement("div")
 tabs.classList.add("row")
 tabs.classList.add("tabList")
