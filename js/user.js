@@ -27,24 +27,32 @@ pfp.classList.add("border")
 const userDetails = document.createElement("div")
 userDetails.classList.add("col")
 userDetails.id = "userDetails"
+userDetails.gap = "20px"
+
+const nameDiv = document.createElement("div")
+nameDiv.classList.add("row")
+nameDiv.style.placeContent = "start"
+nameDiv.style.placeItems = "center"
+
 
 
 const displayName = document.createElement("h2");
 displayName.innerText = "Loading..."
 displayName.id = "displayName"
-displayName.style.marginRight = "10px"
-
 
 
 const usrname = document.createElement("h3");
 usrname.innerText = "Loading..."
 usrname.id = "username"
 
+nameDiv.append(displayName)
+nameDiv.append(usrname)
+
+
 const badges = document.createElement("div")
 badges.classList.add("row")
 badges.style.flexWrap = "nowrap"
 badges.style.placeContent = "start"
-badges.style.marginTop = "10px"
 
 
 const desc = document.createElement("p");
@@ -99,26 +107,29 @@ function createTab(name, current) {
 const divider = document.createElement("hr")
 
 
+const tools = document.createElement("div")
+tools.classList.add("row")
+tools.classList.add('tools')
+
 top.append(pfp)
 
-userDetails.append(displayName)
-userDetails.append(usrname)
+
+userDetails.append(nameDiv)
 userDetails.append(badges)
 userDetails.append(desc)
 
 top.append(userDetails)
 
 
+
 modal.append(top)
+modal.append(tools)
 modal.append(tabs)
 modal.append(divider)
-
-
 
 content.append(modal)
 
 createTab("Hosting", true)
-createTab("Attending")
 
 async function hosting(uid) {
     const hostingTab = document.getElementById("Hosting")
@@ -132,7 +143,7 @@ async function hosting(uid) {
     })
 }
 
-async function uDataStuff(uid) {
+async function attending(uid) {
     const attendingTab = document.getElementById("Attending")
 
     const q = query(collection(db, "posts"))
@@ -174,6 +185,7 @@ const user = new User(uid)
 
 const meta = await user.getData("hidden")
 
+
 if (meta.admin) {
     const adminBadge = createBadge("Admin")
 
@@ -183,22 +195,43 @@ if (meta.admin) {
     badges.append(adminBadge)
 }
 
+if (meta.partner) {
+    const adminBadge = createBadge("Partner")
+
+
+    adminBadge.style.backgroundColor = "var(--accent2)"
+
+    badges.append(adminBadge)
+}
+
+if (meta.group) {
+    const groupBadge = createBadge("Group")
+
+    groupBadge.style.backgroundColor = "#3577d4"
+
+    badges.append(groupBadge)
+}
+
 onAuthStateChanged(auth, async (u) => {
 
-    if (u.uid == uid || meta.admin) {
+    const currentUser = new User(u.uid)
+
+    const metaU = await currentUser.getData("hidden")
+
+    if (u.uid == uid || metaU.admin) {
         const edit = document.createElement("img")
         edit.id = "edit"
         edit.src = "../img/icons/edit.png"
         edit.style.marginLeft = "auto"
         edit.width = "35"
 
+        tools.append(edit)
+
 
         edit.onclick = function () {
             window.location.href = "../edit/index.html?u=" + urlParams.get("u")
 
         }
-
-        top.append(edit)
     }
 })
 
@@ -207,6 +240,10 @@ const data = await user.getData("public")
 
 updateProfile(data)
 await hosting(uid)
-await uDataStuff(uid)
+
+if (!meta.group) {
+    createTab("Attending")
+    await attending(uid)
+}
 
 

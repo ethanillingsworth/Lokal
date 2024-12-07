@@ -117,6 +117,8 @@ onAuthStateChanged(auth, async (user) => {
 
     sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
 
+    // sidebar.menu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"))
+
 
     const pub = await u.getData("public")
 

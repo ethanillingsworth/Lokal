@@ -1,4 +1,4 @@
-import { getDoc, doc, setDoc, getDocs, collection, addDoc, query } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, setDoc, getDocs, collection, addDoc, query, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
 
@@ -530,6 +530,22 @@ export class User {
 
         return userIdRef.data().userId
     }
+
+    static async createUser(username, pub = {}, priv = {}, meta = {}) {
+
+        const d = await addDoc(collection(db, "users"), meta)
+
+        const user = new User(d.id)
+
+        await user.updateUsername(username.toLowerCase())
+
+        await user.updateData(pub, "public")
+
+        await user.updateData(priv, "private")
+
+        return d.id
+
+    }
 }
 
 export function toTitleCase(str) {
@@ -576,7 +592,7 @@ export class Validation {
         // get exisitng usernames
         const usernames = []
 
-        const q = query(collection(db, "usernames"));
+        const q = query(collection(db, "usernames"), where("username", "==", value));
 
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {

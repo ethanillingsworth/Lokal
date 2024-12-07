@@ -6,21 +6,21 @@
     place-items: start;
 }
 
-#userDetails {
-    gap: 0;
-}
 
 #userDetails p {
     font-size: 1.1em;
-    margin-top: 10px;
 }
 
 #displayName {
-    margin: 0;
+    margin: 0 !important;
 }
 
 #username {
     color: gray
+}
+
+#userDetails {
+    width: 100%;
 }
 
 
@@ -43,10 +43,15 @@ hr {
     }
 
     h2 {
-        font-size: 1em;
+        font-size: 1.25em;
     }
 
     #userDetails p {
         font-size: 1em
     }
+
+    h4 {
+        font-size: 0.9em;
+    }
+
 }

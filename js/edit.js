@@ -12,8 +12,6 @@ modal.classList.add("modal")
 
 const urlParams = new URLSearchParams(window.location.search);
 
-
-
 function addField(head, action) {
     const row = document.createElement("div")
     row.classList.add("row")
@@ -29,8 +27,6 @@ function addField(head, action) {
     modal.append(row)
 }
 
-
-
 const buttons = document.createElement("div")
 buttons.classList.add("row")
 
@@ -45,15 +41,17 @@ function addButton(label, onclick) {
 }
 
 
-const uid = await User.getUID(urlParams.get("u"))
+const uid = new User(urlParams.get("u"))
 
-const u = new User(uid)
-
-const pub = await u.getData("public")
 
 onAuthStateChanged(auth, async (user) => {
     const authUser = new User(user.uid)
     const meta = await authUser.getData("hidden")
+
+    if (urlParams.get("createGroup") && urlParams.get("u")) {
+        window.location.href = "../"
+        return
+    }
 
     if (user.uid != uid && !meta.admin) {
         window.location.href = "../"
@@ -61,13 +59,12 @@ onAuthStateChanged(auth, async (user) => {
     }
 })
 
-const oldUsername = await u.getUsername()
 
 
 addField("Username:", (row) => {
     const inp = document.createElement("input")
     inp.id = "username"
-    inp.value = oldUsername
+    inp.placeholder = "lokal"
 
     row.append(inp)
 })
@@ -75,7 +72,8 @@ addField("Username:", (row) => {
 addField("Display Name:", (row) => {
     const inp = document.createElement("input")
     inp.id = "displayName"
-    inp.value = pub.displayName
+    inp.placeholder = "Lokal"
+
 
     row.append(inp)
 })
@@ -84,12 +82,13 @@ addField("Description:", (row) => {
     row.style.placeItems = "start"
     row.style.flexDirection = "column"
     const inp = document.createElement("textarea")
+    inp.placeholder = "You should probably change this."
     inp.rows = 5;
     inp.id = "desc"
     inp.maxLength = "50"
-    inp.value = pub.desc
 
     row.append(inp)
+
 })
 
 const preview = document.createElement("img")
@@ -99,9 +98,6 @@ preview.src = "../img/pfp.jpg"
 
 modal.append(preview)
 
-if (pub.pfp) {
-    preview.src = pub.pfp
-}
 
 
 addField("Upload:", (row) => {
@@ -139,10 +135,45 @@ addField("Upload:", (row) => {
     row.append(inp)
 })
 
-
 addButton("Cancel", () => {
+    if (urlParams.get("createGroup")) {
+        window.location.href = "../"
+        return
+    }
     window.location.href = "../user/index.html?u=" + oldUsername
 })
+
+
+
+modal.append(buttons)
+
+content.append(modal)
+
+let oldUsername = ""
+let u = undefined
+
+if (urlParams.get("u")) {
+
+    const uid = await User.getUID(urlParams.get("u"))
+
+    u = new User(uid)
+
+    const pub = await u.getData("public")
+    oldUsername = await u.getUsername()
+
+    document.getElementById("username").value = oldUsername
+
+    document.getElementById("displayName").value = pub.displayName
+
+    document.getElementById("desc").value = pub.desc
+
+
+    if (pub.pfp) {
+        preview.src = pub.pfp
+    }
+
+
+}
 
 addButton("Done", async () => {
     const usernameVal = document.getElementById("username").value
@@ -171,17 +202,17 @@ addButton("Done", async () => {
         return
     }
 
-    await u.updateUsername(usernameVal)
+    if (urlParams.get("createGroup")) {
+        await User.createUser(usernameVal, data, {}, { group: true })
+    }
+    else {
 
-    await u.updateData(data, "public")
+        await u.updateUsername(usernameVal)
+
+        await u.updateData(data, "public")
+    }
 
 
 
     window.location.href = "../user/index.html?u=" + document.getElementById("username").value
 })
-
-
-modal.append(buttons)
-
-content.append(modal)
-

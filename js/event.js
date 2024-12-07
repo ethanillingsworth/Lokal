@@ -44,6 +44,9 @@ uname.style.color = "gray"
 
 row.append(uname)
 
+const tools = document.createElement("div")
+tools.classList.add("row")
+tools.classList.add("tools")
 
 modal.append(row)
 
@@ -54,6 +57,8 @@ if (data.preview) {
     preview.src = data.preview
     modal.append(preview)
 }
+
+modal.append(tools)
 
 const tabs = document.createElement("div")
 tabs.classList.add("row")
@@ -90,90 +95,12 @@ const currentUser = new User(auth.currentUser.uid)
 
 const meta = await currentUser.getData("hidden")
 
-if (currentUser.uid == data.creator || meta.admin) {
-    const share = document.createElement("img")
-    share.id = "share"
-    share.src = "../img/icons/share.png"
-    share.onclick = function () {
-        linkAlert.show()
-    }
-    share.height = 35
-
-    row.append(share)
-
-    const edit = document.createElement("img")
-    edit.id = "edit"
-    edit.src = "../img/icons/edit.png"
-    edit.onclick = function () {
-        window.location.href = "../host/index.html?e=" + urlParams.get("e")
-    }
-    edit.height = 35
-
-    row.append(edit)
-
-    const del = document.createElement("img")
-    del.id = "del"
-    del.src = "../img/icons/del.png"
-    del.onclick = async function () {
-        if (confirm("Are you sure? Deleting an event cannot be undone!")) {
-
-            const q = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData")))
-
-            q.forEach(async (d) => {
-                await deleteDoc(doc(db, "posts", urlParams.get("e"), "uData", d.id))
-            })
-
-            await deleteDoc(doc(db, "posts", urlParams.get("e")))
-
-            window.location.href = "../"
-        }
-    }
-    del.height = 35
-
-    row.append(del)
-
-    modal.append(tabs)
-
-}
-
-function addPage(label, func, current) {
-    const tab = document.createElement("h4")
-    tab.classList.add('tab')
-    tab.innerText = label
-
-    tabs.append(tab)
-
-    const page = document.createElement("div")
-    page.classList.add("page")
-
-    if (current) page.classList.add("currentPage")
-
-    if (current) tab.classList.add("current")
-
-    modal.append(page)
-
-    tab.onclick = () => {
-        switchPage(page, tab)
-    }
-
-    func(page)
-}
-
-function switchPage(page, tab) {
-    document.querySelectorAll(".tab").forEach(element => {
-        element.classList.remove("current")
-    });
-    document.querySelectorAll(".page").forEach(element => {
-        element.classList.remove("currentPage")
-    });
-
-    page.classList.add("currentPage")
-    tab.classList.add("current")
-}
-
 const hr = document.createElement("hr")
 hr.style.position = "relative"
 hr.style.bottom = "4px"
+
+
+modal.append(tabs)
 
 modal.append(hr)
 
@@ -288,72 +215,168 @@ addPage("Public View", async (page) => {
     page.append(agenda)
 }, true)
 
-addPage("Attendance", async (page) => {
-    const grid = document.createElement("div")
-    grid.classList.add("grid")
+if (currentUser.uid == data.creator || meta.admin) {
+    const share = document.createElement("img")
+    share.id = "share"
+    share.src = "../img/icons/share.png"
+    share.onclick = function () {
+        linkAlert.show()
+    }
 
-    const displayNameHeading = document.createElement("h4")
-    const usernameHeading = document.createElement("h4")
-    const attendingStatusHeading = document.createElement("h4")
+    tools.append(share)
 
-    displayNameHeading.innerText = "Display Name:"
-    usernameHeading.innerText = "Username:"
-    attendingStatusHeading.innerText = "Here:"
+    const edit = document.createElement("img")
+    edit.id = "edit"
+    edit.src = "../img/icons/edit.png"
+    edit.onclick = function () {
+        window.location.href = "../host/index.html?e=" + urlParams.get("e")
+    }
 
-    grid.append(displayNameHeading)
-    grid.append(usernameHeading)
-    grid.append(attendingStatusHeading)
 
-    const uData = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData"), where("attending", "==", true)))
+    tools.append(edit)
 
-    uData.forEach(async (d) => {
-        const usernameElem = document.createElement("h4")
-        const displayElem = document.createElement("h4")
-        const attendingElem = document.createElement("div")
-        attendingElem.classList.add("row")
+    const del = document.createElement("img")
+    del.id = "del"
+    del.src = "../img/icons/del.png"
+    del.onclick = async function () {
+        if (confirm("Are you sure? Deleting an event cannot be undone!")) {
 
-        const here = document.createElement("input")
+            const q = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData")))
 
-        here.type = "checkbox"
+            q.forEach(async (d) => {
+                await deleteDoc(doc(db, "posts", urlParams.get("e"), "uData", d.id))
+            })
 
-        if (d.data().here) {
-            here.checked = true;
+            await deleteDoc(doc(db, "posts", urlParams.get("e")))
+
+            window.location.href = "../"
         }
+    }
 
-        here.onchange = async () => {
-            await setDoc(doc(db, "posts", urlParams.get("e"), "uData", d.id), {
-                here: here.checked
-            }, { merge: true })
+
+    tools.append(del)
+
+    addPage("Attendance", async (page) => {
+        const grid = document.createElement("div")
+        grid.classList.add("grid")
+
+        const displayNameHeading = document.createElement("h4")
+        const usernameHeading = document.createElement("h4")
+        const attendingStatusHeading = document.createElement("h4")
+
+        displayNameHeading.innerText = "Display Name:"
+        usernameHeading.innerText = "Username:"
+        attendingStatusHeading.innerText = "Here:"
+
+        if (window.innerWidth > 512) {
+
+            grid.append(displayNameHeading)
         }
+        grid.append(usernameHeading)
+        grid.append(attendingStatusHeading)
 
-        usernameElem.style.fontWeight = "normal"
-        displayElem.style.fontWeight = "normal"
+        const uData = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData"), where("attending", "==", true)))
+
+        uData.forEach(async (d) => {
+            const usernameElem = document.createElement("h4")
+            const displayElem = document.createElement("h4")
+            const attendingElem = document.createElement("div")
+            attendingElem.classList.add("row")
+
+            const here = document.createElement("input")
+
+            here.type = "checkbox"
+
+            if (d.data().here) {
+                here.checked = true;
+            }
+
+            here.onchange = async () => {
+                await setDoc(doc(db, "posts", urlParams.get("e"), "uData", d.id), {
+                    here: here.checked
+                }, { merge: true })
+            }
+
+            usernameElem.style.fontWeight = "normal"
+            displayElem.style.fontWeight = "normal"
 
 
-        usernameElem.innerText = "N/A"
+            usernameElem.innerText = "N/A"
 
 
-        const usernameRef = await getDoc(doc(db, "usernames", d.id))
+            const usernameRef = await getDoc(doc(db, "usernames", d.id))
 
-        if (usernameRef.exists()) {
+            if (usernameRef.exists()) {
 
-            usernameElem.innerText = "@" + usernameRef.data().username
-        }
-        const publicRef = await getDoc(doc(db, "users", d.id, "data", "public"))
+                usernameElem.innerText = "@" + usernameRef.data().username
+            }
+            const publicRef = await getDoc(doc(db, "users", d.id, "data", "public"))
 
-        if (publicRef.exists()) {
-            displayElem.innerText = publicRef.data().displayName
-        }
+            if (publicRef.exists()) {
+                displayElem.innerText = publicRef.data().displayName
+            }
 
-        attendingElem.append(here)
+            attendingElem.append(here)
 
-        grid.append(displayElem)
+            if (window.innerWidth > 512) {
 
-        grid.append(usernameElem)
-        grid.append(attendingElem)
+                grid.append(displayElem)
+            }
+            else {
+                grid.style.gridTemplateColumns = "1fr 1fr"
+
+            }
 
 
+
+            grid.append(usernameElem)
+            grid.append(attendingElem)
+
+
+        })
+
+        page.append(grid)
     })
 
-    page.append(grid)
-})
+
+
+}
+
+function addPage(label, func, current) {
+    const tab = document.createElement("h4")
+    tab.classList.add('tab')
+    tab.innerText = label
+
+    tabs.append(tab)
+
+    const page = document.createElement("div")
+    page.classList.add("page")
+
+    if (current) page.classList.add("currentPage")
+
+    if (current) tab.classList.add("current")
+
+    modal.append(page)
+
+    tab.onclick = () => {
+        switchPage(page, tab)
+    }
+
+    func(page)
+
+
+}
+
+function switchPage(page, tab) {
+    document.querySelectorAll(".tab").forEach(element => {
+        element.classList.remove("current")
+    });
+    document.querySelectorAll(".page").forEach(element => {
+        element.classList.remove("currentPage")
+    });
+
+    page.classList.add("currentPage")
+    tab.classList.add("current")
+}
+
+
