@@ -46,7 +46,7 @@ button {
     margin-right: auto;
 }
 
-#search:hover {
+#searchButton:hover {
     cursor: pointer;
 }
 
@@ -110,7 +110,7 @@ textarea {
         width: auto
     }
 
-    #search {
+    #searchButton {
         width: 20px !important;
         height: auto !important;
     }

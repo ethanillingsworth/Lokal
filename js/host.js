@@ -1,4 +1,4 @@
-import { createEvent, getBase64, getEvent, toTitleCase, updateEvent } from "./funcs.js"
+import { createEvent, getBase64, getEvent, toTitleCase, updateEvent, User } from "./funcs.js"
 import { auth } from "./firebase.js"
 import { Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
@@ -501,7 +501,7 @@ addField(loc, "Address:", (row) => {
     search.style.border = "2px solid var(--dark0)"
     search.style.borderTopRightRadius = "15px"
     search.style.borderBottomRightRadius = "15px"
-    search.id = "search"
+    search.id = "searchButton"
 
     search.onclick = function () {
         map.src = `https://www.google.com/maps/embed/v1/place?q=${input.value.replaceAll(" ", "+")}&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8`
@@ -521,6 +521,8 @@ content.append(modal)
 // load data if event id is present
 if (urlParams.get("e")) {
 
+    const data = await getEvent(urlParams.get("e"))
+
     const title = document.getElementById("title")
     const desc = document.getElementById("desc")
     const category = document.getElementById("cate")
@@ -529,20 +531,25 @@ if (urlParams.get("e")) {
     const agenda = document.getElementById("agenda")
     const location = document.getElementById("location")
 
+    const currentUser = new User(auth.currentUser.uid)
 
-    const data = await getEvent(urlParams.get("e"))
+    const meta = await currentUser.getData("hidden")
 
-    title.value = data.title
-    desc.value = data.desc
-    category.value = data.category
-    date.value = data.date
-    cost.value = data.cost
-    agenda.value = data.agenda.replaceAll("<br>", "\n")
-    location.value = data.location
-    if (data.preview) {
-        preview.src = data.preview
 
-        isPlaceholder = false
+    if (currentUser.uid == data.creator || meta.admin) {
+
+        title.value = data.title
+        desc.value = data.desc
+        category.value = data.category
+        date.value = data.date
+        cost.value = data.cost
+        agenda.value = data.agenda.replaceAll("<br>", "\n")
+        location.value = data.location
+        if (data.preview) {
+            preview.src = data.preview
+
+            isPlaceholder = false
+        }
     }
 
 }

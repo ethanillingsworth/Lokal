@@ -86,8 +86,11 @@ linkAlert.setDoneFunction(async () => {
     await navigator.clipboard.writeText(href)
 })
 
+const currentUser = new User(auth.currentUser.uid)
 
-if (auth.currentUser.uid == data.creator) {
+const meta = await currentUser.getData("hidden")
+
+if (currentUser.uid == data.creator || meta.admin) {
     const share = document.createElement("img")
     share.id = "share"
     share.src = "../img/icons/share.png"

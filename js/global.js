@@ -142,18 +142,24 @@ onAuthStateChanged(auth, async (user) => {
         });
     }), true)
 
+    let backAdded = false
+
     function resizeChecks() {
         if (window.innerWidth < 512) {
             sidebar.heading.innerText = "L"
-            moreMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
-                expand.classList.remove("showExpand")
-                Menu.clicked = false
-            }), true)
 
-            searchMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
-                expand.classList.remove("showExpand")
-                Menu.clicked = false
-            }), true)
+            if (!backAdded) {
+
+                moreMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                    expand.classList.remove("showExpand")
+                    Menu.clicked = false
+                }), true)
+
+                searchMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                    expand.classList.remove("showExpand")
+                    Menu.clicked = false
+                }), true)
+            }
         }
         else {
             sidebar.heading.innerText = "Lokal"
@@ -170,41 +176,10 @@ onAuthStateChanged(auth, async (user) => {
 
     sidebar.menu.addItem(new Item("More", "../img/icons/more.png", moreMenu), true)
 
-    addBottom()
 
 
 
 });
-
-function addBottom() {
-    // addItem("More", "../img/icons/more.png", null, null, bottom, true, {
-    //     // "Switch to Organization": {
-    //     //     func: async function() {
-    //     //         if (confirm("This action cannot be undone, are you sure?")) {
-    //     //             console.log(auth.currentUser.uid)
-
-    //     //             await setDoc(doc(db, "users", auth.currentUser.uid), {
-    //     //                 org: true
-    //     //             }, {merge: true})
-
-    //     //         }
-    //     //     }
-    //     // },
-    //     "Log out": {
-    //         image: "../img/icons/logout.png",
-    //         func: function () {
-    //             signOut(auth).then(() => {
-    //                 // Sign-out successful.
-    //                 location.href = "../login/index.html?r=" + window.location.href
-
-    //             }).catch((error) => {
-    //                 // An error happened.
-    //             });
-    //         }
-    //     },
-    // })
-    // sidebar.append(bottom)
-}
 
 
 document.querySelectorAll("label").forEach((e) => {

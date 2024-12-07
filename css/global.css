@@ -658,6 +658,10 @@ input[type=checkbox] {
         width: auto
     }
 
+    .item {
+        padding: 5px;
+    }
+
     #heading {
         font-size: 1.75em;
         margin-left: auto;
