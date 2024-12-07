@@ -13,15 +13,13 @@
 
 #displayName {
     margin: 0 !important;
+    text-wrap: balance;
 }
 
 #username {
     color: gray
 }
 
-#userDetails {
-    width: 100%;
-}
 
 
 hr {
@@ -34,6 +32,21 @@ hr {
 
 #edit:hover {
     cursor: pointer;
+}
+
+#top {
+    flex-wrap: nowrap;
+}
+
+#userDetails {
+    width: 100%;
+}
+
+
+@media (max-width: 1080px) {
+    #top {
+        flex-wrap: wrap !important;
+    }
 }
 
 @media (max-width: 512px) {
@@ -50,8 +63,10 @@ hr {
         font-size: 1em
     }
 
+
     h4 {
         font-size: 0.9em;
     }
+
 
 }
