@@ -68,6 +68,7 @@ export class Prompt extends Alert {
 
         this.fields = document.createElement("div")
         this.fields.classList.add("col")
+        this.fields.style.width = "100%"
 
         this.modal.append(this.fields)
 
