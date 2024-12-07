@@ -60,6 +60,7 @@ textarea {
 
 .modal {
     width: fit-content;
+    max-width: 50%;
 }
 
 #agenda {
@@ -112,5 +113,11 @@ textarea {
     #search {
         width: 20px !important;
         height: auto !important;
+    }
+
+    .modal {
+        padding: 10px;
+        max-width: calc(100% - 50px);
+        width: fit-content !important
     }
 }
