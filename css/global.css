@@ -415,6 +415,11 @@ p {
 
 }
 
+.badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+}
+
 #pfp,
 #user .icon {
     aspect-ratio: 1 / 1;

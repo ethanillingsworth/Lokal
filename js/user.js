@@ -1,6 +1,7 @@
 import { getDoc, doc, query, collection, getDocs, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-import { db } from "./firebase.js";
+import { db, auth } from "./firebase.js";
 import { User, displayEvent } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -38,6 +39,22 @@ displayName.style.marginRight = "10px"
 const usrname = document.createElement("h3");
 usrname.innerText = "Loading..."
 usrname.id = "username"
+
+const badges = document.createElement("div")
+badges.classList.add("row")
+badges.style.flexWrap = "nowrap"
+badges.style.placeContent = "start"
+badges.style.marginTop = "10px"
+
+function addBadge(label) {
+    const badge = document.createElement("h4")
+    badge.innerText = label
+    badge.classList.add("badge")
+
+    badges.append(badge)
+
+    return badge
+}
 
 const desc = document.createElement("p");
 
@@ -95,23 +112,11 @@ top.append(pfp)
 
 userDetails.append(displayName)
 userDetails.append(usrname)
+userDetails.append(badges)
 userDetails.append(desc)
 
 top.append(userDetails)
 
-const edit = document.createElement("img")
-edit.id = "edit"
-edit.src = "../img/icons/edit.png"
-edit.style.marginLeft = "auto"
-edit.width = "35"
-
-
-edit.onclick = function () {
-    window.location.href = "../edit/index.html?u=" + urlParams.get("u")
-
-}
-
-top.append(edit)
 
 modal.append(top)
 modal.append(tabs)
@@ -161,6 +166,7 @@ function updateProfile(data) {
     usrname.innerText = `(@${pageUser})`
     document.title = `Lokal - @${pageUser}`
     displayName.innerText = data.displayName
+
     desc.innerText = data.desc.replaceAll("<br>", "\n")
 
     if (data.pfp) {
@@ -168,10 +174,39 @@ function updateProfile(data) {
     }
 
 
+
+
 }
 
 const uid = await User.getUID(pageUser)
 const user = new User(uid)
+
+const meta = await user.getData("hidden")
+
+if (meta.admin) {
+    const adminBadge = addBadge("Admin")
+
+    adminBadge.style.backgroundColor = "var(--accent)"
+}
+
+onAuthStateChanged(auth, async (u) => {
+
+    if (u.uid == uid || meta.admin) {
+        const edit = document.createElement("img")
+        edit.id = "edit"
+        edit.src = "../img/icons/edit.png"
+        edit.style.marginLeft = "auto"
+        edit.width = "35"
+
+
+        edit.onclick = function () {
+            window.location.href = "../edit/index.html?u=" + urlParams.get("u")
+
+        }
+
+        top.append(edit)
+    }
+})
 
 // get actual data
 const data = await user.getData("public")
@@ -179,6 +214,5 @@ const data = await user.getData("public")
 updateProfile(data)
 await hosting(uid)
 await uDataStuff(uid)
-
 
 

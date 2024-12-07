@@ -263,8 +263,6 @@ export async function displayEvent(id, content = document.getElementById("conten
 
     const user = await u.getData()
 
-    const username = await u.getUsername()
-
     let cost = "Free admission";
 
     if (event.cost > 0) {
@@ -282,7 +280,7 @@ export async function displayEvent(id, content = document.getElementById("conten
         <div class="user-info row" style="gap: 5px;">
             
             <h4 class="display-name">${user.displayName}</h4>
-            <h4 class="username">@${username}</h4>
+            <!-- <h4 class="username">@username</h4> -->
                 
             
             <span class="bullet hide">•</span>
@@ -452,10 +450,20 @@ export class User {
     }
     async getData(type = "public") {
 
-        let u = await getDoc(doc(db, "users", this.uid, "data", type))
+        let u = undefined
+
+        if (type != "hidden") {
+            u = await getDoc(doc(db, "users", this.uid, "data", type))
+        }
+        else {
+            u = await getDoc(doc(db, "users", this.uid))
+        }
+
+
         if (!u.exists()) {
-            console.error("Could not load userData with creator id: " + this.uid)
-            return
+            if (type != "hidden")
+                console.error("Could not load userData with id: " + this.uid + " type: " + type)
+            return {}
         };
 
         let userData = u.data()
