@@ -48,6 +48,7 @@ document.body.onresize = function () {
 
 resizeChecks()
 
+
 sidebar.menu.addItem(new Item("Connect", "../img/icons/party.png", "../"))
 
 document.body.append(content)

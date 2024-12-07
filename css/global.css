@@ -351,6 +351,35 @@ button:not(.gsi-material-button):hover {
 
 }
 
+.alert {
+    position: absolute;
+    left: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    place-content: center;
+    place-items: center;
+}
+
+.alert .modal {
+    z-index: 1000;
+    background-color: var(--dark1);
+    width: fit-content;
+}
+
+.alert-text {
+    font-size: 1.25em
+}
+
+#bg {
+    opacity: 0.5;
+    background-color: var(--dark0);
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+}
 
 .event-content {
     display: flex;

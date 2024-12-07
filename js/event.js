@@ -1,7 +1,7 @@
 import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
-import { getEvent, User } from "./funcs.js";
+import { Alert, getEvent, Prompt, User } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search)
 
@@ -63,13 +63,36 @@ tabs.style.position = "relative"
 tabs.style.top = "10px"
 tabs.style.gap = "20px"
 
+const linkAlert = new Prompt("Select options for your link")
+
+linkAlert.addField("Auto Attend:", (row) => {
+    const select = document.createElement("select")
+    select.id = "select"
+    select.innerHTML = `
+    <option value="true">True</option>
+    <option value="false">False</option>
+    `
+
+    row.append(select)
+})
+
+linkAlert.setDoneFunction(async () => {
+    let href = window.location.href
+
+    if (document.getElementById("select").value == "true") {
+        href += "&autoJoin=true"
+    }
+
+    await navigator.clipboard.writeText(href)
+})
+
+
 if (auth.currentUser.uid == data.creator) {
     const share = document.createElement("img")
     share.id = "share"
     share.src = "../img/icons/share.png"
-    share.onclick = async function () {
-        await navigator.clipboard.writeText(window.location.href)
-        alert("Link copied to clipboard")
+    share.onclick = function () {
+        linkAlert.show()
     }
     share.height = 35
 
@@ -184,9 +207,10 @@ addPage("Public View", async (page) => {
 
     let selfAttend = false;
 
-    function addButton(label, src, after) {
+    function addButton(label, src, id, after) {
         const button = document.createElement("div")
         button.classList.add("action")
+        button.id = id
 
         const image = document.createElement("img")
         image.src = src
@@ -214,7 +238,7 @@ addPage("Public View", async (page) => {
         if (doc.id == auth.currentUser.uid && data.attending) selfAttend = true;
     });
 
-    addButton(`${attending} Attending`, "../img/icons/profile.png", (button, span) => {
+    addButton(`${attending} Attending`, "../img/icons/profile.png", "attend", (button, span) => {
         if (selfAttend) {
             button.style.border = "3px solid var(--accent)"
         }
@@ -244,6 +268,10 @@ addPage("Public View", async (page) => {
 
 
     page.append(document.createElement("hr"))
+
+    if (urlParams.get("autoJoin") && !selfAttend) {
+        document.getElementById("attend").click()
+    }
 
 
     const agendaHeading = document.createElement("h3")

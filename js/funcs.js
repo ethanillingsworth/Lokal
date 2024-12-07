@@ -2,6 +2,114 @@ import { getDoc, doc, setDoc, getDocs, collection, addDoc, query } from "https:/
 
 import { auth, db } from "./firebase.js";
 
+
+export class Alert {
+
+    constructor(text) {
+        this.element = document.createElement("div")
+        this.element.classList.add("alert")
+
+        this.background = document.createElement("div")
+        this.background.id = "bg"
+
+        this.element.append(this.background)
+
+        this.modal = document.createElement("div")
+        this.modal.classList.add("modal")
+        this.element.append(this.modal)
+        this.modal.style.gap = "20px"
+
+        this.textElement = document.createElement("p")
+        this.textElement.innerText = text
+        this.textElement.classList.add("alert-text")
+
+        this.modal.append(this.textElement)
+
+        this.buttons = document.createElement("div")
+        this.buttons.classList.add("row")
+        this.buttons.style.width = "100%"
+
+        this.modal.append(this.buttons)
+
+        this.addButton("Okay", () => {
+            this.hide()
+        })
+    }
+
+    addButton(label, func) {
+        const button = document.createElement("button")
+        button.innerText = label
+        button.onclick = () => {
+            func()
+        }
+
+        this.buttons.append(button)
+    }
+
+    show() {
+        document.body.append(this.element)
+
+    }
+
+    hide() {
+        this.element.remove()
+    }
+}
+
+export class Prompt extends Alert {
+    constructor(text) {
+        super(text)
+
+        this.buttons.remove()
+
+        this.buttons = document.createElement("div")
+        this.buttons.classList.add("row")
+        this.buttons.style.width = "100%"
+
+        this.fields = document.createElement("div")
+        this.fields.classList.add("col")
+
+        this.modal.append(this.fields)
+
+        this.addButton("Cancel", () => {
+            this.hide()
+        })
+
+        this.doneFunction = () => { }
+
+        this.addButton("Done", () => {
+            this.doneFunction()
+            this.hide()
+        })
+
+        this.modal.append(this.buttons)
+    }
+
+    addField(label, after) {
+
+        const row = document.createElement("div")
+        row.classList.add("row")
+        row.style.placeContent = "start"
+        row.style.flexWrap = "nowrap"
+
+
+        const lab = document.createElement("h3")
+        lab.innerText = label
+        lab.style.textWrap = "nowrap"
+
+        row.append(lab)
+
+        after(row)
+
+        this.fields.append(row)
+
+    }
+
+    setDoneFunction(func) {
+        this.doneFunction = func
+    }
+}
+
 export class Item {
     constructor(label, img, click) {
         this.label = label
