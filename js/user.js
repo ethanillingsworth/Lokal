@@ -2,7 +2,7 @@ import { getDoc, doc, query, collection, getDocs, where } from "https://www.gsta
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 import { db, auth } from "./firebase.js";
-import { User, displayEvent } from "./funcs.js";
+import { User, createBadge, displayEvent } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -46,15 +46,6 @@ badges.style.flexWrap = "nowrap"
 badges.style.placeContent = "start"
 badges.style.marginTop = "10px"
 
-function addBadge(label) {
-    const badge = document.createElement("h4")
-    badge.innerText = label
-    badge.classList.add("badge")
-
-    badges.append(badge)
-
-    return badge
-}
 
 const desc = document.createElement("p");
 
@@ -184,9 +175,12 @@ const user = new User(uid)
 const meta = await user.getData("hidden")
 
 if (meta.admin) {
-    const adminBadge = addBadge("Admin")
+    const adminBadge = createBadge("Admin")
+
 
     adminBadge.style.backgroundColor = "var(--accent)"
+
+    badges.append(adminBadge)
 }
 
 onAuthStateChanged(auth, async (u) => {

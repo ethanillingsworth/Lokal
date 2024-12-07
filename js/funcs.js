@@ -254,6 +254,14 @@ export class Menu {
     }
 }
 
+export function createBadge(label, labelType = "h4") {
+    const badge = document.createElement(labelType)
+    badge.innerText = label
+    badge.classList.add("badge")
+
+    return badge
+}
+
 
 export async function displayEvent(id, content = document.getElementById("content")) {
 
@@ -262,6 +270,10 @@ export async function displayEvent(id, content = document.getElementById("conten
     const u = new User(event.creator)
 
     const user = await u.getData()
+
+    const meta = await u.getData("hidden")
+
+    const username = await u.getUsername()
 
     let cost = "Free admission";
 
@@ -277,8 +289,9 @@ export async function displayEvent(id, content = document.getElementById("conten
     ev.innerHTML = `
     <img class="pfp border" src="../img/pfp.jpg">
     <div class="event-content">
-        <div class="user-info row" style="gap: 5px;">
-            
+        <div class="user-info row" style="gap: 5px; place-items: center">
+            <div class="row badges" style="display: none"></div>
+
             <h4 class="display-name">${user.displayName}</h4>
             <!-- <h4 class="username">@username</h4> -->
                 
@@ -308,6 +321,24 @@ export async function displayEvent(id, content = document.getElementById("conten
     </div>
     `
     content.appendChild(ev)
+
+    const badges = ev.querySelector(".badges")
+
+    if (meta.admin) {
+        const adminBadge = createBadge("Admin", "h5")
+        adminBadge.style.backgroundColor = "var(--accent)"
+
+        badges.append(adminBadge)
+        badges.style.display = "flex"
+    }
+
+    ev.querySelector(".pfp").onclick = function () {
+        window.location.href = `../user/index.html?u=${username}`
+    }
+
+    ev.querySelector(".display-name").onclick = function () {
+        window.location.href = `../user/index.html?u=${username}`
+    }
 
     if (event.preview) {
         ev.querySelector(".event-image").src = event.preview
@@ -508,7 +539,7 @@ export function toTitleCase(str) {
 }
 
 export function getVersion() {
-    return "Lokal v2 (The Mobile Update)"
+    return "Lokal v3 (The Administrative Update)"
 }
 
 

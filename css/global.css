@@ -418,6 +418,8 @@ p {
 .badge {
     padding: 5px 10px;
     border-radius: 15px;
+    color: white !important;
+    font-weight: bold !important;
 }
 
 #pfp,
@@ -443,7 +445,15 @@ p {
     color: white;
     font-weight: bold;
     margin: 0;
-    margin-right: 2.5px;
+    user-select: none;
+}
+
+.display-name:hover {
+    cursor: pointer;
+}
+
+.pfp:hover {
+    cursor: pointer;
 }
 
 .bullet {
