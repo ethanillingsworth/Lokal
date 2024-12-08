@@ -726,7 +726,7 @@ export function toTitleCase(str) {
 }
 
 export function getVersion() {
-    return "Lokal v3 (The Administrative Update)"
+    return "Lokal v4 (Organization Takeover)"
 }
 
 

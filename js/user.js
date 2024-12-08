@@ -193,70 +193,78 @@ async function members(user) {
 
         const dis = await User.display(username, pub, meta, tab, admin)
 
+        const currentUser = new User(auth.currentUser.uid)
 
-        const actions = dis.querySelector(".actions")
+        const currentUserMeta = await currentUser.getData("hidden")
 
-        actions.innerHTML = ""
+        const memData = await user.getMember(auth.currentUser.uid)
 
-        let p = true
+        if (currentUserMeta.admin || memData.admin) {
 
-        const promote = document.createElement("img")
-        if (!admin) {
-            promote.src = "../img/icons/up.png"
-        }
-        else {
-            promote.src = "../img/icons/down.png"
-            p = false
+            const actions = dis.querySelector(".actions")
 
-        }
-        promote.classList.add("action")
-        promote.onclick = async function () {
+            actions.innerHTML = ""
 
+            let p = true
 
-            if (p) {
-                if (confirm("Are you sure you want to promote that person?")) {
-                    await user.updateMember(person.id, { admin: true })
-                }
-                p = false
-                promote.src = "../img/icons/down.png"
-
-
-
+            const promote = document.createElement("img")
+            if (!admin) {
+                promote.src = "../img/icons/up.png"
             }
             else {
-                if (confirm("Are you sure you want to demote that person?")) {
-                    await user.updateMember(person.id, { admin: false })
+                promote.src = "../img/icons/down.png"
+                p = false
+
+            }
+            promote.classList.add("action")
+            promote.onclick = async function () {
+
+
+                if (p) {
+                    if (confirm("Are you sure you want to promote that person?")) {
+                        await user.updateMember(person.id, { admin: true })
+                    }
+                    p = false
+                    promote.src = "../img/icons/down.png"
+
+
+
                 }
-                p = true
-                promote.src = "../img/icons/up.png"
+                else {
+                    if (confirm("Are you sure you want to demote that person?")) {
+                        await user.updateMember(person.id, { admin: false })
+                    }
+                    p = true
+                    promote.src = "../img/icons/up.png"
+
+                }
+            }
+
+            const del = document.createElement("img")
+            del.src = "../img/icons/del.png"
+            del.classList.add("action")
+            del.onclick = async function () {
+                if (confirm("Are you sure you want to remove that person from your group?")) {
+                    await user.updateMember(person.id, { pending: false, accepted: false })
+                    actions.parentElement.remove()
+                }
+            }
+
+            const open = document.createElement("img")
+            open.src = "../img/icons/arrow.png"
+            open.classList.add("action")
+            open.onclick = async function () {
+                window.location.href = "../user/index.html?u=" + username
+            }
+
+            if (auth.currentUser.uid != personClass.uid) {
+                actions.append(promote)
+                actions.append(del)
 
             }
+
+            actions.append(open)
         }
-
-        const del = document.createElement("img")
-        del.src = "../img/icons/del.png"
-        del.classList.add("action")
-        del.onclick = async function () {
-            if (confirm("Are you sure you want to remove that person from your group?")) {
-                await user.updateMember(person.id, { pending: false, accepted: false })
-                actions.parentElement.remove()
-            }
-        }
-
-        const open = document.createElement("img")
-        open.src = "../img/icons/arrow.png"
-        open.classList.add("action")
-        open.onclick = async function () {
-            window.location.href = "../user/index.html?u=" + username
-        }
-
-        if (auth.currentUser.uid != personClass.uid) {
-            actions.append(promote)
-            actions.append(del)
-
-        }
-
-        actions.append(open)
     })
 }
 
@@ -417,7 +425,7 @@ onAuthStateChanged(auth, async (u) => {
             join.innerText = "Joined"
         }
 
-        if (memberData.admin) {
+        if (memberData.admin || metaU.admin) {
             createTab("Requests")
             await requests(user)
         }
