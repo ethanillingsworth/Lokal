@@ -203,7 +203,9 @@ addButton("Done", async () => {
     }
 
     if (urlParams.get("createGroup")) {
-        await User.createUser(usernameVal, data, {}, { group: true })
+        const newUser = await User.createUser(usernameVal, data, {}, { group: true })
+
+        newUser.updateMember(auth.currentUser.uid, { admin: true, accepted: true })
     }
     else {
 

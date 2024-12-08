@@ -213,8 +213,13 @@ button:not(.gsi-material-button):hover {
     gap: 10px;
 }
 
+h6 {
+    margin: 0;
+}
 
-
+.pending {
+    border-color: var(--dark0);
+}
 
 #heading {
     margin: 20px;
@@ -340,7 +345,8 @@ button:not(.gsi-material-button):hover {
 }
 
 
-.event {
+.event,
+.user {
     display: flex;
     text-wrap: nowrap;
     flex-direction: row;
@@ -403,7 +409,10 @@ p {
     width: 50px;
     margin-right: 15px;
     border-radius: 100%;
+    aspect-ratio: 1/1;
+    object-fit: contain;
 }
+
 
 .event-image {
     width: 100%;
@@ -712,7 +721,8 @@ input[type=checkbox] {
         aspect-ratio: 1/1;
     }
 
-    .event {
+    .event,
+    .user {
         padding: 10px
     }
 

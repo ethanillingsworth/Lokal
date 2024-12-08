@@ -1,8 +1,8 @@
-import { getDoc, doc, query, collection, getDocs, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, query, collection, getDocs, where, limit } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 import { db, auth } from "./firebase.js";
-import { User, createBadge, displayEvent } from "./funcs.js";
+import { User, Badge, displayEvent } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -48,6 +48,7 @@ usrname.id = "username"
 nameDiv.append(displayName)
 nameDiv.append(usrname)
 
+nameDiv.style.gap = "5px"
 
 const badges = document.createElement("div")
 badges.classList.add("row")
@@ -58,6 +59,14 @@ badges.style.placeContent = "start"
 const desc = document.createElement("p");
 
 desc.innerText = "Loading..."
+
+const join = document.createElement("button")
+
+join.innerText = "Join"
+
+join.style.width = "fit-content"
+join.style.display = "none"
+
 
 const tabs = document.createElement("div")
 
@@ -117,6 +126,7 @@ top.append(pfp)
 userDetails.append(nameDiv)
 userDetails.append(badges)
 userDetails.append(desc)
+userDetails.append(join)
 
 top.append(userDetails)
 
@@ -163,6 +173,152 @@ async function attending(uid) {
     })
 }
 
+async function members(user) {
+    const tab = document.getElementById("Members")
+
+    const q = query(collection(db, "users", user.uid, "members"), where("accepted", "==", true), limit(25))
+
+    const get = await getDocs(q)
+
+    get.forEach(async (person) => {
+        const personClass = new User(person.id)
+
+        const username = await personClass.getUsername()
+        const pub = await personClass.getData("public")
+        const meta = await personClass.getData("hidden")
+
+        let admin = false
+
+        if (person.data().admin) { admin = true }
+
+        const dis = await User.display(username, pub, meta, tab, admin)
+
+
+        const actions = dis.querySelector(".actions")
+
+        actions.innerHTML = ""
+
+        let p = true
+
+        const promote = document.createElement("img")
+        if (!admin) {
+            promote.src = "../img/icons/up.png"
+        }
+        else {
+            promote.src = "../img/icons/down.png"
+            p = false
+
+        }
+        promote.classList.add("action")
+        promote.onclick = async function () {
+
+
+            if (p) {
+                if (confirm("Are you sure you want to promote that person?")) {
+                    await user.updateMember(person.id, { admin: true })
+                }
+                p = false
+                promote.src = "../img/icons/down.png"
+
+
+
+            }
+            else {
+                if (confirm("Are you sure you want to demote that person?")) {
+                    await user.updateMember(person.id, { admin: false })
+                }
+                p = true
+                promote.src = "../img/icons/up.png"
+
+            }
+        }
+
+        const del = document.createElement("img")
+        del.src = "../img/icons/del.png"
+        del.classList.add("action")
+        del.onclick = async function () {
+            if (confirm("Are you sure you want to remove that person from your group?")) {
+                await user.updateMember(person.id, { pending: false, accepted: false })
+                actions.parentElement.remove()
+            }
+        }
+
+        const open = document.createElement("img")
+        open.src = "../img/icons/arrow.png"
+        open.classList.add("action")
+        open.onclick = async function () {
+            window.location.href = "../user/index.html?u=" + username
+        }
+
+        if (auth.currentUser.uid != personClass.uid) {
+            actions.append(promote)
+            actions.append(del)
+
+        }
+
+        actions.append(open)
+    })
+}
+
+
+async function groups(user) {
+    const tab = document.getElementById("Groups")
+
+    const groupQ = query(collection(db, "users"), where("group", "==", true))
+
+    const groups = await getDocs(groupQ)
+
+    groups.forEach(async (g) => {
+        const group = new User(g.id)
+
+        const username = await group.getUsername()
+
+        const pub = await group.getData("public")
+        const meta = await group.getData("hidden")
+
+
+        if (await group.getMember(user.uid) != {}) {
+            await User.display(username, pub, meta, tab)
+        }
+    })
+
+}
+
+async function requests(user) {
+    const tab = document.getElementById("Requests")
+
+    const q = query(collection(db, "users", user.uid, "members"), where("pending", "==", true), limit(25))
+
+    const get = await getDocs(q)
+
+
+
+    get.forEach(async (person) => {
+        const personClass = new User(person.id)
+
+        const username = await personClass.getUsername()
+        const pub = await personClass.getData("public")
+        const meta = await personClass.getData("hidden")
+
+
+        const dis = await User.display(username, pub, meta, tab)
+
+        const actions = dis.querySelector(".actions")
+
+        actions.innerHTML = ""
+
+        const confirm = document.createElement("img")
+        confirm.src = "../img/icons/confirm.png"
+        confirm.classList.add("action")
+        confirm.onclick = async function () {
+            await user.updateMember(person.id, { pending: false, accepted: true })
+            actions.parentElement.remove()
+        }
+
+        actions.append(confirm)
+    })
+}
+
 
 function updateProfile(data) {
     usrname.innerText = `(@${pageUser})`
@@ -175,9 +331,6 @@ function updateProfile(data) {
         document.getElementById("pfp").src = data.pfp
     }
 
-
-
-
 }
 
 const uid = await User.getUID(pageUser)
@@ -187,7 +340,7 @@ const meta = await user.getData("hidden")
 
 
 if (meta.admin) {
-    const adminBadge = createBadge("Admin")
+    const adminBadge = new Badge("Lokal Staff")
 
 
     adminBadge.style.backgroundColor = "var(--accent)"
@@ -196,8 +349,7 @@ if (meta.admin) {
 }
 
 if (meta.partner) {
-    const adminBadge = createBadge("Partner")
-
+    const adminBadge = new Badge("Partner")
 
     adminBadge.style.backgroundColor = "var(--accent2)"
 
@@ -205,7 +357,7 @@ if (meta.partner) {
 }
 
 if (meta.group) {
-    const groupBadge = createBadge("Group")
+    const groupBadge = new Badge("Group")
 
     groupBadge.style.backgroundColor = "#3577d4"
 
@@ -214,15 +366,32 @@ if (meta.group) {
 
 onAuthStateChanged(auth, async (u) => {
 
+    if (!u) {
+        window.location.href = "../"
+    }
+
     const currentUser = new User(u.uid)
 
     const metaU = await currentUser.getData("hidden")
 
-    if (u.uid == uid || metaU.admin) {
+    const groupU = await user.getMember(u.uid)
+
+    if ((u.uid == uid || metaU.admin) || (meta.group && groupU.admin)) {
+
+        if (meta.group) {
+            const addEvent = document.createElement("img")
+            addEvent.src = "../img/icons/plus.png"
+
+            addEvent.onclick = function () {
+                window.location.href = "../host/index.html?u=" + user.uid
+            }
+
+            tools.append(addEvent)
+        }
+
         const edit = document.createElement("img")
         edit.id = "edit"
         edit.src = "../img/icons/edit.png"
-        edit.style.marginLeft = "auto"
         edit.width = "35"
 
         tools.append(edit)
@@ -232,6 +401,51 @@ onAuthStateChanged(auth, async (u) => {
             window.location.href = "../edit/index.html?u=" + urlParams.get("u")
 
         }
+    }
+
+    if (meta.group) {
+        const memberData = await user.getMember(currentUser.uid)
+
+
+        if (memberData.pending) {
+            join.classList.add("pending")
+            join.innerText = "Pending..."
+        }
+
+        if (memberData.accepted) {
+
+            join.innerText = "Joined"
+        }
+
+        if (memberData.admin) {
+            createTab("Requests")
+            await requests(user)
+        }
+        else {
+            join.style.display = "flex"
+        }
+
+        join.onclick = async function () {
+            if (join.innerText == "Join") {
+                join.classList.add("pending")
+                join.innerText = "Pending..."
+                await user.updateMember(currentUser.uid, { pending: true })
+
+            }
+            else if (join.innerText == "Pending...") {
+                join.classList.remove("pending")
+                join.innerText = "Join"
+
+                await user.updateMember(currentUser.uid, { pending: false })
+            }
+            else if (join.innerText == "Joined") {
+
+                join.innerText = "Join"
+                await user.updateMember(currentUser.uid, { pending: false, accepted: false })
+
+            }
+        }
+
     }
 })
 
@@ -244,6 +458,15 @@ await hosting(uid)
 if (!meta.group) {
     createTab("Attending")
     await attending(uid)
+
+    createTab("Groups")
+
+    await groups(user)
+}
+else {
+    createTab("Members")
+    await members(user)
+
 }
 
 

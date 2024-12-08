@@ -101,23 +101,23 @@ onAuthStateChanged(auth, async (user) => {
 
     searchMenu.addItem(searchBar)
     // prev searches
-    if (priv.prevRes) {
-        let count = 0
-        priv.prevRes.reverse().forEach(res => {
-            if (count <= 10) {
+    // if (priv.prevRes) {
+    //     let count = 0
+    //     priv.prevRes.reverse().forEach(res => {
+    //         if (count <= 10) {
 
-                searchMenu.addItem(new Item(res, "../img/icons/prev.png", `../search/index.html?q=${res.replaceAll("-", "\-").replaceAll(" ", "-")}`))
+    //             searchMenu.addItem(new Item(res, "../img/icons/prev.png", `../search/index.html?q=${res.replaceAll("-", "\-").replaceAll(" ", "-")}`))
 
-            }
-            count++
-        })
-    }
+    //         }
+    //         count++
+    //     })
+    // }
 
     sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
 
     sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
 
-    // sidebar.menu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"))
+    sidebar.menu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"))
 
 
     const pub = await u.getData("public")

@@ -254,13 +254,20 @@ export class Menu {
     }
 }
 
-export function createBadge(label, labelType = "h4") {
-    const badge = document.createElement(labelType)
-    badge.innerText = label
-    badge.classList.add("badge")
+export class Badge {
 
-    return badge
+    constructor(label, labelType = "h4") {
+        this.badge = document.createElement(labelType)
+        this.badge.innerText = label
+        this.badge.classList.add("badge")
+
+        return this.badge
+
+    }
+
+
 }
+
 
 
 export async function displayEvent(id, content = document.getElementById("content")) {
@@ -289,11 +296,10 @@ export async function displayEvent(id, content = document.getElementById("conten
     ev.innerHTML = `
     <img class="pfp border" src="../img/pfp.jpg">
     <div class="event-content">
+    
         <div class="user-info row" style="gap: 5px; place-items: center">
-            <div class="row badges" style="display: none"></div>
-
             <h4 class="display-name">${user.displayName}</h4>
-            <!-- <h4 class="username">@username</h4> -->
+            <h4 class="username">(@${username})</h4>
                 
             
             <span class="bullet hide">•</span>
@@ -301,6 +307,7 @@ export async function displayEvent(id, content = document.getElementById("conten
                 
 
         </div>
+        <div class="row badges" style="display: none"></div>
         <div class="event-details row">
             <span><b>${event.date}</b></span>
             <span class="hide">|</span>
@@ -325,10 +332,26 @@ export async function displayEvent(id, content = document.getElementById("conten
     const badges = ev.querySelector(".badges")
 
     if (meta.admin) {
-        const adminBadge = createBadge("Admin", "h5")
-        adminBadge.style.backgroundColor = "var(--accent)"
+        const badge = new Badge("Lokal Staff", "h5")
+        badge.style.backgroundColor = "var(--accent)"
 
-        badges.append(adminBadge)
+        badges.append(badge)
+        badges.style.display = "flex"
+    }
+
+    if (meta.partner) {
+        const badge = new Badge("Partner", "h5")
+        badge.style.backgroundColor = "var(--accent2)"
+
+        badges.append(badge)
+        badges.style.display = "flex"
+    }
+
+    if (meta.group) {
+        const badge = new Badge("Group", "h5")
+        badge.style.backgroundColor = "#3577d4"
+
+        badges.append(badge)
         badges.style.display = "flex"
     }
 
@@ -520,6 +543,153 @@ export class User {
         return usernameRef.data().username
     }
 
+    async updateMember(memberId, data) {
+        await setDoc(doc(db, "users", this.uid, "members", memberId), data, { merge: true })
+    }
+
+    async getMember(memberId) {
+        const ref = await getDoc(doc(db, "users", this.uid, "members", memberId))
+
+        if (!ref.exists()) {
+            console.error("Could not fetch data for member ID:" + memberId)
+            return {}
+        }
+
+        return ref.data()
+    }
+
+    static async display(uname, pub, meta, content = document.getElementById("content"), groupAdmin = false) {
+
+        const user = document.createElement("div")
+        user.classList.add("user")
+        user.classList.add("row")
+        user.style.gap = "0"
+        user.style.flexWrap = "nowrap"
+        user.style.width = "calc(100% - 40px)"
+        user.style.placeContent = "start"
+        user.style.placeItems = "start"
+
+
+
+
+        const pfp = document.createElement("img")
+        pfp.classList.add("pfp")
+        pfp.classList.add("border")
+        pfp.src = "../img/pfp.jpg"
+
+        if (pub.pfp) {
+            pfp.src = pub.pfp
+        }
+
+        const userDetails = document.createElement("div")
+        userDetails.classList.add("col")
+
+        const userRow = document.createElement("div")
+        userRow.classList.add("row")
+        userRow.style.width = '100%'
+        userRow.style.placeContent = "start"
+
+        const badges = document.createElement("div")
+        badges.classList.add("row")
+        badges.classList.add("badges")
+        badges.style.display = "none"
+
+        if (meta.admin) {
+            const badge = new Badge("Lokal Staff", "h5")
+            badge.style.backgroundColor = "var(--accent)"
+
+            badges.append(badge)
+
+            badges.style.display = "flex"
+        }
+
+        if (meta.partner) {
+            const badge = new Badge("Partner", "h5")
+            badge.style.backgroundColor = "var(--accent2)"
+
+            badges.append(badge)
+            badges.style.display = "flex"
+        }
+
+        if (meta.group) {
+            const badge = new Badge("Group", "h5")
+            badge.style.backgroundColor = "#3577d4"
+
+            badges.append(badge)
+            badges.style.display = "flex"
+        }
+
+        if (groupAdmin) {
+            const badge = new Badge("Admin", "h5")
+            badge.style.backgroundColor = "#144a96"
+
+            badges.append(badge)
+            badges.style.display = "flex"
+        }
+
+
+
+
+
+        const displayName = document.createElement("h4")
+        displayName.innerText = pub.displayName
+        displayName.classList.add("display-name")
+
+
+        const username = document.createElement("h4")
+        username.style.fontWeight = "normal"
+        username.style.color = "gray"
+        username.innerText = `(@${uname})`
+
+        userRow.append(displayName)
+        userRow.append(username)
+
+        const desc = document.createElement("p")
+        desc.innerText = pub.desc
+
+        userDetails.append(userRow)
+
+        badges.style.placeContent = "start"
+        userDetails.append(badges)
+
+        userDetails.append(desc)
+
+        user.append(pfp)
+        user.append(userDetails)
+
+        const actions = document.createElement("div")
+        actions.classList.add("actions")
+        actions.style.width = "auto"
+        actions.style.marginLeft = "auto"
+
+        const open = document.createElement("img")
+        open.src = "../img/icons/arrow.png"
+        open.onclick = function () {
+
+            window.location.href = "../user/index.html?u=" + uname
+
+
+        }
+        open.classList.add("action")
+        open.id = "open"
+
+
+        actions.append(open)
+
+        user.append(actions)
+
+        actions.style.marginTop = "auto"
+        actions.style.marginBottom = "auto"
+
+
+
+
+        content.append(user)
+
+        return user
+
+    }
+
     static async getUID(username) {
         let userIdRef = await getDoc(doc(db, "uids", username))
 
@@ -530,6 +700,7 @@ export class User {
 
         return userIdRef.data().userId
     }
+
 
     static async createUser(username, pub = {}, priv = {}, meta = {}) {
 
@@ -543,7 +714,7 @@ export class User {
 
         await user.updateData(priv, "private")
 
-        return d.id
+        return new User(d.id)
 
     }
 }

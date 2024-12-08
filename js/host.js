@@ -113,6 +113,10 @@ function addPage(name, prev = null, next = null, current = false) {
                 else {
                     data.timestamp = Timestamp.fromDate(new Date())
                     data.creator = auth.currentUser.uid
+                    if (urlParams.get("u")) {
+                        data.creator = urlParams.get("u")
+                    }
+
                     const id = await createEvent(data)
 
                     window.location.href = "../event/index.html?e=" + id
