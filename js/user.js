@@ -139,8 +139,6 @@ modal.append(divider)
 
 content.append(modal)
 
-createTab("Hosting", true)
-
 async function hosting(uid) {
     const hostingTab = document.getElementById("Hosting")
 
@@ -465,7 +463,6 @@ onAuthStateChanged(auth, async (u) => {
 const data = await user.getData("public")
 
 updateProfile(data)
-await hosting(uid)
 
 if (!meta.group) {
     createTab("Attending")
@@ -476,6 +473,8 @@ if (!meta.group) {
     await groups(user)
 }
 else {
+    createTab("Hosting", true)
+    await hosting(uid)
     createTab("Members")
     await members(user)
 

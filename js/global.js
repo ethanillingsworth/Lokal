@@ -71,7 +71,7 @@ onAuthStateChanged(auth, async (user) => {
     const username = await u.getUsername()
 
 
-    const priv = await u.getData("private")
+    const meta = await u.getData("hidden")
 
     const searchMenu = new Menu(expand)
 
@@ -113,14 +113,14 @@ onAuthStateChanged(auth, async (user) => {
     //     })
     // }
 
+    const pub = await u.getData("public")
+
     sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
 
-    sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
-
-    sidebar.menu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"))
-
-
-    const pub = await u.getData("public")
+    // sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
+    if (meta.approved) {
+        sidebar.menu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"))
+    }
 
 
     const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)

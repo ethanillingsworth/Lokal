@@ -133,12 +133,25 @@ googleButton.onclick = function () {
             const { isNewUser } = getAdditionalUserInfo(result)
             localStorage.clear()
 
+            const email = user.email
+
 
             if (isNewUser) {
                 console.log("New User")
+
                 let tempUsername = generateUsername()
 
+                if (Validation.username(email.split("@")[0])) {
+                    tempUsername = email.split("@")[0]
+                }
+
+                if (!await Validation.finalUsername(tempUsername)) {
+                    tempUsername = generateUsername()
+
+                }
+
                 await setUserData(user, tempUsername)
+
 
 
             }

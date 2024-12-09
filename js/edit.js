@@ -41,12 +41,14 @@ function addButton(label, onclick) {
 }
 
 
-const uid = new User(urlParams.get("u"))
+const uid = new User(await User.getUID(urlParams.get("u"))).uid
 
 
 onAuthStateChanged(auth, async (user) => {
     const authUser = new User(user.uid)
     const meta = await authUser.getData("hidden")
+
+
 
     if (urlParams.get("createGroup") && urlParams.get("u")) {
         window.location.href = "../"
