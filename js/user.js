@@ -433,7 +433,7 @@ onAuthStateChanged(auth, async (u) => {
             createTab("Requests")
             await requests(user)
         }
-        else {
+        if (!memberData.admin) {
             join.style.display = "flex"
         }
 

@@ -215,7 +215,11 @@ addPage("Public View", async (page) => {
     page.append(agenda)
 }, true)
 
-if (currentUser.uid == data.creator || meta.admin) {
+const creator = new User(data.creator)
+
+const currentUserMemberData = await creator.getMember(currentUser.uid)
+
+if (currentUser.uid == data.creator || currentUserMemberData.admin || meta.admin) {
     const share = document.createElement("img")
     share.id = "share"
     share.src = "../img/icons/share.png"
