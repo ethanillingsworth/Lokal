@@ -285,7 +285,7 @@ async function groups(user) {
         const meta = await group.getData("hidden")
 
 
-        if (await group.getMember(user.uid) != {}) {
+        if (Object.keys(await group.getMember(user.uid)).length != 0) {
             await User.display(username, pub, meta, tab)
         }
     })
