@@ -339,6 +339,10 @@ function updateProfile(data) {
         document.getElementById("pfp").src = data.pfp
     }
 
+    if (data.accentColor) {
+        document.getElementById("pfp").style.borderColor = data.accentColor
+    }
+
 }
 
 const uid = await User.getUID(pageUser)

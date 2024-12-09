@@ -3,7 +3,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/f
 
 import { db, auth } from "./firebase.js";
 
-import { User, Validation, getBase64 } from "./funcs.js";
+import { User, Validation, getBase64, rgbToHex } from "./funcs.js";
 
 const content = document.getElementById("content")
 
@@ -135,6 +135,19 @@ addField("Upload:", (row) => {
     row.append(inp)
 })
 
+addField("Border Color:", (row) => {
+    const inp = document.createElement("input")
+    inp.type = "color"
+    inp.id = "borderColor"
+    inp.value = "#a353b9"
+    inp.onchange = function () {
+        preview.style.borderColor = inp.value
+    }
+
+
+    row.append(inp)
+})
+
 addButton("Cancel", () => {
     if (urlParams.get("createGroup")) {
         window.location.href = "../"
@@ -172,6 +185,12 @@ if (urlParams.get("u")) {
         preview.src = pub.pfp
     }
 
+    if (pub.accentColor) {
+        preview.style.borderColor = pub.accentColor
+
+        document.getElementById('borderColor').value = rgbToHex(pub.accentColor)
+    }
+
 
 }
 
@@ -182,7 +201,8 @@ addButton("Done", async () => {
 
         displayName: displayNameVal,
         desc: document.getElementById("desc").value,
-        pfp: document.getElementById("pfp").src
+        pfp: document.getElementById("pfp").src,
+        accentColor: preview.style.borderColor
 
     }
 

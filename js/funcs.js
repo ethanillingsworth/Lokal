@@ -331,6 +331,10 @@ export async function displayEvent(id, content = document.getElementById("conten
 
     const badges = ev.querySelector(".badges")
 
+    if (user.accentColor) {
+        ev.querySelector(".pfp").style.borderColor = user.accentColor
+    }
+
     if (meta.admin) {
         const badge = new Badge("Lokal Staff", "h5")
         badge.style.backgroundColor = "var(--accent)"
@@ -581,6 +585,10 @@ export class User {
             pfp.src = pub.pfp
         }
 
+        if (pub.accentColor) {
+            pfp.style.borderColor = pub.accentColor
+        }
+
         const userDetails = document.createElement("div")
         userDetails.classList.add("col")
 
@@ -821,4 +829,18 @@ export function getBase64(file) {
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
     });
+}
+
+// thanks chatgpt
+
+export function rgbToHex(rgb) {
+    // Extract the numbers from the rgb string using a regex
+    const result = rgb.match(/\d+/g);
+    if (!result || result.length !== 3) {
+        throw new Error("Invalid RGB input");
+    }
+
+    // Convert each number to a 2-digit hexadecimal and concatenate them
+    const [r, g, b] = result.map(num => parseInt(num, 10));
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
 }
