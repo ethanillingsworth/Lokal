@@ -30,12 +30,7 @@ function generateUsername() {
     var rA = Math.floor(Math.random() * a.length);
     var rB = Math.floor(Math.random() * b.length);
     var rC = Math.floor(Math.random() * 1000)
-    while (usernames.includes(a[rA] + b[rB])) {
-        rA = Math.floor(Math.random() * a.length);
-        rB = Math.floor(Math.random() * b.length);
-        rC = Math.floor(Math.random() * 1000)
 
-    }
     return (a[rA] + b[rB] + rC)
 }
 
@@ -138,11 +133,7 @@ googleButton.onclick = function () {
                 await setUserData(user, tempUsername)
 
 
-
             }
-            console.log(user)
-
-            redirect()
 
 
             // IdP data available using getAdditionalUserInfo(result)
