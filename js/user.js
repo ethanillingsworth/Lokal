@@ -465,7 +465,7 @@ const data = await user.getData("public")
 updateProfile(data)
 
 if (!meta.group) {
-    createTab("Attending")
+    createTab("Attending", true)
     await attending(uid)
 
     createTab("Groups")

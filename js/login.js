@@ -21,21 +21,6 @@ const passwordError = document.getElementById("passwordError")
 const urlParams = new URLSearchParams(window.location.search)
 
 
-
-
-// get exisitng usernames
-const usernames = []
-
-const q = query(collection(db, "usernames"));
-
-const querySnapshot = await getDocs(q);
-querySnapshot.forEach((doc) => {
-    // doc.data() is never undefined for query doc snapshots
-    console.log(doc.id, " => ", doc.data());
-    usernames.push(doc.data()["username"])
-});
-
-
 // random username
 
 var a = ["Small", "Blue", "Pretty", "Big", "High", "Silly", "Red", "Party", "Cute", "Beautiful"];
@@ -166,22 +151,25 @@ googleButton.onclick = function () {
 }
 
 // normal sign up
-signUp.onclick = function () {
+signUp.onclick = async function () {
+
+    if (await Validation.finalUsername(username.value) !== true) {
+        alert(await Validation.finalUsername(username.value))
+        return
+    }
 
     createUserWithEmailAndPassword(auth, email.value, password.value)
         .then(async (userCredential) => {
             // Signed up 
             const user = userCredential.user;
             var finalUsername = generateUsername()
-            if (username.value) {
 
-                if (await Validation.finalUsername(username.value) !== true) {
-                    alert(await Validation.finalUsername(username.value))
-                    return
-                }
+            // Username validation is screwed
+            if (username.value) {
 
                 if (Validation.username(username.value) === true) {
                     finalUsername = username.value
+
                 }
 
                 await setUserData(user, finalUsername)

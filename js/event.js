@@ -289,6 +289,8 @@ if (currentUser.uid == data.creator || currentUserMemberData.admin || meta.admin
 
             const here = document.createElement("input")
 
+            console.log(d.id)
+
             here.type = "checkbox"
 
             if (d.data().here) {
