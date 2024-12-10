@@ -134,6 +134,7 @@ googleButton.onclick = function () {
 
 
             }
+            redirect()
 
 
             // IdP data available using getAdditionalUserInfo(result)
