@@ -539,8 +539,14 @@ if (urlParams.get("e")) {
 
     const meta = await currentUser.getData("hidden")
 
+    const creator = new User(data.creator)
 
-    if (currentUser.uid == data.creator || meta.admin) {
+    const memberData = await creator.getMember(currentUser.uid)
+
+    console.log(memberData)
+
+
+    if (currentUser.uid == data.creator || meta.admin || memberData.admin) {
 
         title.value = data.title
         desc.value = data.desc
@@ -554,6 +560,9 @@ if (urlParams.get("e")) {
 
             isPlaceholder = false
         }
+    }
+    else {
+        console.error("idk")
     }
 
 }

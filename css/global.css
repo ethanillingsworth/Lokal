@@ -718,7 +718,6 @@ input[type=checkbox] {
     .pfp {
         width: 32px;
         height: 32px;
-        aspect-ratio: 1/1;
     }
 
     .event,

@@ -41,12 +41,14 @@ function addButton(label, onclick) {
 }
 
 
-const uid = new User(await User.getUID(urlParams.get("u"))).uid
+const pageUser = new User(await User.getUID(urlParams.get("u")))
 
 
 onAuthStateChanged(auth, async (user) => {
     const authUser = new User(user.uid)
     const meta = await authUser.getData("hidden")
+
+    const memberData = await pageUser.getMember(authUser.uid)
 
 
 
@@ -55,10 +57,15 @@ onAuthStateChanged(auth, async (user) => {
         return
     }
 
-    if (user.uid != uid && !meta.admin) {
+    if (user.uid == pageUser.uid || meta.admin || memberData.admin) {
+
+    }
+    else {
         window.location.href = "../"
+
         return
     }
+
 })
 
 
