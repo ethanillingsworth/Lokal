@@ -192,11 +192,15 @@ async function members(user) {
 
         const dis = await User.display(username, pub, meta, tab, admin)
 
-        const currentUser = new User(auth.currentUser.uid)
+        let currentUser = new User("notloggedin")
+
+        if (auth.currentUser) currentUser = new User(auth.currentUser.uid)
 
         const currentUserMeta = await currentUser.getData("hidden")
 
-        const memData = await user.getMember(auth.currentUser.uid)
+        let memData = {}
+
+        if (auth.currentUser) memData = await user.getMember(auth.currentUser.uid)
 
         if (currentUserMeta.admin || memData.admin) {
 
@@ -378,7 +382,7 @@ if (meta.group) {
 onAuthStateChanged(auth, async (u) => {
 
     if (!u) {
-        window.location.href = "../"
+        return
     }
 
     const currentUser = new User(u.uid)

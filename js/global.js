@@ -48,7 +48,6 @@ document.body.onresize = function () {
 
 resizeChecks()
 
-
 sidebar.menu.addItem(new Item("Connect", "../img/icons/party.png", "../"))
 
 document.body.append(content)
@@ -57,21 +56,6 @@ document.body.append(content)
 //addItem("Home", "../img/icons/home.png", "../")
 
 onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-
-        location.href = "../login/index.html?r=" + window.location.href
-
-    }
-    const uid = user.uid;
-
-    const u = new User(uid)
-
-    // createEvent(uid, "Sports", "Verrat de marde de mosus de doux Jésus de charrue de saint-ciboire de sacristi de crucifix de colon d'étole de maudite marde.", new Date(), "Elk Grove High School", 0, [])
-
-    const username = await u.getUsername()
-
-
-    const meta = await u.getData("hidden")
 
     const searchMenu = new Menu(expand)
 
@@ -87,10 +71,11 @@ onAuthStateChanged(auth, async (user) => {
             document.getElementById("search-icon").onclick = async function () {
                 if (document.getElementById('search').value) {
                     const s = document.getElementById('search').value.replaceAll('-', '\-').replaceAll(' ', '-')
-
-                    await updateDoc(doc(db, "users", uid, "data", "private"), {
-                        "prevRes": arrayUnion(s)
-                    });
+                    if (user) {
+                        await updateDoc(doc(db, "users", uid, "data", "private"), {
+                            "prevRes": arrayUnion(s)
+                        });
+                    }
                     window.location.href = '../search/index.html?q=' + s
 
                 }
@@ -100,85 +85,112 @@ onAuthStateChanged(auth, async (user) => {
     searchBar.noHover = true
 
     searchMenu.addItem(searchBar)
-    // prev searches
-    // if (priv.prevRes) {
-    //     let count = 0
-    //     priv.prevRes.reverse().forEach(res => {
-    //         if (count <= 10) {
 
-    //             searchMenu.addItem(new Item(res, "../img/icons/prev.png", `../search/index.html?q=${res.replaceAll("-", "\-").replaceAll(" ", "-")}`))
+    if (!user) {
 
-    //         }
-    //         count++
-    //     })
-    // }
+        sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
 
-    const pub = await u.getData("public")
 
-    sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
+        const dName = new Item("Sign in", "../img/pfp.jpg", () => {
+            window.location.href = "../login"
+        })
+        dName.id = "user"
 
-    // sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
-    if (meta.approved) {
-        sidebar.menu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"))
+        sidebar.menu.addItem(dName, true)
+
+
     }
+    else {
+
+        const uid = user.uid;
+
+        const u = new User(uid)
+
+        // createEvent(uid, "Sports", "Verrat de marde de mosus de doux Jésus de charrue de saint-ciboire de sacristi de crucifix de colon d'étole de maudite marde.", new Date(), "Elk Grove High School", 0, [])
+
+        const username = await u.getUsername()
 
 
-    const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
+        const meta = await u.getData("hidden")
 
-    if (pub.pfp) {
-        dName.img = pub.pfp
-    }
-    dName.id = "user"
+        // prev searches
+        // if (priv.prevRes) {
+        //     let count = 0
+        //     priv.prevRes.reverse().forEach(res => {
+        //         if (count <= 10) {
 
-    sidebar.menu.addItem(dName, true)
+        //             searchMenu.addItem(new Item(res, "../img/icons/prev.png", `../search/index.html?q=${res.replaceAll("-", "\-").replaceAll(" ", "-")}`))
 
-    const moreMenu = new Menu(expand)
+        //         }
+        //         count++
+        //     })
+        // }
 
-    moreMenu.addItem(new Item("Log Out", "../img/icons/logout.png", () => {
-        signOut(auth).then(() => {
-            // Sign-out successful.
-            location.href = "../login/index.html?r=" + window.location.href
+        const pub = await u.getData("public")
 
-        }).catch((error) => {
-            // An error happened.
-        });
-    }), true)
+        sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
 
-    let backAdded = false
+        // sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
+        if (meta.approved) {
+            sidebar.menu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"))
+        }
 
-    function resizeChecks() {
-        if (window.innerWidth < 512) {
-            sidebar.heading.innerText = "L"
+        const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
 
-            if (!backAdded) {
+        if (pub.pfp) {
+            dName.img = pub.pfp
+        }
+        dName.id = "user"
 
-                moreMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
-                    expand.classList.remove("showExpand")
-                    Menu.clicked = false
-                }), true)
+        sidebar.menu.addItem(dName, true)
 
-                searchMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
-                    expand.classList.remove("showExpand")
-                    Menu.clicked = false
-                }), true)
+        const moreMenu = new Menu(expand)
+
+        moreMenu.addItem(new Item("Log Out", "../img/icons/logout.png", () => {
+            signOut(auth).then(() => {
+                // Sign-out successful.
+                location.href = "../login/index.html?r=" + window.location.href
+
+            }).catch((error) => {
+                // An error happened.
+            });
+        }), true)
+
+        let backAdded = false
+
+        function resizeChecks() {
+            if (window.innerWidth < 512) {
+                sidebar.heading.innerText = "L"
+
+                if (!backAdded) {
+
+                    moreMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                        expand.classList.remove("showExpand")
+                        Menu.clicked = false
+                    }), true)
+
+                    searchMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                        expand.classList.remove("showExpand")
+                        Menu.clicked = false
+                    }), true)
+                }
+            }
+            else {
+                sidebar.heading.innerText = "Lokal"
             }
         }
-        else {
-            sidebar.heading.innerText = "Lokal"
+
+
+        document.body.onresize = function () {
+
+            resizeChecks()
         }
-    }
-
-
-    document.body.onresize = function () {
 
         resizeChecks()
+
+        sidebar.menu.addItem(new Item("More", "../img/icons/more.png", moreMenu), true)
+
     }
-
-    resizeChecks()
-
-    sidebar.menu.addItem(new Item("More", "../img/icons/more.png", moreMenu), true)
-
-
 
 
 });

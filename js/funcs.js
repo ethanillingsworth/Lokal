@@ -392,7 +392,9 @@ export async function displayEvent(id, content = document.getElementById("conten
         if (data.attending) {
             attending += 1
         }
-        if (doc.id == auth.currentUser.uid && data.attending) selfAttend = true;
+        if (auth.currentUser) {
+            if (doc.id == auth.currentUser.uid && data.attending) selfAttend = true;
+        }
     })
 
     const left = document.createElement("div")
@@ -417,7 +419,10 @@ export async function displayEvent(id, content = document.getElementById("conten
 
         left.append(action)
 
-        if (auth.currentUser.uid != event.creator) func(action, label)
+        if (auth.currentUser) {
+
+            if (auth.currentUser.uid != event.creator) func(action, label)
+        }
 
     }
 
