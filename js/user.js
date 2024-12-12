@@ -10,6 +10,23 @@ const pageUser = urlParams.get("u")
 
 const content = document.getElementById("content")
 
+const ad = document.createElement("div")
+
+ad.innerHTML = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8715143726198603"
+     crossorigin="anonymous"></script>
+<!-- User1 -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8715143726198603"
+     data-ad-slot="5231747620"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>`
+
+content.append(ad)
+
 
 const modal = document.createElement("div")
 modal.classList.add("modal")
