@@ -52,7 +52,8 @@ async function setUserData(user, email, username) {
     await setDoc(doc(db, "users", user.uid, "data", "private"), {
         prevRes: []
     })
-    if (email.endsWith("@stu.d214.org")) {
+
+    if (email.endsWith("@d214.org")) {
         await setDoc(doc(db, "users", user.uid), {
             approved: true
         })
@@ -161,7 +162,6 @@ signUp.onclick = async function () {
     //     alert("That email isnt an authorized @stu.d214.org or @d214.org email adress.")
     //     return
     // }
-
     createUserWithEmailAndPassword(auth, email.value, password.value)
         .then(async (userCredential) => {
             // Signed up 
@@ -175,6 +175,8 @@ signUp.onclick = async function () {
                     finalUsername = username.value
 
                 }
+
+
 
                 await setUserData(user, email.value, finalUsername)
 
