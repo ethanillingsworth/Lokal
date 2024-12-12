@@ -34,8 +34,8 @@ function generateUsername() {
     return (a[rA] + b[rB] + rC)
 }
 
-async function setUserData(user, username) {
-    localStorage.clear()
+async function setUserData(user, email, username) {
+
     await setDoc(doc(db, "usernames", user.uid), {
         username: username.toLowerCase()
     });
@@ -52,6 +52,11 @@ async function setUserData(user, username) {
     await setDoc(doc(db, "users", user.uid, "data", "private"), {
         prevRes: []
     })
+    if (email.endsWith("@stu.d214.org")) {
+        await setDoc(doc(db, "users", user.uid), {
+            approved: true
+        })
+    }
 
 }
 
@@ -109,15 +114,17 @@ googleButton.onclick = function () {
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const token = credential.accessToken;
             // The signed-in user info.
-            const user = result.user;
+            const u = result.user;
             const { isNewUser } = getAdditionalUserInfo(result)
-            localStorage.clear()
+
 
             const email = user.email
 
 
+
+
             if (isNewUser) {
-                console.log("New User")
+
 
                 let tempUsername = generateUsername()
 
@@ -130,7 +137,7 @@ googleButton.onclick = function () {
 
                 }
 
-                await setUserData(user, tempUsername)
+                await setUserData(u, email, tempUsername)
 
 
             }
@@ -150,6 +157,11 @@ signUp.onclick = async function () {
         return
     }
 
+    // if (!email.value.endsWith("@stu.d214.org") || !email.value.endsWith("@d214.org")) {
+    //     alert("That email isnt an authorized @stu.d214.org or @d214.org email adress.")
+    //     return
+    // }
+
     createUserWithEmailAndPassword(auth, email.value, password.value)
         .then(async (userCredential) => {
             // Signed up 
@@ -164,7 +176,7 @@ signUp.onclick = async function () {
 
                 }
 
-                await setUserData(user, finalUsername)
+                await setUserData(user, email.value, finalUsername)
 
                 redirect()
                 // ...
