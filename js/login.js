@@ -119,7 +119,7 @@ googleButton.onclick = function () {
             const { isNewUser } = getAdditionalUserInfo(result)
 
 
-            const email = user.email
+            const email = u.email
 
 
 
