@@ -158,8 +158,9 @@ signUp.onclick = async function () {
         return
     }
 
+    console.log(email.value.endsWith("@stu.d214.org"))
 
-    if (!email.value.endsWith("@stu.d214.org") || !email.value.endsWith("@d214.org")) {
+    if (!email.value.endsWith("@stu.d214.org") && !email.value.endsWith("@d214.org")) {
         alert("That email isnt an authorized @stu.d214.org or @d214.org email adress.")
         return
 
