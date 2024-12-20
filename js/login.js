@@ -107,48 +107,48 @@ password.oninput = function () {
 }
 
 // google sign in
-googleButton.onclick = function () {
+// googleButton.onclick = function () {
 
-    signInWithPopup(auth, google)
-        .then(async (result) => {
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            const token = credential.accessToken;
-            // The signed-in user info.
-            const u = result.user;
-            const { isNewUser } = getAdditionalUserInfo(result)
-
-
-            const email = u.email
+//     signInWithPopup(auth, google)
+//         .then(async (result) => {
+//             // This gives you a Google Access Token. You can use it to access the Google API.
+//             const credential = GoogleAuthProvider.credentialFromResult(result);
+//             const token = credential.accessToken;
+//             // The signed-in user info.
+//             const u = result.user;
+//             const { isNewUser } = getAdditionalUserInfo(result)
 
 
+//             const email = u.email
 
 
-            if (isNewUser) {
 
 
-                let tempUsername = generateUsername()
-
-                if (Validation.username(email.split("@")[0])) {
-                    tempUsername = email.split("@")[0]
-                }
-
-                if (!await Validation.finalUsername(tempUsername)) {
-                    tempUsername = generateUsername()
-
-                }
-
-                await setUserData(u, email, tempUsername)
+//             if (isNewUser) {
 
 
-            }
-            redirect()
+//                 let tempUsername = generateUsername()
+
+//                 if (Validation.username(email.split("@")[0])) {
+//                     tempUsername = email.split("@")[0]
+//                 }
+
+//                 if (!await Validation.finalUsername(tempUsername)) {
+//                     tempUsername = generateUsername()
+
+//                 }
+
+//                 await setUserData(u, email, tempUsername)
 
 
-            // IdP data available using getAdditionalUserInfo(result)
-            // ...
-        })
-}
+//             }
+//             redirect()
+
+
+//             // IdP data available using getAdditionalUserInfo(result)
+//             // ...
+//         })
+// }
 
 // normal sign up
 signUp.onclick = async function () {
@@ -158,10 +158,13 @@ signUp.onclick = async function () {
         return
     }
 
-    // if (!email.value.endsWith("@stu.d214.org") || !email.value.endsWith("@d214.org")) {
-    //     alert("That email isnt an authorized @stu.d214.org or @d214.org email adress.")
-    //     return
-    // }
+
+    if (!email.value.endsWith("@stu.d214.org") || !email.value.endsWith("@d214.org")) {
+        alert("That email isnt an authorized @stu.d214.org or @d214.org email adress.")
+        return
+
+    }
+
     createUserWithEmailAndPassword(auth, email.value, password.value)
         .then(async (userCredential) => {
             // Signed up 
