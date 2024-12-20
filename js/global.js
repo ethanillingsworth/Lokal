@@ -71,11 +71,11 @@ onAuthStateChanged(auth, async (user) => {
             document.getElementById("search-icon").onclick = async function () {
                 if (document.getElementById('search').value) {
                     const s = document.getElementById('search').value.replaceAll('-', '\-').replaceAll(' ', '-')
-                    if (user) {
-                        await updateDoc(doc(db, "users", uid, "data", "private"), {
-                            "prevRes": arrayUnion(s)
-                        });
-                    }
+                    // if (user) {
+                    //     await updateDoc(doc(db, "users", uid, "data", "private"), {
+                    //         "prevRes": arrayUnion(s)
+                    //     });
+                    // }
                     window.location.href = '../search/index.html?q=' + s
 
                 }

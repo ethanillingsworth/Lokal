@@ -40,8 +40,12 @@ function addButton(label, onclick) {
     }
 }
 
+let pageUser = undefined
 
-const pageUser = new User(await User.getUID(urlParams.get("u")))
+if (urlParams.get("u")) {
+
+    pageUser = new User(await User.getUID(urlParams.get("u")))
+}
 
 
 onAuthStateChanged(auth, async (user) => {

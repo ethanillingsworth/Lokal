@@ -1,4 +1,4 @@
-import { getDocs, limit, query, collection } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDocs, limit, query, collection, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { db } from "./firebase.js";
 import { displayEvent, User } from "./funcs.js"
@@ -16,8 +16,8 @@ const search = urlParams.get("q").replaceAll("-", " ").toLowerCase()
 heading.innerText = "Results for \"" + search + '"'
 
 
-const q = query(collection(db, "posts"), limit(20))
-const qu = query(collection(db, "usernames"), limit(20))
+const q = query(collection(db, "posts"), limit(50))
+const qu = query(collection(db, "usernames"), limit(100))
 
 
 const ref = await getDocs(q)
