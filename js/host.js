@@ -1,4 +1,4 @@
-import { createEvent, getBase64, getEvent, toTitleCase, Event, User } from "./funcs.js"
+import { createEvent, Utils, Event, User } from "./funcs.js"
 import { auth } from "./firebase.js"
 import { Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
@@ -90,7 +90,7 @@ function addPage(name, prev = null, next = null, current = false) {
                     desc: desc.value,
                     category: cate.value,
                     date: date.value,
-                    location: toTitleCase(loc.value),
+                    location: Utils.toTitleCase(loc.value),
                     cost: cost.valueAsNumber,
                     agenda: agenda.value.replaceAll("\n", "<br>"),
 
@@ -448,7 +448,7 @@ addField(addImage, "Image Upload:", (row) => {
     input.onchange = async function () {
         const file = input.files[0]
 
-        preview.src = await getBase64(file)
+        preview.src = await Utils.getBase64(file)
 
         isPlaceholder = false
     }
@@ -526,7 +526,9 @@ content.append(modal)
 // load data if event id is present
 if (urlParams.get("e")) {
 
-    const data = await getEvent(urlParams.get("e"))
+    const e = new Event(urlParams.get("e"))
+
+    const data = await e.get()
 
     const title = document.getElementById("title")
     const desc = document.getElementById("desc")

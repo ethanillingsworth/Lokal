@@ -3,7 +3,7 @@ import { getDoc, doc, setDoc, getDocs, updateDoc, collection, addDoc, Timestamp,
 
 import { auth, db } from "./firebase.js";
 
-import { CustomItem, getVersion, Item, Menu, Sidebar, User } from "./funcs.js";
+import { CustomItem, Utils, Item, Menu, Sidebar, User } from "./funcs.js";
 
 
 // debug only version
@@ -13,7 +13,7 @@ import { CustomItem, getVersion, Item, Menu, Sidebar, User } from "./funcs.js";
 // document.body.append(ver)
 
 window.getVersion = function () {
-    return getVersion()
+    return Utils.getVersion()
 }
 
 // elements
