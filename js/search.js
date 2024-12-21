@@ -1,7 +1,7 @@
 import { getDocs, limit, query, collection, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { db } from "./firebase.js";
-import { displayEvent, User } from "./funcs.js"
+import { Event, User } from "./funcs.js"
 
 const content = document.getElementById("content")
 
@@ -28,7 +28,10 @@ ref.forEach(async (d) => {
     const data = d.data()
     if (data.title.toLowerCase().includes(search) || data.desc.toLowerCase().includes(search) || data.category.toLowerCase().includes(search)
         || data.date.toLowerCase().includes(search) || data.location.toLowerCase().includes(search)) {
-        await displayEvent(d.id, modal)
+
+        const e = new Event(d.id)
+
+        await e.display(modal)
     }
 });
 

@@ -2,7 +2,7 @@ import { getDoc, doc, query, collection, getDocs, where, limit } from "https://w
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 import { db, auth } from "./firebase.js";
-import { User, Badge, displayEvent } from "./funcs.js";
+import { User, Badge, Event } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -149,7 +149,8 @@ async function hosting(uid) {
     const get = await getDocs(q)
 
     get.forEach(async (event) => {
-        await displayEvent(event.id, hostingTab)
+        const e = new Event(event.id)
+        await e.display(hostingTab)
     })
 }
 
@@ -163,11 +164,14 @@ async function attending(uid) {
     get.forEach(async (event) => {
 
         const uData = await getDoc(doc(db, "posts", event.id, "uData", uid))
+
+        const e = new Event(event.id)
+
         if (uData.exists()) {
             const data = uData.data()
             // check if user is attending
             if (data.attending) {
-                await displayEvent(event.id, attendingTab)
+                await e.display(attendingTab)
             }
         }
     })

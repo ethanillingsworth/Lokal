@@ -269,31 +269,35 @@ export class Badge {
 }
 
 
-
-export async function displayEvent(id, content = document.getElementById("content")) {
-
-    const event = await getEvent(id)
-
-    const u = new User(event.creator)
-
-    const user = await u.getData()
-
-    const meta = await u.getData("hidden")
-
-    const username = await u.getUsername()
-
-    let cost = "Free admission";
-
-    if (event.cost > 0) {
-        cost = `$${event.cost} per person`
+export class Event {
+    constructor(id) {
+        this.id = id
     }
 
-    // make event
-    const ev = document.createElement("div")
-    ev.classList.add("event")
-    ev.id = id
+    async display(content = document.getElementById("content")) {
 
-    ev.innerHTML = `
+        const event = await this.getData(this.id)
+
+        const u = new User(event.creator)
+
+        const user = await u.getData()
+
+        const meta = await u.getData("hidden")
+
+        const username = await u.getUsername()
+
+        let cost = "Free admission";
+
+        if (event.cost > 0) {
+            cost = `$${event.cost} per person`
+        }
+
+        // make event
+        const ev = document.createElement("div")
+        ev.classList.add("event")
+        ev.id = id
+
+        ev.innerHTML = `
     <img class="pfp border" src="../img/pfp.jpg">
     <div class="event-content">
     
@@ -327,181 +331,180 @@ export async function displayEvent(id, content = document.getElementById("conten
         
     </div>
     `
-    content.appendChild(ev)
+        content.appendChild(ev)
 
-    const badges = ev.querySelector(".badges")
+        const badges = ev.querySelector(".badges")
 
-    if (user.accentColor) {
-        ev.querySelector(".pfp").style.borderColor = user.accentColor
-    }
-
-    if (meta.admin) {
-        const badge = new Badge("Lokal Staff", "h5")
-        badge.style.backgroundColor = "var(--accent)"
-
-        badges.append(badge)
-        badges.style.display = "flex"
-    }
-
-    if (meta.partner) {
-        const badge = new Badge("Partner", "h5")
-        badge.style.backgroundColor = "var(--accent2)"
-
-        badges.append(badge)
-        badges.style.display = "flex"
-    }
-
-    if (meta.group) {
-        const badge = new Badge("Group", "h5")
-        badge.style.backgroundColor = "#3577d4"
-
-        badges.append(badge)
-        badges.style.display = "flex"
-    }
-
-    ev.querySelector(".pfp").onclick = function () {
-        window.location.href = `../user/index.html?u=${username}`
-    }
-
-    ev.querySelector(".display-name").onclick = function () {
-        window.location.href = `../user/index.html?u=${username}`
-    }
-
-    if (event.preview) {
-        ev.querySelector(".event-image").src = event.preview
-    }
-    else {
-        ev.querySelector(".event-image").style.display = "none"
-    }
-
-    if (user.pfp) {
-        ev.querySelector(".pfp").src = user.pfp
-    }
-
-    // actions
-
-    let attending = 0
-
-    let selfAttend = false
-
-    const uData = await getEventUData(id)
-
-    uData.forEach((doc) => {
-        const data = doc.data()
-
-        if (data.attending) {
-            attending += 1
-        }
-        if (auth.currentUser) {
-            if (doc.id == auth.currentUser.uid && data.attending) selfAttend = true;
-        }
-    })
-
-    const left = document.createElement("div")
-    left.classList.add("row")
-
-    const actions = ev.querySelector(`.actions`)
-
-    actions.append(left)
-
-    function addAction(l, src, func) {
-        const action = document.createElement("div")
-        action.classList.add("action")
-
-        const img = document.createElement("img")
-        img.src = src
-
-        const label = document.createElement("span")
-        label.innerText = l
-
-        action.append(img)
-        action.append(label)
-
-        left.append(action)
-
-        if (auth.currentUser) {
-
-            if (auth.currentUser.uid != event.creator) func(action, label)
+        if (user.accentColor) {
+            ev.querySelector(".pfp").style.borderColor = user.accentColor
         }
 
-    }
+        if (meta.admin) {
+            const badge = new Badge("Lokal Staff", "h5")
+            badge.style.backgroundColor = "var(--accent)"
 
-    addAction(`${attending} Attending`, "../img/icons/profile.png", (button, span) => {
-        if (selfAttend) {
-            button.style.border = "3px solid var(--accent)"
+            badges.append(badge)
+            badges.style.display = "flex"
         }
 
-        button.onclick = async function () {
-            if (selfAttend) {
-                selfAttend = false
-                button.style.border = "3px solid transparent"
-                attending -= 1
+        if (meta.partner) {
+            const badge = new Badge("Partner", "h5")
+            badge.style.backgroundColor = "var(--accent2)"
 
-            }
-            else {
-                selfAttend = true
-                button.style.border = "3px solid var(--accent)"
+            badges.append(badge)
+            badges.style.display = "flex"
+        }
+
+        if (meta.group) {
+            const badge = new Badge("Group", "h5")
+            badge.style.backgroundColor = "#3577d4"
+
+            badges.append(badge)
+            badges.style.display = "flex"
+        }
+
+        ev.querySelector(".pfp").onclick = function () {
+            window.location.href = `../user/index.html?u=${username}`
+        }
+
+        ev.querySelector(".display-name").onclick = function () {
+            window.location.href = `../user/index.html?u=${username}`
+        }
+
+        if (event.preview) {
+            ev.querySelector(".event-image").src = event.preview
+        }
+        else {
+            ev.querySelector(".event-image").style.display = "none"
+        }
+
+        if (user.pfp) {
+            ev.querySelector(".pfp").src = user.pfp
+        }
+
+        // actions
+
+        let attending = 0
+
+        let selfAttend = false
+
+        const uData = await this.getUData()
+
+        uData.forEach((doc) => {
+            const data = doc.data()
+
+            if (data.attending) {
                 attending += 1
-
             }
+            if (auth.currentUser) {
+                if (doc.id == auth.currentUser.uid && data.attending) selfAttend = true;
+            }
+        })
 
-            span.innerText = `${attending} Attending`;
-            await setDoc(doc(db, "posts", id, "uData", auth.currentUser.uid), {
-                attending: selfAttend
-            })
+        const left = document.createElement("div")
+        left.classList.add("row")
+
+        const actions = ev.querySelector(`.actions`)
+
+        actions.append(left)
+
+        function addAction(l, src, func) {
+            const action = document.createElement("div")
+            action.classList.add("action")
+
+            const img = document.createElement("img")
+            img.src = src
+
+            const label = document.createElement("span")
+            label.innerText = l
+
+            action.append(img)
+            action.append(label)
+
+            left.append(action)
+
+            if (auth.currentUser) {
+
+                if (auth.currentUser.uid != event.creator) func(action, label)
+            }
 
         }
 
+        addAction(`${attending} Attending`, "../img/icons/profile.png", (button, span) => {
+            if (selfAttend) {
+                button.style.border = "3px solid var(--accent)"
+            }
 
-    })
+            button.onclick = async function () {
+                if (selfAttend) {
+                    selfAttend = false
+                    button.style.border = "3px solid transparent"
+                    attending -= 1
+
+                }
+                else {
+                    selfAttend = true
+                    button.style.border = "3px solid var(--accent)"
+                    attending += 1
+
+                }
+
+                span.innerText = `${attending} Attending`;
+                await setDoc(doc(db, "posts", this.id, "uData", auth.currentUser.uid), {
+                    attending: selfAttend
+                })
+
+            }
 
 
-    const open = document.createElement("div")
-    open.classList.add("action")
+        })
 
-    const openImage = document.createElement("img")
 
-    openImage.src = "../img/icons/arrow.png"
+        const open = document.createElement("div")
+        open.classList.add("action")
 
-    open.append(openImage)
+        const openImage = document.createElement("img")
 
-    open.onclick = function () {
-        window.location.href = "../event/index.html?e=" + id
+        openImage.src = "../img/icons/arrow.png"
+
+        open.append(openImage)
+
+        open.onclick = function () {
+            window.location.href = "../event/index.html?e=" + this.id
+        }
+
+        actions.append(open)
     }
 
-    actions.append(open)
-
-
-
-}
-
-export async function getEventUData(eventId) {
-    return await getDocs(query(collection(db, "posts", eventId, "uData")))
-}
-
-export async function createEvent(data) {
-    const event = await addDoc(collection(db, "posts"), data)
-    return event.id;
-}
-
-export async function updateEvent(eventId, data) {
-    await setDoc(doc(db, "posts", eventId), data, { merge: true })
-
-}
-
-export async function getEvent(eventId) {
-    let e = await getDoc(doc(db, "posts", eventId))
-
-    if (!e.exists()) {
-        console.error("Could not load event with id: " + eventId)
-        return {}
+    async getUData() {
+        return await getDocs(query(collection(db, "posts", this.id, "uData")))
     }
 
+    async update(data) {
+        await setDoc(doc(db, "posts", this.id), data, { merge: true })
+    }
 
-    let eventData = e.data()
+    async get() {
+        let e = await getDoc(doc(db, "posts", this.id))
 
-    return eventData
+        if (!e.exists()) {
+            console.error("Could not load event with id: " + this.id)
+            return {}
+        }
+
+
+        let eventData = e.data()
+
+        return eventData
+    }
+
+    static async create(data) {
+        const event = await addDoc(collection(db, "posts"), data)
+        return event.id;
+    }
 }
+
+
 
 export class User {
     constructor(uid) {

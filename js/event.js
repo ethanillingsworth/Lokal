@@ -1,7 +1,7 @@
 import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
-import { Alert, getEvent, Prompt, User } from "./funcs.js";
+import { Alert, Event, Prompt, User } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search)
 
@@ -15,8 +15,9 @@ modal.classList.add("modal")
 
 content.append(modal)
 
+const e = new Event(urlParams.get("e"))
 
-const data = await getEvent(urlParams.get("e"))
+const data = await e.get()
 
 
 const row = document.createElement("div")

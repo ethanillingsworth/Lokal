@@ -1,4 +1,4 @@
-import { createEvent, getBase64, getEvent, toTitleCase, updateEvent, User } from "./funcs.js"
+import { createEvent, getBase64, getEvent, toTitleCase, Event, User } from "./funcs.js"
 import { auth } from "./firebase.js"
 import { Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
@@ -105,7 +105,8 @@ function addPage(name, prev = null, next = null, current = false) {
 
                 // upload
                 if (urlParams.get("e")) {
-                    await updateEvent(urlParams.get("e"), data)
+                    const e = new Event(urlParams.get("e"))
+                    await e.update(data)
 
                     window.location.href = "../event/index.html?e=" + urlParams.get("e");
 
