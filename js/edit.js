@@ -1,24 +1,21 @@
-import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 import { db, auth } from "./firebase.js";
+import "./jquery.js";
+
 
 import { User, Validation, getBase64, rgbToHex } from "./funcs.js";
 
-const content = document.getElementById("content")
+const content = $("#content")
 
-const modal = document.createElement("div")
-modal.classList.add("modal")
+const modal = $("<div></div>").addClass("modal")
 
 const urlParams = new URLSearchParams(window.location.search);
 
 function addField(head, action) {
-    const row = document.createElement("div")
-    row.classList.add("row")
-    row.style.placeContent = "start"
+    const row = $("<div></div>").addClass("row").css("placeContent", "start")
 
-    const heading = document.createElement("h3")
-    heading.innerText = head
+    const heading = $("<h3></h3>").text(head)
 
     row.append(heading)
 
@@ -27,17 +24,16 @@ function addField(head, action) {
     modal.append(row)
 }
 
-const buttons = document.createElement("div")
-buttons.classList.add("row")
+const buttons = $("<div></div>").addClass("row")
 
 function addButton(label, onclick) {
-    const button = document.createElement('button')
-    button.innerText = label
+    const button = $("<button></button>").text(label)
+
     buttons.append(button)
 
-    button.onclick = () => {
+    button.on("click", () => {
         onclick()
-    }
+    })
 }
 
 let pageUser = undefined
@@ -75,39 +71,32 @@ onAuthStateChanged(auth, async (user) => {
 
 
 addField("Username:", (row) => {
-    const inp = document.createElement("input")
-    inp.id = "username"
-    inp.placeholder = "lokal"
+    const inp = $("<input></input>").attr("id", "username").attr("placeholder", "lokal")
 
     row.append(inp)
 })
 
 addField("Display Name:", (row) => {
-    const inp = document.createElement("input")
-    inp.id = "displayName"
-    inp.placeholder = "Lokal"
-
+    const inp = $("<input></input>").attr("id", "displayName").attr("placeholder", "Lokal")
 
     row.append(inp)
 })
 
 addField("Description:", (row) => {
-    row.style.placeItems = "start"
-    row.style.flexDirection = "column"
-    const inp = document.createElement("textarea")
-    inp.placeholder = "You should probably change this."
-    inp.rows = 5;
-    inp.id = "desc"
-    inp.maxLength = "200"
+    row.css("placeItems", "start")
+    row.css("flexDirection", "column")
+
+    const inp = $("<textarea></textarea>")
+        .attr("placeholder", "You should probably change this.")
+        .attr("rows", 5)
+        .attr("id", "desc")
+        .attr("maxLength", 200)
 
     row.append(inp)
 
 })
 
-const preview = document.createElement("img")
-preview.id = "pfp"
-preview.classList.add("border")
-preview.src = "../img/pfp.jpg"
+const preview = $("<img>").attr("id", "pfp").addClass("border").attr("src", "../img/pfp.jpg")
 
 modal.append(preview)
 
@@ -115,25 +104,18 @@ modal.append(preview)
 
 addField("Upload:", (row) => {
 
-    row.style.placeContent = "center"
+    row.css("placeContent", "center")
 
-    const inp = document.createElement("input")
-    inp.type = "file"
-    inp.name = "fileUpload"
-    inp.accept = "image/png, image/jpeg"
+    const inp = $("<input>").attr("type", "file").attr("name", "fileUpload")
+        .attr("accept", "image/png, image/jpeg")
 
+    const lab = $("<label></label>").text("Select Image").attr("for", "fileUpload")
 
-    const lab = document.createElement("label")
-    lab.innerText = "Select Image"
-    lab.htmlFor = "fileUpload"
+    lab.on("click", () => {
+        inp.trigger("click")
+    })
 
-
-
-    lab.onclick = function () {
-        inp.click()
-    }
-
-    inp.onchange = async function (event) {
+    inp.on("change", async (event) => {
 
         if (event.target.files[0].size > 1000000) {
             alert("That image is over 1 megabyte, please upload one under that size!")
@@ -141,21 +123,21 @@ addField("Upload:", (row) => {
         }
 
 
-        preview.src = await getBase64(event.target.files[0])
-    }
+        preview.attr("src", await getBase64(event.target.files[0]))
+    })
 
     row.append(lab)
     row.append(inp)
 })
 
 addField("Border Color:", (row) => {
-    const inp = document.createElement("input")
-    inp.type = "color"
-    inp.id = "borderColor"
-    inp.value = "#a353b9"
-    inp.onchange = function () {
-        preview.style.borderColor = inp.value
-    }
+    const inp = $("<input></input>").attr("type", "color")
+        .attr("id", "borderColor")
+        .attr("value", "#a353b9")
+
+    inp.on("change", () => {
+        preview.css("borderColor", inp.val())
+    })
 
 
     row.append(inp)
@@ -187,35 +169,37 @@ if (urlParams.get("u")) {
     const pub = await u.getData("public")
     oldUsername = await u.getUsername()
 
-    document.getElementById("username").value = oldUsername
+    $("#username").val(oldUsername)
 
-    document.getElementById("displayName").value = pub.displayName
+    $("#displayName").val(pub.displayName)
 
-    document.getElementById("desc").value = pub.desc
-
+    $("#desc").val(pub.desc)
 
     if (pub.pfp) {
-        preview.src = pub.pfp
+        preview.attr("src", pub.pfp)
     }
 
     if (pub.accentColor) {
-        preview.style.borderColor = pub.accentColor
+        preview.css("borderColor", pub.accentColor)
 
-        document.getElementById('borderColor').value = rgbToHex(pub.accentColor)
+        $("#borderColor").val(rgbToHex(pub.accentColor))
     }
 
 
 }
 
 addButton("Done", async () => {
-    const usernameVal = document.getElementById("username").value
-    const displayNameVal = document.getElementById("displayName").value
+    const usernameVal = $("#username").val()
+    const displayNameVal = $("#displayName").val()
+    const descVal = $("#desc").val()
+    const pfpVal = $("#pfp").val()
+
     const data = {
 
         displayName: displayNameVal,
-        desc: document.getElementById("desc").value,
-        pfp: document.getElementById("pfp").src,
-        accentColor: preview.style.borderColor
+        desc: descVal,
+        pfp: pfpVal,
+        accentColor: preview.css("borderColor")
 
     }
 
@@ -249,5 +233,5 @@ addButton("Done", async () => {
 
 
 
-    window.location.href = "../user/index.html?u=" + document.getElementById("username").value
+    window.location.href = "../user/index.html?u=" + usernameVal
 })
