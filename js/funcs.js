@@ -742,7 +742,7 @@ export function toTitleCase(str) {
 }
 
 export function getVersion() {
-    return "Lokal v4 (Organization Takeover)"
+    return "Lokal v5 (User Appreciation Day)"
 }
 
 
