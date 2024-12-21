@@ -98,7 +98,7 @@ addField("Description:", (row) => {
     inp.placeholder = "You should probably change this."
     inp.rows = 5;
     inp.id = "desc"
-    inp.maxLength = "50"
+    inp.maxLength = "150"
 
     row.append(inp)
 
