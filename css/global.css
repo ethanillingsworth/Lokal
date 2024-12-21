@@ -348,7 +348,6 @@ h6 {
 .event,
 .user {
     display: flex;
-    text-wrap: nowrap;
     flex-direction: row;
     width: auto;
     padding: 20px;
