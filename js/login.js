@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAdditionalUserInfo } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { auth, db } from "./firebase.js";
 import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { Validation } from "./funcs.js";
@@ -18,6 +18,19 @@ const usernameDiv = $("#usernameDiv")
 const usernameError = $("#usernameError")
 const emailError = $("#emailError")
 const passwordError = $("#passwordError")
+
+
+const forgotPass = $("#forgotpass")
+
+forgotPass.on("click", () => {
+    sendPasswordResetEmail(auth, email.val())
+        .then(() => {
+            alert("Password change request sent, check " + email.val() + "'s inbox!")
+        })
+        .catch((error) => {
+            alert("Dont forget to fill out your email first!")
+        })
+})
 
 
 const urlParams = new URLSearchParams(window.location.search)

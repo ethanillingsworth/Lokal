@@ -36,7 +36,7 @@ input {
     margin: 0;
 }
 
-#inputs > * {
+#inputs>* {
     margin-bottom: 10px;
 }
 
@@ -44,4 +44,7 @@ input {
 .modal {
     width: auto;
 }
-  
+
+#forgotpass {
+    cursor: pointer;
+}

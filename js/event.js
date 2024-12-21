@@ -1,7 +1,7 @@
 import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
-import { Alert, Event, Prompt, User } from "./funcs.js";
+import { Event, Prompt, User } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search)
 
