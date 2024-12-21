@@ -1,7 +1,6 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-import { getDoc, doc, setDoc, getDocs, updateDoc, collection, addDoc, Timestamp, arrayUnion, query } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-import { auth, db } from "./firebase.js";
+import { auth } from "./firebase.js";
 
 import { CustomItem, Utils, Item, Menu, Sidebar, User } from "./funcs.js";
 
