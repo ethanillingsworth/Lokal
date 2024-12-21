@@ -1,21 +1,23 @@
-import { signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, getAdditionalUserInfo } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-import { auth, google, db } from "./firebase.js";
-import { setDoc, doc, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAdditionalUserInfo } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { auth, db } from "./firebase.js";
+import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { Validation } from "./funcs.js";
+import "./jquery.js";
+
 
 // elements
-const googleButton = document.getElementById("google")
-const signUp = document.getElementById("signup")
-const signIn = document.getElementById("signin")
+// const googleButton = document.getElementById("google")
+const signUp = $("#signup")
+const signIn = $("#signin")
 
-const email = document.getElementById("email")
-const username = document.getElementById("username")
-const password = document.getElementById("password")
+const email = $("#email")
+const username = $("#username")
+const password = $("#password")
 
-const usernameDiv = document.getElementById("usernameDiv")
-const usernameError = document.getElementById("usernameError")
-const emailError = document.getElementById("emailError")
-const passwordError = document.getElementById("passwordError")
+const usernameDiv = $("#usernameDiv")
+const usernameError = $("#usernameError")
+const emailError = $("#emailError")
+const passwordError = $("#passwordError")
 
 
 const urlParams = new URLSearchParams(window.location.search)
@@ -70,41 +72,43 @@ function redirect() {
     }
 }
 
-username.oninput = function () {
-    if (Validation.username(username.value) != true) {
-        usernameDiv.style.border = "2px solid var(--red)"
-        usernameError.innerText = Validation.username(username.value)
+username.on("input", () => {
+    if (Validation.username(username.val()) != true) {
+        usernameDiv.css("border", "2px solid var(--red)")
+        usernameError.text(Validation.username(username.val()))
+
     }
     else {
-        usernameDiv.style.border = "none"
-        usernameError.innerText = ""
+        usernameDiv.css("border", "none")
+        usernameError.text("")
 
     }
-}
+})
 
-email.oninput = function () {
-    if (Validation.email(email.value) != true) {
-        email.style.border = "2px solid var(--red)"
-        emailError.innerText = Validation.email(email.value)
-    }
-    else {
-        email.style.border = "none"
-        emailError.innerText = ""
-
-    }
-}
-
-password.oninput = function () {
-    if (Validation.password(password.value) != true) {
-        password.style.border = "2px solid var(--red)"
-        passwordError.innerText = Validation.password(password.value)
+email.on("input", () => {
+    if (Validation.email(email.val()) != true) {
+        email.css("border", "2px solid var(--red)")
+        emailError.text(Validation.email(email.val()))
     }
     else {
-        password.style.border = "none"
-        passwordError.innerText = ""
+        email.css("border", "none")
+        emailError.text("")
 
     }
-}
+})
+
+password.on("input", () => {
+    if (Validation.password(password.val()) != true) {
+        password.css("border", "2px solid var(--red)")
+        passwordError.text(Validation.password(password.val()))
+    }
+    else {
+        password.css("border", "none")
+        passwordError.text("")
+
+    }
+})
+
 
 // google sign in
 // googleButton.onclick = function () {
@@ -151,48 +155,48 @@ password.oninput = function () {
 // }
 
 // normal sign up
-signUp.onclick = async function () {
+signUp.on("click", async () => {
 
-    if (await Validation.finalUsername(username.value) !== true) {
-        alert(await Validation.finalUsername(username.value))
+    if (await Validation.finalUsername(username.val()) !== true) {
+        alert(await Validation.finalUsername(username.val()))
         return
     }
 
-    console.log(email.value.endsWith("@stu.d214.org"))
+    console.log(email.val().endsWith("@stu.d214.org"))
 
-    if (!email.value.endsWith("@stu.d214.org") && !email.value.endsWith("@d214.org")) {
+    if (!email.val().endsWith("@stu.d214.org") && !email.val().endsWith("@d214.org")) {
         alert("That email isnt an authorized @stu.d214.org or @d214.org email adress.")
         return
 
     }
 
-    createUserWithEmailAndPassword(auth, email.value, password.value)
+    createUserWithEmailAndPassword(auth, email.val(), password.val())
         .then(async (userCredential) => {
             // Signed up 
             const user = userCredential.user;
             var finalUsername = generateUsername()
 
             // Username validation is screwed
-            if (username.value) {
+            if (username.val()) {
 
-                if (Validation.username(username.value) === true) {
-                    finalUsername = username.value
+                if (Validation.username(username.val()) === true) {
+                    finalUsername = username.val()
 
                 }
 
 
 
-                await setUserData(user, email.value, finalUsername)
+                await setUserData(user, emailVal, finalUsername)
 
                 redirect()
                 // ...
             }
         })
-}
+})
 
 // normal sign in
-signIn.onclick = function () {
-    signInWithEmailAndPassword(auth, email.value, password.value)
+signIn.on("click", () => {
+    signInWithEmailAndPassword(auth, email.val(), password.val())
         .then((userCredential) => {
             localStorage.clear()
 
@@ -202,4 +206,7 @@ signIn.onclick = function () {
 
             // ...
         })
-}
+        .catch((error) => {
+            alert(error)
+        })
+})

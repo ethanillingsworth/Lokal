@@ -184,8 +184,6 @@ if (urlParams.get("u")) {
 
         $("#borderColor").val(rgbToHex(pub.accentColor))
     }
-
-
 }
 
 addButton("Done", async () => {
@@ -230,8 +228,5 @@ addButton("Done", async () => {
 
         await u.updateData(data, "public")
     }
-
-
-
     window.location.href = "../user/index.html?u=" + usernameVal
 })
