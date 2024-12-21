@@ -741,9 +741,6 @@ export function toTitleCase(str) {
     });
 }
 
-export function getVersion() {
-    return "Lokal v5 (User Appreciation Day)"
-}
 
 
 export class Validation {
@@ -830,25 +827,38 @@ export class Validation {
 }
 
 
-export function getBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-}
+export class Utils {
 
-// thanks chatgpt
-
-export function rgbToHex(rgb) {
-    // Extract the numbers from the rgb string using a regex
-    const result = rgb.match(/\d+/g);
-    if (!result || result.length !== 3) {
-        throw new Error("Invalid RGB input");
+    static toTitleCase(str) {
+        return str.replace(/\w\S*/g, function (txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1);
+        });
     }
 
-    // Convert each number to a 2-digit hexadecimal and concatenate them
-    const [r, g, b] = result.map(num => parseInt(num, 10));
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+    static getVersion() {
+        return "Lokal v5 (User Appreciation Day)"
+    }
+
+    static getBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // thanks chatgpt
+
+    static rgbToHex(rgb) {
+        // Extract the numbers from the rgb string using a regex
+        const result = rgb.match(/\d+/g);
+        if (!result || result.length !== 3) {
+            throw new Error("Invalid RGB input");
+        }
+
+        // Convert each number to a 2-digit hexadecimal and concatenate them
+        const [r, g, b] = result.map(num => parseInt(num, 10));
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+    }
 }
