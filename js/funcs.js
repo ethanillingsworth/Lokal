@@ -1,6 +1,8 @@
 import { getDoc, doc, setDoc, getDocs, collection, addDoc, query, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-import { auth, db } from "./firebase.js";
+import { logEvent } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
+
+import { auth, db, analytics } from "./firebase.js";
 
 import "./jquery.js"
 
@@ -840,5 +842,9 @@ export class Utils {
         // Convert each number to a 2-digit hexadecimal and concatenate them
         const [r, g, b] = result.map(num => parseInt(num, 10));
         return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+    }
+
+    static logMetric(name, data) {
+        logEvent(analytics, name, data)
     }
 }

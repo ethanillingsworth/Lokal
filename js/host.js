@@ -1,4 +1,4 @@
-import { createEvent, Utils, Event, User } from "./funcs.js"
+import { Utils, Event, User } from "./funcs.js"
 import { auth } from "./firebase.js"
 import { Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
@@ -118,7 +118,11 @@ function addPage(name, prev = null, next = null, current = false) {
                         data.creator = urlParams.get("u")
                     }
 
-                    const id = await createEvent(data)
+                    const id = await Event.create(data)
+                    Utils.logMetric("event_created", {
+                        timestamp: data.timestamp,
+                        event_id: id
+                    })
 
                     window.location.href = "../event/index.html?e=" + id
                 }
