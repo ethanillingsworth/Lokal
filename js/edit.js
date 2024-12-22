@@ -131,7 +131,8 @@ addField("Upload:", (row) => {
 })
 
 addField("Border Color:", (row) => {
-    const inp = $("<input></input>").attr("type", "color")
+    const inp = $("<input></input>")
+        .attr("type", "color")
         .attr("id", "borderColor")
         .attr("value", "#a353b9")
 
