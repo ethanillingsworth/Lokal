@@ -17,16 +17,11 @@ window.getVersion = function () {
 
 // elements
 
-const expand = document.createElement("div")
-expand.id = "expand"
+const expand = $("<div/>").attr("id", "expand")
 
-document.body.append(expand)
+$(document.body).append(expand)
 
-const bottom = document.createElement("div")
-bottom.id = "bottom"
-
-const content = document.createElement("div")
-content.id = "content"
+const content = $("<div/>").attr("id", "content")
 
 const sidebar = new Sidebar()
 
@@ -49,7 +44,7 @@ resizeChecks()
 
 sidebar.menu.addItem(new Item("Connect", "../img/icons/party.png", "../"))
 
-document.body.append(content)
+$(document.body).append(content)
 
 
 //addItem("Home", "../img/icons/home.png", "../")

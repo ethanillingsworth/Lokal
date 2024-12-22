@@ -136,24 +136,22 @@ export class CustomItem extends Item {
 
 export class Sidebar {
     constructor(heading = "Lokal") {
-        this.element = document.createElement("div")
-        this.element.id = "sidebar"
+        this.element = $("<div/>").attr("id", "sidebar")
 
-        document.body.append(this.element)
+        $(document.body).append(this.element)
 
-        this.heading = document.createElement("h1")
-        this.heading.id = "heading"
+        this.heading = $("<h1/>").attr("id", "heading")
+            .on("click", () => {
+                window.location.href = "../"
+
+            })
+
         this.setHeading(heading)
-        this.heading.onclick = () => {
-            window.location.href = "../"
-        }
 
         this.element.append(this.heading)
 
-        this.itemsElement = document.createElement("div")
-        this.itemsElement.classList.add("menu")
-        this.itemsElement.classList.add("col")
-        this.itemsElement.style.gap = "5px"
+        this.itemsElement = $("<div/>").addClass("menu").addClass("col").css("gap", "5px")
+
 
         this.element.append(this.itemsElement)
 
@@ -161,7 +159,7 @@ export class Sidebar {
     }
 
     setHeading(label) {
-        this.heading.innerText = label
+        this.heading.text(label)
 
     }
 
@@ -177,29 +175,26 @@ export class Menu {
     }
 
     refresh() {
-        this.element.innerHTML = ""
+        this.element.html("")
 
-        const bottom = document.createElement("div")
-        bottom.id = "bottom"
-
+        const bottom = $("<div/>").attr("id", "bottom")
 
         this.items.forEach((item) => {
             let e = this.element
 
             if (item.bottom) e = bottom
 
-            const i = document.createElement("div")
-            i.classList.add("item")
+            const i = $("<div/>").addClass("item")
 
-            if (item.noHover) i.classList.add("no-hov")
+            if (item.noHover) i.addClass("no-hov")
 
 
-            if (item.id != null) i.id = item.id
+            if (item.id != null) i.attr("id", item.id)
 
             e.append(i)
 
             if (item.customHtml) {
-                i.innerHTML = item.customHtml
+                i.html(item.customHtml)
 
 
                 item.after()
@@ -209,30 +204,30 @@ export class Menu {
                 if (item.click instanceof Menu) {
                     const element = item.click.element
 
-                    i.onclick = function () {
+                    i.on("click", function () {
                         item.click.refresh()
                         if (Menu.clicked == false) {
-                            element.classList.add("showExpand")
+                            element.addClass("showExpand")
 
                             Menu.clicked = true
                         }
                         else {
-                            element.classList.remove("showExpand")
+                            element.removeClass("showExpand")
                             Menu.clicked = false
                         }
-                    }
+                    })
 
 
                 }
                 else if (item.click instanceof Function) {
-                    i.onclick = function () {
+                    i.on("click", function () {
                         item.click()
-                    }
+                    })
                 }
                 else {
-                    i.onclick = function () {
+                    i.on("click", function () {
                         window.location.href = item.click
-                    }
+                    })
                 }
 
                 const img = document.createElement("img")
@@ -499,8 +494,6 @@ export class Event {
     }
 }
 
-
-
 export class User {
     constructor(uid) {
         this.uid = uid
@@ -716,14 +709,6 @@ export class User {
 
     }
 }
-
-export function toTitleCase(str) {
-    return str.replace(/\w\S*/g, function (txt) {
-        return txt.charAt(0).toUpperCase() + txt.substr(1);
-    });
-}
-
-
 
 export class Validation {
     static username(value) {
