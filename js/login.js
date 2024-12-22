@@ -67,12 +67,13 @@ async function setUserData(user, email, username) {
     await setDoc(doc(db, "users", user.uid, "data", "private"), {
         prevRes: []
     })
+    // require manual approval for now
 
-    if (email.endsWith("@d214.org")) {
-        await setDoc(doc(db, "users", user.uid), {
-            approved: true
-        })
-    }
+    // if (email.endsWith("@d214.org")) {
+    //     await setDoc(doc(db, "users", user.uid), {
+    //         approved: true
+    //     })
+    // }
 
 }
 
@@ -199,7 +200,7 @@ signUp.on("click", async () => {
 
 
 
-                await setUserData(user, emailVal, finalUsername)
+                await setUserData(user, email.val(), finalUsername)
 
                 redirect()
                 // ...
