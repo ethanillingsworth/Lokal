@@ -4,7 +4,7 @@ import { db, auth } from "./firebase.js";
 import "./jquery.js";
 
 
-import { User, Validation, getBase64, rgbToHex } from "./funcs.js";
+import { User, Validation, Utils } from "./funcs.js";
 
 const content = $("#content")
 
@@ -123,7 +123,7 @@ addField("Upload:", (row) => {
         }
 
 
-        preview.attr("src", await getBase64(event.target.files[0]))
+        preview.attr("src", await Utils.getBase64(event.target.files[0]))
     })
 
     row.append(lab)
@@ -131,7 +131,8 @@ addField("Upload:", (row) => {
 })
 
 addField("Border Color:", (row) => {
-    const inp = $("<input></input>").attr("type", "color")
+    const inp = $("<input></input>")
+        .attr("type", "color")
         .attr("id", "borderColor")
         .attr("value", "#a353b9")
 
@@ -182,7 +183,7 @@ if (urlParams.get("u")) {
     if (pub.accentColor) {
         preview.css("borderColor", pub.accentColor)
 
-        $("#borderColor").val(rgbToHex(pub.accentColor))
+        $("#borderColor").val(Utils.rgbToHex(pub.accentColor))
     }
 }
 

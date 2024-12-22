@@ -4,145 +4,113 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/f
 import { db, auth } from "./firebase.js";
 import { User, Badge, Event } from "./funcs.js";
 
+import "./jquery.js";
+
 const urlParams = new URLSearchParams(window.location.search);
+const pageUser = urlParams.get("u");
 
-const pageUser = urlParams.get("u")
+const content = $("#content");
 
-const content = document.getElementById("content")
+// Modal
+const modal = $("<div/>").addClass("modal");
 
+// Top row
+const top = $("<div/>")
+    .addClass("row")
+    .attr("id", "top")
+    .css("width", "100%")
+    .css("place-content", "start");
 
+const pfp = $("<img/>")
+    .attr("src", "../img/pfp.jpg")
+    .attr("id", "pfp")
+    .addClass("border");
 
-const modal = document.createElement("div")
-modal.classList.add("modal")
+// User Details
+const userDetails = $("<div/>")
+    .addClass("col")
+    .attr("id", "userDetails")
+    .css("gap", "20px");
 
-const top = document.createElement("div")
-top.classList.add("row")
-top.id = "top"
-top.style.width = "100%"
-top.style.placeContent = "start"
+// Name Div
+const nameDiv = $("<div/>")
+    .addClass("row")
+    .css("place-content", "start")
+    .css("place-items", "center")
+    .css("gap", "5px");
 
-const pfp = document.createElement("img")
-pfp.src = "../img/pfp.jpg"
-pfp.id = "pfp"
-pfp.classList.add("border")
+const displayName = $("<h2/>")
+    .text("Loading...")
+    .attr("id", "displayName");
 
-const userDetails = document.createElement("div")
-userDetails.classList.add("col")
-userDetails.id = "userDetails"
-userDetails.gap = "20px"
+const usrname = $("<h3/>")
+    .text("Loading...")
+    .attr("id", "username");
 
-const nameDiv = document.createElement("div")
-nameDiv.classList.add("row")
-nameDiv.style.placeContent = "start"
-nameDiv.style.placeItems = "center"
+nameDiv.append(displayName).append(usrname);
 
+const badges = $("<div/>")
+    .addClass("row")
+    .css("flex-wrap", "nowrap")
+    .css("place-content", "start");
 
+const desc = $("<p/>").text("Loading...");
 
-const displayName = document.createElement("h2");
-displayName.innerText = "Loading..."
-displayName.id = "displayName"
+const join = $("<button/>")
+    .text("Join")
+    .css("width", "fit-content")
+    .css("display", "none");
 
+const tabs = $("<div/>")
+    .addClass("row tabList")
+    .css("gap", "20px")
+    .css("margin-bottom", "0")
+    .css("margin-top", "20px")
+    .css("position", "relative")
+    .css("top", "10px");
 
-const usrname = document.createElement("h3");
-usrname.innerText = "Loading..."
-usrname.id = "username"
-
-nameDiv.append(displayName)
-nameDiv.append(usrname)
-
-nameDiv.style.gap = "5px"
-
-const badges = document.createElement("div")
-badges.classList.add("row")
-badges.style.flexWrap = "nowrap"
-badges.style.placeContent = "start"
-
-
-const desc = document.createElement("p");
-
-desc.innerText = "Loading..."
-
-const join = document.createElement("button")
-
-join.innerText = "Join"
-
-join.style.width = "fit-content"
-join.style.display = "none"
-
-
-const tabs = document.createElement("div")
-
-tabs.classList.add("row")
-tabs.classList.add("tabList")
-
-tabs.style.gap = "20px"
-tabs.style.marginBottom = "0"
-tabs.style.marginTop = "20px"
-tabs.style.position = "relative"
-tabs.style.top = "10px"
-
+// Tab Creation Function
 function createTab(name, current) {
-    const tab = document.createElement("h4")
-    tab.classList.add("tab")
-    if (current) tab.classList.add("current")
+    const tab = $("<h4/>")
+        .addClass("tab")
+        .text(name);
 
-    tab.innerText = name
+    if (current) tab.addClass("current");
 
-    tabs.append(tab)
+    tabs.append(tab);
 
-    const pageContent = document.createElement("div")
-    pageContent.classList.add("pageContent")
-    pageContent.id = name
-    if (current) pageContent.classList.add("currentPage")
+    const pageContent = $("<div/>")
+        .addClass("pageContent")
+        .attr("id", name);
 
+    if (current) pageContent.addClass("currentPage");
 
-    tab.onclick = function () {
+    tab.on("click", function () {
+        $(".pageContent").removeClass("currentPage");
+        $(".tab").removeClass("current");
 
-        document.querySelectorAll(".pageContent").forEach((c) => {
-            c.classList.remove("currentPage")
-        })
+        tab.addClass("current");
+        $(`#${name}`).addClass("currentPage");
+    });
 
-        document.querySelectorAll(".tab").forEach((t) => {
-            t.classList.remove("current")
-        })
-        tab.classList.add("current")
-        document.getElementById(name).classList.add("currentPage")
-
-    }
-
-    modal.append(pageContent)
-
-
+    modal.append(pageContent);
 }
 
-const divider = document.createElement("hr")
+const divider = $("<hr/>");
 
+const tools = $("<div/>").addClass("row tools");
 
-const tools = document.createElement("div")
-tools.classList.add("row")
-tools.classList.add('tools')
+top.append(pfp);
+userDetails.append(nameDiv).append(badges).append(desc).append(join);
+top.append(userDetails);
 
-top.append(pfp)
+modal.append(top).append(tools).append(tabs).append(divider);
 
+content.append(modal);
 
-userDetails.append(nameDiv)
-userDetails.append(badges)
-userDetails.append(desc)
-userDetails.append(join)
-
-top.append(userDetails)
-
-
-
-modal.append(top)
-modal.append(tools)
-modal.append(tabs)
-modal.append(divider)
-
-content.append(modal)
 
 async function hosting(uid) {
-    const hostingTab = document.getElementById("Hosting")
+    const hostingTab = $("#Hosting")
 
     const q = query(collection(db, "posts"), where("creator", "==", uid))
 
@@ -155,7 +123,7 @@ async function hosting(uid) {
 }
 
 async function attending(uid) {
-    const attendingTab = document.getElementById("Attending")
+    const attendingTab = $("#Attending")
 
     const q = query(collection(db, "posts"))
 
@@ -178,7 +146,7 @@ async function attending(uid) {
 }
 
 async function members(user) {
-    const tab = document.getElementById("Members")
+    const tab = $("#Members")
 
     const q = query(collection(db, "users", user.uid, "members"), where("accepted", "==", true), limit(25))
 
@@ -209,76 +177,58 @@ async function members(user) {
 
         if (currentUserMeta.admin || memData.admin) {
 
-            const actions = dis.querySelector(".actions")
+            const actions = dis.find(".actions");
+            actions.empty();
 
-            actions.innerHTML = ""
+            let p = true;
 
-            let p = true
-
-            const promote = document.createElement("img")
-            if (!admin) {
-                promote.src = "../img/icons/up.png"
-            }
-            else {
-                promote.src = "../img/icons/down.png"
-                p = false
-
-            }
-            promote.classList.add("action")
-            promote.onclick = async function () {
-
-
-                if (p) {
-                    if (confirm("Are you sure you want to promote that person?")) {
-                        await user.updateMember(person.id, { admin: true })
+            const promote = $("<img/>")
+                .addClass("action")
+                .attr("src", admin ? "../img/icons/down.png" : "../img/icons/up.png")
+                .on("click", async function () {
+                    if (p) {
+                        if (confirm("Are you sure you want to promote that person?")) {
+                            await user.updateMember(person.id, { admin: true });
+                        }
+                        p = false;
+                        $(this).attr("src", "../img/icons/down.png");
+                    } else {
+                        if (confirm("Are you sure you want to demote that person?")) {
+                            await user.updateMember(person.id, { admin: false });
+                        }
+                        p = true;
+                        $(this).attr("src", "../img/icons/up.png");
                     }
-                    p = false
-                    promote.src = "../img/icons/down.png"
+                });
 
-
-
-                }
-                else {
-                    if (confirm("Are you sure you want to demote that person?")) {
-                        await user.updateMember(person.id, { admin: false })
+            const del = $("<img/>")
+                .addClass("action")
+                .attr("src", "../img/icons/del.png")
+                .on("click", async function () {
+                    if (confirm("Are you sure you want to remove that person from your group?")) {
+                        await user.updateMember(person.id, { pending: false, accepted: false });
+                        actions.parent().remove();
                     }
-                    p = true
-                    promote.src = "../img/icons/up.png"
+                });
 
-                }
+            const open = $("<img/>")
+                .addClass("action")
+                .attr("src", "../img/icons/arrow.png")
+                .on("click", function () {
+                    window.location.href = `../user/index.html?u=${username}`;
+                });
+
+            if (auth.currentUser.uid !== personClass.uid) {
+                actions.append(promote).append(del);
             }
 
-            const del = document.createElement("img")
-            del.src = "../img/icons/del.png"
-            del.classList.add("action")
-            del.onclick = async function () {
-                if (confirm("Are you sure you want to remove that person from your group?")) {
-                    await user.updateMember(person.id, { pending: false, accepted: false })
-                    actions.parentElement.remove()
-                }
-            }
-
-            const open = document.createElement("img")
-            open.src = "../img/icons/arrow.png"
-            open.classList.add("action")
-            open.onclick = async function () {
-                window.location.href = "../user/index.html?u=" + username
-            }
-
-            if (auth.currentUser.uid != personClass.uid) {
-                actions.append(promote)
-                actions.append(del)
-
-            }
-
-            actions.append(open)
+            actions.append(open);
         }
     })
 }
 
-
 async function groups(user) {
-    const tab = document.getElementById("Groups")
+    const tab = $("#Groups")
 
     const groupQ = query(collection(db, "users"), where("group", "==", true))
 
@@ -301,7 +251,7 @@ async function groups(user) {
 }
 
 async function requests(user) {
-    const tab = document.getElementById("Requests")
+    const tab = $("#Requests")
 
     const q = query(collection(db, "users", user.uid, "members"), where("pending", "==", true), limit(25))
 
@@ -319,36 +269,35 @@ async function requests(user) {
 
         const dis = await User.display(username, pub, meta, tab)
 
-        const actions = dis.querySelector(".actions")
+        const actions = dis.find(".actions");
+        actions.empty();
 
-        actions.innerHTML = ""
+        const confirm = $("<img/>")
+            .addClass("action")
+            .attr("src", "../img/icons/confirm.png")
+            .on("click", async function () {
+                await user.updateMember(person.id, { pending: false, accepted: true });
+                actions.parent().remove();
+            });
 
-        const confirm = document.createElement("img")
-        confirm.src = "../img/icons/confirm.png"
-        confirm.classList.add("action")
-        confirm.onclick = async function () {
-            await user.updateMember(person.id, { pending: false, accepted: true })
-            actions.parentElement.remove()
-        }
-
-        actions.append(confirm)
+        actions.append(confirm);
     })
 }
 
 
 function updateProfile(data) {
-    usrname.innerText = `(@${pageUser})`
-    document.title = `Lokal - @${pageUser}`
-    displayName.innerText = data.displayName
+    $("#username").text(`(@${pageUser})`);
+    document.title = `Lokal - @${pageUser}`;
+    displayName.text(data.displayName);
 
-    desc.innerText = data.desc.replaceAll("<br>", "\n")
+    desc.text(data.desc.replaceAll("<br>", "\n"));
 
     if (data.pfp) {
-        document.getElementById("pfp").src = data.pfp
+        $("#pfp").attr("src", data.pfp);
     }
 
     if (data.accentColor) {
-        document.getElementById("pfp").style.borderColor = data.accentColor
+        $("#pfp").css("border-color", data.accentColor);
     }
 
 }
@@ -363,7 +312,8 @@ if (meta.admin) {
     const adminBadge = new Badge("Lokal Staff")
 
 
-    adminBadge.style.backgroundColor = "var(--accent)"
+    adminBadge.css("backgroundColor", "var(--accent)")
+
 
     badges.append(adminBadge)
 }
@@ -371,7 +321,7 @@ if (meta.admin) {
 if (meta.partner) {
     const adminBadge = new Badge("Partner")
 
-    adminBadge.style.backgroundColor = "var(--accent2)"
+    adminBadge.css("backgroundColor", "var(--accent2)")
 
     badges.append(adminBadge)
 }
@@ -379,7 +329,7 @@ if (meta.partner) {
 if (meta.group) {
     const groupBadge = new Badge("Group")
 
-    groupBadge.style.backgroundColor = "#3577d4"
+    groupBadge.css("backgroundColor", "#3577d4")
 
     badges.append(groupBadge)
 }
