@@ -3,312 +3,228 @@ import { auth } from "./firebase.js"
 import { Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 
-const urlParams = new URLSearchParams(window.location.search)
+const urlParams = new URLSearchParams(window.location.search);
 
-const content = document.getElementById("content")
+const content = $("#content");
 
-const modal = document.createElement("div")
-modal.classList.add("modal")
+const modal = $("<div/>").addClass("modal");
 
-let isPlaceholder = true
-
+let isPlaceholder = true;
 
 function addField(page, label, customFunc) {
-    const row = document.createElement("div")
-    row.classList.add("row")
+    const row = $("<div/>").addClass("row");
 
+    const lab = $("<h3/>").text(label);
 
-    const lab = document.createElement("h3")
-    lab.innerText = label
+    row.append(lab);
 
-    row.append(lab)
+    customFunc(row);
 
-    customFunc(row)
-
-    page.querySelector(".cont").append(row)
-
+    page.find(".cont").append(row);
 }
 
 function switchPage(name) {
-    document.querySelectorAll(".pageh").forEach((page) => {
-        page.classList.remove("currenth")
-    })
-
-    document.getElementById(name).classList.add("currenth")
+    $(".pageh").removeClass("currenth");
+    $("#" + name).addClass("currenth");
 }
 
 function addPage(name, prev = null, next = null, current = false) {
-    const page = document.createElement("div")
-    page.id = name
-    page.classList.add("pageh");
+    const page = $("<div/>").attr("id", name).addClass("pageh");
 
-    const content = document.createElement("div")
-    content.classList.add("cont")
+    const content = $("<div/>").addClass("cont");
 
-    page.append(content)
+    page.append(content);
 
-    if (current) page.classList.add("currenth");
+    if (current) page.addClass("currenth");
 
-    const buttons = document.createElement("div")
-    buttons.classList.add("row")
-    buttons.id = "buttons"
+    const buttons = $("<div/>").addClass("row").attr("id", "buttons");
+
     if (prev) {
-        const p = document.createElement("button")
-        p.id = "prev"
-
-        p.innerText = "< " + prev
-        p.onclick = function () {
-            switchPage(prev)
-        }
-
-        buttons.append(p)
+        const p = $("<button/>").attr("id", "prev").text("< " + prev).on("click", function () {
+            switchPage(prev);
+        });
+        buttons.append(p);
     }
 
     if (next) {
-        const n = document.createElement("button")
-        n.id = "next"
+        const n = $("<button/>").attr("id", "next").text(next + " >").on("click", async function () {
+            if (next === "Done") {
+                const title = $("#title");
+                const desc = $("#desc");
+                const cate = $("#cate");
+                const date = $("#date");
+                const loc = $("#location");
+                const cost = $("#cost");
+                const preview = $("#preview");
+                const agenda = $("#agenda");
 
-        n.innerText = next + " >"
-        n.onclick = async function () {
-            if (next == "Done") {
-                const title = document.getElementById("title")
-                const desc = document.getElementById("desc")
-
-                const cate = document.getElementById("cate")
-                const date = document.getElementById("date")
-                const loc = document.getElementById("location")
-                const cost = document.getElementById("cost")
-                const preview = document.getElementById("preview")
-
-
-                const agenda = document.getElementById("agenda")
-
-                if (!loc.value) loc.value = "None"
+                if (!loc.val()) loc.val("None");
 
                 const data = {
-                    title: title.value,
-                    desc: desc.value,
-                    category: cate.value,
-                    date: date.value,
-                    location: Utils.toTitleCase(loc.value),
-                    cost: cost.valueAsNumber,
-                    agenda: agenda.value.replaceAll("\n", "<br>"),
-
-                }
-
-
+                    title: title.val(),
+                    desc: desc.val(),
+                    category: cate.val(),
+                    date: date.val(),
+                    location: Utils.toTitleCase(loc.val()),
+                    cost: cost.val(),
+                    agenda: agenda.val().replaceAll("\n", "<br>"),
+                };
 
                 if (!isPlaceholder) {
-                    data.preview = preview.src
+                    data.preview = preview.attr("src");
                 }
-
 
                 // upload
                 if (urlParams.get("e")) {
-                    const e = new Event(urlParams.get("e"))
-                    await e.update(data)
+                    const e = new Event(urlParams.get("e"));
+                    await e.update(data);
 
                     window.location.href = "../event/index.html?e=" + urlParams.get("e");
-
-                }
-                else {
-                    data.timestamp = Timestamp.fromDate(new Date())
-                    data.creator = auth.currentUser.uid
+                } else {
+                    data.timestamp = Timestamp.fromDate(new Date());
+                    data.creator = auth.currentUser.uid;
                     if (urlParams.get("u")) {
-                        data.creator = urlParams.get("u")
+                        data.creator = urlParams.get("u");
                     }
 
-                    const id = await Event.create(data)
+                    const id = await Event.create(data);
                     Utils.logMetric("event_created", {
                         timestamp: data.timestamp,
-                        event_id: id
-                    })
+                        event_id: id,
+                    });
 
-                    window.location.href = "../event/index.html?e=" + id
+                    window.location.href = "../event/index.html?e=" + id;
                 }
-
-
+            } else {
+                switchPage(next);
             }
-            else {
+        });
 
-                switchPage(next)
-
-            }
-        }
-
-        buttons.append(n)
+        buttons.append(n);
     }
 
+    page.append(buttons);
 
-    page.append(buttons)
+    modal.append(page);
 
-    modal.append(page)
-
-    return page
+    return page;
 }
 
+const init = addPage("Details", null, "Agenda", true);
 
+addField(init, "Title:", function (row) {
+    const input = $("<input/>").attr("id", "title").val("Event Name").attr("maxlength", "25");
 
-const init = addPage("Details", null, "Agenda", true)
-
-addField(init, "Title:", (row) => {
-    const input = document.createElement("input")
-    input.id = "title"
-    input.value = "Event Name"
-    input.maxLength = "25"
-
-    input.onchange = () => {
-        if (input.textLength < 1) {
-            input.value = "Event Name"
+    input.on("change", function () {
+        if (input.text().length < 1) {
+            input.val("Event Name");
         }
-    }
-
-    row.append(input)
-})
-
-addField(init, "Summary:", (row) => {
-    row.style.placeItems = "start"
-    row.style.flexDirection = "column"
-
-    const txtDiv = document.createElement("div")
-    txtDiv.style.width = "100%";
-
-    const txtArea = document.createElement("textarea")
-    txtArea.rows = "5"
-    txtArea.value = "A summary for the event\n(displayed in the event preview)"
-    txtArea.maxLength = "250"
-    txtArea.id = "desc"
-
-
-    const txtLimit = document.createElement("h5")
-    txtLimit.style.textAlign = "right"
-    txtLimit.style.color = "gray"
-
-    txtLimit.innerHTML = '<span id="count" style="color: gray">0</span>/250'
-    txtArea.oninput = () => {
-        txtLimit.querySelector("span").innerText = txtArea.textLength
-    }
-    txtLimit.querySelector("span").innerText = txtArea.textLength
-
-    txtArea.onchange = () => {
-        if (txtArea.textLength < 10) {
-            txtArea.value = "Your summary must be at least 10 characters"
-        }
-        txtLimit.querySelector("span").innerText = txtArea.textLength
-    }
-
-
-    txtDiv.append(txtArea)
-    txtDiv.append(txtLimit)
-
-    row.append(txtDiv)
-
-})
-
-addField(init, "Category:", (row) => {
-    const cate = document.createElement("select")
-    cate.id = "cate"
-
-    const favs = ["Club Activity", "Sports", "Tech"]
-
-
-    let categorys = ["Arts", "Community", "Club Activity", "Food & Drink", "Fitness",
-        "Sports", "Music", "Workshops / Classes", "Family / Kids", "Tech", "Holidays",
-        "Networking", "Activism", "Travel", "Conference", "Charity",
-        "Community Service"]
-
-    const fav = document.createElement("optgroup")
-    fav.label = "Favorites"
-
-    favs.forEach((e) => {
-        categorys = categorys.filter(item => item !== e)
-
-        const opt = document.createElement("option")
-        opt.innerText = e
-        fav.append(opt)
-    })
-
-    const group = document.createElement("optgroup")
-    group.label = "Other Categorys"
-
-    categorys.sort()
-
-    categorys.forEach(element => {
-
-        const opt = document.createElement("option")
-        opt.innerText = element
-        group.append(opt)
-
     });
 
-    cate.append(fav)
-    cate.append(group)
+    row.append(input);
+});
 
-    cate.onchange = function () {
-        console.log(cate.value)
-    }
+addField(init, "Summary:", function (row) {
+    row.css({ "place-items": "start", "flex-direction": "column" });
 
-    row.append(cate)
-})
+    const txtDiv = $("<div/>").css("width", "100%");
 
-addField(init, "Date:", (row) => {
-    const date = document.createElement("input")
-    date.id = "date"
+    const txtArea = $("<textarea/>").attr("rows", "5").val("A summary for the event\n(displayed in the event preview)").attr("maxlength", "250").attr("id", "desc");
 
-    date.value = new Date().toLocaleDateString("en-US")
+    const txtLimit = $("<h5/>").css("text-align", "right").css("color", "gray").html('<span id="count" style="color: gray">0</span>/250');
 
-    date.onchange = function () {
-        if (new Date(date.value) < new Date() || new Date(date.value) == "Invalid Date") {
-            date.value = new Date().toLocaleDateString("en-US")
+    txtArea.on("input", function () {
+        txtLimit.find("span").text(txtArea.text().length);
+    });
+
+    txtLimit.find("span").text(txtArea.text().length);
+
+    txtArea.on("change", function () {
+        if (txtArea.text().length < 10) {
+            txtArea.val("Your summary must be at least 10 characters");
         }
-        else {
-            date.value = new Date(date.value).toLocaleDateString("en-US")
+        txtLimit.find("span").text(txtArea.text().length);
+    });
+
+    txtDiv.append(txtArea);
+    txtDiv.append(txtLimit);
+
+    row.append(txtDiv);
+});
+
+addField(init, "Category:", function (row) {
+    const cate = $("<select/>").attr("id", "cate");
+
+    const favs = ["Club Activity", "Sports", "Tech"];
+
+    let categories = ["Arts", "Community", "Club Activity", "Food & Drink", "Fitness", "Sports", "Music", "Workshops / Classes", "Family / Kids", "Tech", "Holidays", "Networking", "Activism", "Travel", "Conference", "Charity", "Community Service"];
+
+    const fav = $("<optgroup/>").attr("label", "Favorites");
+
+    favs.forEach(function (e) {
+        categories = categories.filter(function (item) {
+            return item !== e;
+        });
+
+        const opt = $("<option/>").text(e);
+        fav.append(opt);
+    });
+
+    const $group = $("<optgroup/>").attr("label", "Other Categories");
+
+    categories.sort();
+
+    categories.forEach(function (element) {
+        const opt = $("<option/>").text(element);
+        $group.append(opt);
+    });
+
+    cate.append(fav).append($group);
+
+    cate.on("change", function () {
+        console.log(cate.val());
+    });
+
+    row.append(cate);
+});
+
+addField(init, "Date:", function (row) {
+    const date = $("<input/>").attr("id", "date").val(new Date().toLocaleDateString("en-US"));
+
+    date.on("change", function () {
+        if (new Date(date.val()) < new Date() || new Date(date.val()) == "Invalid Date") {
+            date.val(new Date().toLocaleDateString("en-US"));
+        } else {
+            date.val(new Date(date.val()).toLocaleDateString("en-US"));
         }
-    }
+    });
 
-    row.append(date)
-})
+    row.append(date);
+});
 
-addField(init, "Cost:", (row) => {
-    const inp = document.createElement("input");
-    inp.id = "cost"
-    inp.placeholder = "0"
-    inp.value = "0"
-    inp.type = "number"
+addField(init, "Cost:", function (row) {
+    const inp = $("<input/>").attr("id", "cost").attr("placeholder", "0").val("0").attr("type", "number");
 
-    inp.onchange = function () {
-        if (inp.valueAsNumber < 0) inp.value = 0;
-        if (inp.valueAsNumber > 1000) inp.value = 1000;
-    }
+    inp.on("change", function () {
+        if (inp.val() < 0) inp.val(0);
+        if (inp.val() > 1000) inp.val(1000);
+    });
 
+    row.append(inp);
+});
 
-    row.append(inp)
-})
-
-// addField(init, "Tags:", (row) => {
-//     row.style.placeItems = "start"
-//     row.style.flexDirection = "column"
-
-//     const inp = document.createElement("textarea");
-
-//     inp.rows = 3;
-
-//     inp.id = "tags"
-//     inp.placeholder = "football, sports, pizza"
-
-
-//     row.append(inp)
-// })
-
-const age = addPage("Agenda", "Details", "Image")
+const age = addPage("Agenda", "Details", "Image");
 
 function wrapText(textarea, startTag, endTag) {
+    // assume textarea is jquery
+    textarea = $(textarea)[0];
+
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const text = textarea.value;
 
     if (textarea.disabled) {
-        return
+        return;
     }
 
     // Get the selected text
@@ -324,252 +240,212 @@ function wrapText(textarea, startTag, endTag) {
 
     // Focus back on the textarea
     textarea.focus();
-
 }
 
 addField(age, "Agenda:", (row) => {
-    row.style.placeItems = "start"
-    row.style.flexDirection = "column"
+    row.css({ placeItems: "start", flexDirection: "column" });
 
-    const txtDiv = document.createElement("div")
-    txtDiv.style.width = "100%";
+    const txtDiv = $("<div/>").css({ width: "100%" });
 
-    const buttons = document.createElement('div')
-    buttons.classList.add("row")
-    buttons.className = "buttons"
-    buttons.style.marginLeft = "auto"
-    buttons.style.placeContent = "end"
+    const buttons = $("<div/>", { class: "row buttons" }).css({
+        marginLeft: "auto",
+        placeContent: "end",
+    });
 
     function addButton(name, func) {
-        const button = document.createElement("button")
-        button.innerText = name
-        button.style.borderBottomLeftRadius = "0"
-        button.style.borderBottomRightRadius = "0"
-        button.style.borderBottom = "none"
+        const button = $("<button/>").text(name).css({
+            borderBottomLeftRadius: "0",
+            borderBottomRightRadius: "0",
+            borderBottom: "none",
+        });
 
-
-        buttons.append(button)
-        button.onclick = function () { func() }
+        button.on("click", func);
+        buttons.append(button);
     }
 
-    const txtArea = document.createElement("textarea")
-    txtArea.id = "agenda"
-    txtArea.placeholder = `This is where you put a detailed run down of your plans for the event!
+    const txtArea = $("<textarea/>", {
+        id: "agenda",
+        placeholder: `This is where you put a detailed run down of your plans for the event!
     
-Use the formmating tools to make it look pretty.`
-    txtArea.maxLength = "1000"
+Use the formatting tools to make it look pretty.`,
+        maxLength: "1000",
+    }).css({ width: "500px", height: "400px", borderTopRightRadius: "0" });
 
-    txtArea.style.width = "500px"
-    txtArea.style.height = "400px"
+    const txtP = $("<p/>", {
+        class: "inp",
+        css: {
+            width: "500px",
+            height: "400px",
+            overflowY: "auto",
+            display: "none",
+            fontSize: "1em",
+            borderTopRightRadius: "0",
+            border: "3px solid var(--accent)",
+        },
+    });
 
-    txtArea.style.borderTopRightRadius = "0"
-
-    const txtP = document.createElement("p")
-    txtP.classList.add("inp")
-    txtP.style.width = "500px"
-    txtP.style.height = "400px"
-    txtP.style.overflowY = "auto"
-    txtP.style.display = "none"
-    txtP.style.fontSize = "1em"
-    txtP.style.borderTopRightRadius = "0"
-    txtP.style.border = "3px solid var(--accent)";
-
-
-
-    let showFinal = false
+    let showFinal = false;
 
     addButton("View Output", () => {
         if (!showFinal) {
-            txtArea.style.display = "none"
-            txtArea.disabled = true
-            txtP.style.display = "block"
-            txtP.innerHTML = txtArea.value.replaceAll("\n", "<br>")
-
-            showFinal = true
+            txtArea.hide().prop("disabled", true);
+            txtP.show().html(txtArea.val().replaceAll("\n", "<br>"));
+            showFinal = true;
+        } else {
+            txtArea.prop("disabled", false).show();
+            txtP.hide();
+            showFinal = false;
         }
-        else {
-            txtArea.disabled = false
-            txtArea.style.display = "block"
-            txtP.style.display = "none"
-            showFinal = false
-        }
-    })
+    });
 
     addButton("Bold", () => {
-        wrapText(txtArea, "<b>", "</b>")
-    })
+        wrapText(txtArea[0], "<b>", "</b>");
+    });
     addButton("Italic", () => {
-        wrapText(txtArea, "<i>", "</i>")
-    })
+        wrapText(txtArea[0], "<i>", "</i>");
+    });
     addButton("Underline", () => {
-        wrapText(txtArea, "<u>", "</u>")
-    })
+        wrapText(txtArea[0], "<u>", "</u>");
+    });
 
+    const txtLimit = $("<h5/>").css({ textAlign: "right", color: "gray" });
 
-    const txtLimit = document.createElement("h5")
-    txtLimit.style.textAlign = "right"
-    txtLimit.style.color = "gray"
+    txtLimit.html('<span id="count" style="color: gray">0</span>/1000');
 
-    txtLimit.innerHTML = '<span id="count" style="color: gray">0</span>/1000'
+    txtArea.on("input", () => {
+        txtLimit.find("span").text(txtArea[0].textLength);
+    });
 
-    txtArea.oninput = () => {
-        txtLimit.querySelector("span").innerText = txtArea.textLength
-    }
-    txtLimit.querySelector("span").innerText = txtArea.textLength
-
-    txtArea.onchange = () => {
-        if (txtArea.textLength < 1) {
-            txtArea.value = "This cannot be left blank!!"
+    txtArea.on("change", () => {
+        if (txtArea[0].textLength < 1) {
+            txtArea.val("This cannot be left blank!!");
         }
-        txtLimit.querySelector("span").innerText = txtArea.textLength
-    }
+        txtLimit.find("span").text(txtArea[0].textLength);
+    });
 
-    txtDiv.append(buttons)
-    txtDiv.append(txtArea)
-    txtDiv.append(txtP)
+    txtDiv.append(buttons, txtArea, txtP, txtLimit);
+    row.append(txtDiv);
+});
 
-    txtDiv.append(txtLimit)
+const preview = $("<img/>", {
+    id: "preview",
+    src: "../img/placeholder.png",
+});
 
-    row.append(txtDiv)
-})
+const addImage = addPage("Image", "Agenda", "Location");
 
-const preview = document.createElement("img")
-preview.id = "preview"
-preview.src = "../img/placeholder.png"
-
-
-const addImage = addPage("Image", "Agenda", "Location")
-
-addImage.querySelector(".cont").append(preview)
+addImage.find(".cont").append(preview);
 
 addField(addImage, "Image Upload:", (row) => {
-    const input = document.createElement("input")
-    input.type = "file"
-    input.accept = "image/png, image/jpeg"
-    input.name = "upload"
-    input.id = "upload"
+    const input = $("<input/>", {
+        type: "file",
+        accept: "image/png, image/jpeg",
+        name: "upload",
+        id: "upload",
+    }).on("change", async function () {
+        const file = input[0].files[0];
+        preview.attr("src", await Utils.getBase64(file));
+        isPlaceholder = false;
+    });
 
-    input.onchange = async function () {
-        const file = input.files[0]
+    const label = $("<label/>", {
+        text: "Browse...",
+        for: "upload",
+    }).on("click", function () {
+        input.click();
+    });
 
-        preview.src = await Utils.getBase64(file)
+    row.append(input, label);
+});
 
-        isPlaceholder = false
-    }
+const loc = addPage("Location", "Image", "Done");
 
-    const label = document.createElement("label")
-    label.innerText = "Browse..."
-
-    label.onclick = function () {
-        input.click()
-    }
-    label.htmlFor = "upload"
-
-
-    row.append(input)
-    row.append(label)
+const map = $("<iframe/>", {
+    id: "map",
+    src: "https://www.google.com/maps/embed/v1/place?q=''&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8",
+    style: "border: 0px solid black",
 })
+    .css("width", "600px")
+    .css("height", "350px")
 
-const loc = addPage("Location", "Image", "Done")
 
-const map = document.createElement("iframe")
-map.id = "map"
-map.src = "https://www.google.com/maps/embed/v1/place?q=''&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
-map.width = 600
-map.height = 350
-map.style.border = "0px solid black"
-
-loc.querySelector(".cont").append(map)
+loc.find(".cont").append(map);
 
 addField(loc, "Address:", (row) => {
+    const newRow = $("<div/>", { class: "row" }).css({
+        flexWrap: "nowrap",
+        height: "37.2px",
+        gap: "0",
+    });
 
-    const newRow = document.createElement("div")
-    newRow.classList.add("row")
+    const input = $("<input/>", {
+        id: "location",
+        placeholder: "Location / Address",
+    }).css({
+        borderTopRightRadius: "0",
+        borderBottomRightRadius: "0",
+    });
 
-    const input = document.createElement("input")
-    input.id = "location"
+    const search = $("<img/>", {
+        src: "../img/icons/search.png",
+        css: {
+            width: "auto",
+            height: "calc(100% - 10px)",
+            padding: "10px",
+            paddingTop: "5px",
+            paddingBottom: "5px",
+            border: "2px solid var(--dark0)",
+            borderTopRightRadius: "15px",
+            borderBottomRightRadius: "15px",
+        },
+        id: "searchButton",
+        on: {
+            click: function () {
+                map.attr("src", `https://www.google.com/maps/embed/v1/place?q=${input.val().replaceAll(" ", "+")}&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8`);
+            },
+        },
+    });
 
-    input.style.borderTopRightRadius = "0"
-    input.style.borderBottomRightRadius = "0"
+    newRow.append(input, search);
+    row.append(newRow);
+});
 
-    input.placeholder = "Location / Address"
-
-    newRow.append(input)
-    newRow.style.flexWrap = "nowrap"
-    newRow.style.height = "37.2px"
-    newRow.style.gap = "0"
-
-    const search = document.createElement("img")
-
-    search.src = "../img/icons/search.png"
-    search.style.width = "auto"
-    search.style.height = "calc(100% - 10px)"
-    search.style.padding = "10px"
-    search.style.paddingTop = "5px"
-    search.style.paddingBottom = "5px"
-    search.style.border = "2px solid var(--dark0)"
-    search.style.borderTopRightRadius = "15px"
-    search.style.borderBottomRightRadius = "15px"
-    search.id = "searchButton"
-
-    search.onclick = function () {
-        map.src = `https://www.google.com/maps/embed/v1/place?q=${input.value.replaceAll(" ", "+")}&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8`
-    }
-
-
-
-    newRow.append(search)
-
-    row.append(newRow)
-
-})
-
-
-content.append(modal)
+content.append(modal);
 
 // load data if event id is present
 if (urlParams.get("e")) {
+    const e = new Event(urlParams.get("e"));
+    const data = await e.get();
 
-    const e = new Event(urlParams.get("e"))
+    const title = $("#title");
+    const desc = $("#desc");
+    const category = $("#cate");
+    const date = $("#date");
+    const cost = $("#cost");
+    const agenda = $("#agenda");
+    const location = $("#location");
 
-    const data = await e.get()
+    const currentUser = new User(auth.currentUser.uid);
+    const meta = await currentUser.getData("hidden");
 
-    const title = document.getElementById("title")
-    const desc = document.getElementById("desc")
-    const category = document.getElementById("cate")
-    const date = document.getElementById("date")
-    const cost = document.getElementById("cost")
-    const agenda = document.getElementById("agenda")
-    const location = document.getElementById("location")
+    const creator = new User(data.creator);
+    const memberData = await creator.getMember(currentUser.uid);
 
-    const currentUser = new User(auth.currentUser.uid)
+    console.log(memberData);
 
-    const meta = await currentUser.getData("hidden")
-
-    const creator = new User(data.creator)
-
-    const memberData = await creator.getMember(currentUser.uid)
-
-    console.log(memberData)
-
-
-    if (currentUser.uid == data.creator || meta.admin || memberData.admin) {
-
-        title.value = data.title
-        desc.value = data.desc
-        category.value = data.category
-        date.value = data.date
-        cost.value = data.cost
-        agenda.value = data.agenda.replaceAll("<br>", "\n")
-        location.value = data.location
+    if (currentUser.uid === data.creator || meta.admin || memberData.admin) {
+        title.val(data.title);
+        desc.val(data.desc);
+        category.val(data.category);
+        date.val(data.date);
+        cost.val(data.cost);
+        agenda.val(data.agenda.replaceAll("<br>", "\n"));
+        location.val(data.location);
         if (data.preview) {
-            preview.src = data.preview
-
-            isPlaceholder = false
+            preview.attr("src", data.preview);
+            isPlaceholder = false;
         }
+    } else {
+        console.error("idk");
     }
-    else {
-        console.error("idk")
-    }
-
 }
