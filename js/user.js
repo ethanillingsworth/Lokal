@@ -145,7 +145,6 @@ async function attending(uid) {
     })
 }
 
-// still needs to be updated for JQ
 async function members(user) {
     const tab = $("#Members")
 
@@ -178,69 +177,52 @@ async function members(user) {
 
         if (currentUserMeta.admin || memData.admin) {
 
-            const actions = dis.querySelector(".actions")
+            const actions = dis.find(".actions");
+            actions.empty();
 
-            actions.innerHTML = ""
+            let p = true;
 
-            let p = true
-
-            const promote = document.createElement("img")
-            if (!admin) {
-                promote.src = "../img/icons/up.png"
-            }
-            else {
-                promote.src = "../img/icons/down.png"
-                p = false
-
-            }
-            promote.classList.add("action")
-            promote.onclick = async function () {
-
-
-                if (p) {
-                    if (confirm("Are you sure you want to promote that person?")) {
-                        await user.updateMember(person.id, { admin: true })
+            const promote = $("<img/>")
+                .addClass("action")
+                .attr("src", admin ? "../img/icons/down.png" : "../img/icons/up.png")
+                .on("click", async function () {
+                    if (p) {
+                        if (confirm("Are you sure you want to promote that person?")) {
+                            await user.updateMember(person.id, { admin: true });
+                        }
+                        p = false;
+                        $(this).attr("src", "../img/icons/down.png");
+                    } else {
+                        if (confirm("Are you sure you want to demote that person?")) {
+                            await user.updateMember(person.id, { admin: false });
+                        }
+                        p = true;
+                        $(this).attr("src", "../img/icons/up.png");
                     }
-                    p = false
-                    promote.src = "../img/icons/down.png"
+                });
 
-
-
-                }
-                else {
-                    if (confirm("Are you sure you want to demote that person?")) {
-                        await user.updateMember(person.id, { admin: false })
+            const del = $("<img/>")
+                .addClass("action")
+                .attr("src", "../img/icons/del.png")
+                .on("click", async function () {
+                    if (confirm("Are you sure you want to remove that person from your group?")) {
+                        await user.updateMember(person.id, { pending: false, accepted: false });
+                        actions.parent().remove();
                     }
-                    p = true
-                    promote.src = "../img/icons/up.png"
+                });
 
-                }
+            const open = $("<img/>")
+                .addClass("action")
+                .attr("src", "../img/icons/arrow.png")
+                .on("click", function () {
+                    window.location.href = `../user/index.html?u=${username}`;
+                });
+
+            if (auth.currentUser.uid !== personClass.uid) {
+                actions.append(promote).append(del);
             }
 
-            const del = document.createElement("img")
-            del.src = "../img/icons/del.png"
-            del.classList.add("action")
-            del.onclick = async function () {
-                if (confirm("Are you sure you want to remove that person from your group?")) {
-                    await user.updateMember(person.id, { pending: false, accepted: false })
-                    actions.parentElement.remove()
-                }
-            }
-
-            const open = document.createElement("img")
-            open.src = "../img/icons/arrow.png"
-            open.classList.add("action")
-            open.onclick = async function () {
-                window.location.href = "../user/index.html?u=" + username
-            }
-
-            if (auth.currentUser.uid != personClass.uid) {
-                actions.append(promote)
-                actions.append(del)
-
-            }
-
-            actions.append(open)
+            actions.append(open);
         }
     })
 }
@@ -268,7 +250,6 @@ async function groups(user) {
 
 }
 
-// still needs to be updated for JQ
 async function requests(user) {
     const tab = $("#Requests")
 
@@ -288,19 +269,18 @@ async function requests(user) {
 
         const dis = await User.display(username, pub, meta, tab)
 
-        const actions = dis.querySelector(".actions")
+        const actions = dis.find(".actions");
+        actions.empty();
 
-        actions.innerHTML = ""
+        const confirm = $("<img/>")
+            .addClass("action")
+            .attr("src", "../img/icons/confirm.png")
+            .on("click", async function () {
+                await user.updateMember(person.id, { pending: false, accepted: true });
+                actions.parent().remove();
+            });
 
-        const confirm = document.createElement("img")
-        confirm.src = "../img/icons/confirm.png"
-        confirm.classList.add("action")
-        confirm.onclick = async function () {
-            await user.updateMember(person.id, { pending: false, accepted: true })
-            actions.parentElement.remove()
-        }
-
-        actions.append(confirm)
+        actions.append(confirm);
     })
 }
 
