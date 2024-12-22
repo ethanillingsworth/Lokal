@@ -2,6 +2,8 @@ import { getDoc, doc, setDoc, getDocs, collection, addDoc, query, where } from "
 
 import { auth, db } from "./firebase.js";
 
+import "./jquery.js"
+
 
 export class Alert {
 
@@ -257,12 +259,7 @@ export class Menu {
 export class Badge {
 
     constructor(label, labelType = "h4") {
-        this.badge = document.createElement(labelType)
-        this.badge.innerText = label
-        this.badge.classList.add("badge")
-
-        return this.badge
-
+        return $(`<${labelType}/>`).text(label).addClass("badge")
     }
 
 
@@ -274,9 +271,9 @@ export class Event {
         this.id = id
     }
 
-    async display(content = document.getElementById("content")) {
+    async display(content = $("#content")) {
 
-        const event = await this.getData(this.id)
+        const event = await this.get(this.id)
 
         const u = new User(event.creator)
 
@@ -293,93 +290,93 @@ export class Event {
         }
 
         // make event
-        const ev = document.createElement("div")
-        ev.classList.add("event")
-        ev.id = id
+        const ev = $("<div/>")
+            .addClass("event")
+            .attr("id", id)
+            .html(`<img class="pfp border" src="../img/pfp.jpg">
+            <div class="event-content">
+            
+                <div class="user-info row" style="gap: 5px; place-items: center">
+                    <h4 class="display-name">${user.displayName}</h4>
+                    <h4 class="username">(@${username})</h4>
+                        
+                    
+                    <span class="bullet hide">•</span>
+                    <h4 class="category">${event.category}</h4>
+                        
 
-        ev.innerHTML = `
-    <img class="pfp border" src="../img/pfp.jpg">
-    <div class="event-content">
-    
-        <div class="user-info row" style="gap: 5px; place-items: center">
-            <h4 class="display-name">${user.displayName}</h4>
-            <h4 class="username">(@${username})</h4>
+                </div>
+                <div class="row badges" style="display: none"></div>
+                <div class="event-details row">
+                    <span><b>${event.date}</b></span>
+                    <span class="hide">|</span>
+                    <span><b>${event.location}</b></span>
+                    <span class="hide">|</span>
+                    <span><b>${cost}</b></span>
+                </div>
+                <p>
+                    ${event.desc}
+                </p>
+                <img class="event-image" src="../img/sample.jpg">
+            
+                <div class="actions">
+                    
+                </div>
+                    
                 
-            
-            <span class="bullet hide">•</span>
-            <h4 class="category">${event.category}</h4>
-                
+            </div>`)
 
-        </div>
-        <div class="row badges" style="display: none"></div>
-        <div class="event-details row">
-            <span><b>${event.date}</b></span>
-            <span class="hide">|</span>
-            <span><b>${event.location}</b></span>
-            <span class="hide">|</span>
-            <span><b>${cost}</b></span>
-        </div>
-        <p>
-            ${event.desc}
-        </p>
-        <img class="event-image" src="../img/sample.jpg">
-    
-        <div class="actions">
-            
-        </div>
-            
-        
-    </div>
-    `
-        content.appendChild(ev)
+        content.append(ev)
 
-        const badges = ev.querySelector(".badges")
+        const badges = ev.find(".badges")
 
         if (user.accentColor) {
-            ev.querySelector(".pfp").style.borderColor = user.accentColor
+            ev.find(".pfp").css("borderColor", user.accentColor)
         }
 
         if (meta.admin) {
             const badge = new Badge("Lokal Staff", "h5")
-            badge.style.backgroundColor = "var(--accent)"
+            badge.css("backgroundColor", "var(--accent)")
 
             badges.append(badge)
-            badges.style.display = "flex"
+            badges.css("display", flex)
         }
 
         if (meta.partner) {
             const badge = new Badge("Partner", "h5")
-            badge.style.backgroundColor = "var(--accent2)"
+            badge.css("backgroundColor", "var(--accent2)")
+
 
             badges.append(badge)
-            badges.style.display = "flex"
+            badges.css("display", flex)
         }
 
         if (meta.group) {
             const badge = new Badge("Group", "h5")
-            badge.style.backgroundColor = "#3577d4"
+            badge.css("backgroundColor", "#3577d4")
+
 
             badges.append(badge)
-            badges.style.display = "flex"
+            badges.css("display", flex)
         }
 
-        ev.querySelector(".pfp").onclick = function () {
-            window.location.href = `../user/index.html?u=${username}`
-        }
+        // ev.querySelector(".pfp").onclick = function () {
+        //     window.location.href = `../user/index.html?u=${username}`
+        // }
 
-        ev.querySelector(".display-name").onclick = function () {
-            window.location.href = `../user/index.html?u=${username}`
-        }
+        // ev.querySelector(".display-name").onclick = function () {
+        //     window.location.href = `../user/index.html?u=${username}`
+        // }
 
         if (event.preview) {
-            ev.querySelector(".event-image").src = event.preview
+            ev.find(".event-image").attr("src", event.preview)
         }
         else {
-            ev.querySelector(".event-image").style.display = "none"
+            ev.find(".event-image").css("display", "none")
         }
 
         if (user.pfp) {
-            ev.querySelector(".pfp").src = user.pfp
+            ev.find(".pfp").attr("src", user.pfp)
         }
 
         // actions
@@ -401,22 +398,18 @@ export class Event {
             }
         })
 
-        const left = document.createElement("div")
-        left.classList.add("row")
+        const left = $("<div/>").addClass("row")
 
-        const actions = ev.querySelector(`.actions`)
+        const actions = ev.find(`.actions`)
 
         actions.append(left)
 
         function addAction(l, src, func) {
-            const action = document.createElement("div")
-            action.classList.add("action")
+            const action = $("<div/>").addClass("action")
 
-            const img = document.createElement("img")
-            img.src = src
+            const img = $("<img/>").attr("src", src)
 
-            const label = document.createElement("span")
-            label.innerText = l
+            const label = $("<span/>").text(l)
 
             action.append(img)
             action.append(label)
@@ -432,48 +425,48 @@ export class Event {
 
         addAction(`${attending} Attending`, "../img/icons/profile.png", (button, span) => {
             if (selfAttend) {
-                button.style.border = "3px solid var(--accent)"
+                button.css("border", "3px solid var(--accent)")
+
             }
 
-            button.onclick = async function () {
+            button.on("click", async () => {
                 if (selfAttend) {
                     selfAttend = false
-                    button.style.border = "3px solid transparent"
+                    button.css("border", "3px solid transparent")
                     attending -= 1
 
                 }
                 else {
                     selfAttend = true
-                    button.style.border = "3px solid var(--accent)"
+                    button.css("border", "3px solid var(--accent)")
                     attending += 1
 
                 }
 
-                span.innerText = `${attending} Attending`;
+                span.text(`${attending} Attending`);
+
                 await setDoc(doc(db, "posts", this.id, "uData", auth.currentUser.uid), {
                     attending: selfAttend
                 })
 
-            }
+            })
 
 
         })
 
 
-        const open = document.createElement("div")
-        open.classList.add("action")
+        const open = $("<div/>").addClass("action")
 
-        const openImage = document.createElement("img")
-
-        openImage.src = "../img/icons/arrow.png"
+        const openImage = $("<img/>").attr("src", "../img/icons/arrow.png")
 
         open.append(openImage)
 
-        open.onclick = function () {
+        open.on("click", () => {
             window.location.href = "../event/index.html?e=" + this.id
-        }
+        })
 
         actions.append(open)
+
     }
 
     async getUData() {
@@ -570,135 +563,122 @@ export class User {
         return ref.data()
     }
 
-    static async display(uname, pub, meta, content = document.getElementById("content"), groupAdmin = false) {
+    static async display(uname, pub, meta, content = $("#content"), groupAdmin = false) {
 
-        const user = document.createElement("div")
-        user.classList.add("user")
-        user.classList.add("row")
-        user.style.gap = "0"
-        user.style.flexWrap = "nowrap"
-        user.style.width = "calc(100% - 40px)"
-        user.style.placeContent = "start"
-        user.style.placeItems = "start"
+        const user = $("<div/>")
+            .addClass("user")
+            .addClass("row")
+            .css("gap", 0)
+            .css("flex-wrap", "nowrap")
+            .css("width", "calc(100% - 40px)")
+            .css("place-content", "start")
+            .css("place-items", "start")
 
-
-
-
-        const pfp = document.createElement("img")
-        pfp.classList.add("pfp")
-        pfp.classList.add("border")
-        pfp.src = "../img/pfp.jpg"
+        const pfp = $("<img/>")
+            .addClass("pfp")
+            .addClass("border")
+            .attr("src", "../img/pfp.jpg")
 
         if (pub.pfp) {
-            pfp.src = pub.pfp
+            pfp.attr("src", pub.pfp)
         }
 
         if (pub.accentColor) {
-            pfp.style.borderColor = pub.accentColor
+            pfp.css("border-color", pub.accentColor)
         }
 
-        const userDetails = document.createElement("div")
-        userDetails.classList.add("col")
+        const userDetails = $("<div/>")
+            .addClass("col")
 
-        const userRow = document.createElement("div")
-        userRow.classList.add("row")
-        userRow.style.width = '100%'
-        userRow.style.placeContent = "start"
+        const userRow = $("<div/>")
+            .addClass("row")
+            .css("width", "100%")
+            .css("place-content", "start")
 
-        const badges = document.createElement("div")
-        badges.classList.add("row")
-        badges.classList.add("badges")
-        badges.style.display = "none"
+
+        const badges = $("<div/>")
+            .addClass("row")
+            .addClass("badges")
+            .css("display", "none")
+            .css("placeContent", "start")
 
         if (meta.admin) {
             const badge = new Badge("Lokal Staff", "h5")
-            badge.style.backgroundColor = "var(--accent)"
+            badge.css("backgroundColor", "var(--accent)")
 
             badges.append(badge)
-
-            badges.style.display = "flex"
+            badges.css("display", "flex")
         }
 
         if (meta.partner) {
             const badge = new Badge("Partner", "h5")
-            badge.style.backgroundColor = "var(--accent2)"
+            badge.css("backgroundColor", "var(--accent2)")
+
 
             badges.append(badge)
-            badges.style.display = "flex"
+            badges.css("display", "flex")
         }
 
         if (meta.group) {
             const badge = new Badge("Group", "h5")
-            badge.style.backgroundColor = "#3577d4"
+            badge.css("backgroundColor", "#3577d4")
+
 
             badges.append(badge)
-            badges.style.display = "flex"
+            badges.css("display", "flex")
         }
 
         if (groupAdmin) {
             const badge = new Badge("Admin", "h5")
-            badge.style.backgroundColor = "#144a96"
+            badge.css("backgroundColor", "#144a96")
+
+
 
             badges.append(badge)
-            badges.style.display = "flex"
+            badges.css("display", "flex")
         }
 
 
+        const displayName = $("<h4/>").text(pub.displayName).addClass("display-name")
 
-
-
-        const displayName = document.createElement("h4")
-        displayName.innerText = pub.displayName
-        displayName.classList.add("display-name")
-
-
-        const username = document.createElement("h4")
-        username.style.fontWeight = "normal"
-        username.style.color = "gray"
-        username.innerText = `(@${uname})`
+        const username = $("<h4/>")
+            .css("font-weight", "normal")
+            .css("color", "gray")
+            .text(`(@${uname})`)
 
         userRow.append(displayName)
         userRow.append(username)
 
-        const desc = document.createElement("p")
-        desc.innerText = pub.desc
+        const desc = $("<p/>").text(pub.desc)
 
         userDetails.append(userRow)
-
-        badges.style.placeContent = "start"
         userDetails.append(badges)
-
         userDetails.append(desc)
 
         user.append(pfp)
         user.append(userDetails)
 
-        const actions = document.createElement("div")
-        actions.classList.add("actions")
-        actions.style.width = "auto"
-        actions.style.marginLeft = "auto"
-
-        const open = document.createElement("img")
-        open.src = "../img/icons/arrow.png"
-        open.onclick = function () {
-
-            window.location.href = "../user/index.html?u=" + uname
+        const actions = $("<div/>")
+            .addClass("actions")
+            .css("width", "auto")
+            .css("margin-left", "auto")
+            .css("margin-top", "auto")
+            .css("margin-bottom", "auto")
 
 
-        }
-        open.classList.add("action")
-        open.id = "open"
+
+        const open = $("<img/>")
+            .attr("src", "../img/icons/arrow.png")
+            .addClass("action")
+            .attr("id", "open")
+            .on("click", function () {
+                window.location.href = "../user/index.html?u=" + uname;
+            });
 
 
         actions.append(open)
 
         user.append(actions)
-
-        actions.style.marginTop = "auto"
-        actions.style.marginBottom = "auto"
-
-
-
 
         content.append(user)
 
