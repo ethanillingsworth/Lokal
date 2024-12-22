@@ -226,7 +226,12 @@ export class Menu {
                 }
                 else {
                     i.on("click", function () {
-                        window.location.href = item.click
+                        if (item.click.startsWith("mailto:")) {
+                            window.open(item.click, '_blank').focus();
+                        }
+                        else {
+                            window.location.href = item.click
+                        }
                     })
                 }
 

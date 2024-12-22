@@ -140,6 +140,10 @@ onAuthStateChanged(auth, async (user) => {
 
         const moreMenu = new Menu(expand)
 
+        if (!meta.approved) {
+            moreMenu.addItem(new Item("Request Approval", "../img/icons/approval.png", `mailto:support@lokalevents.com?subject=Account Approval, UID ${uid}&body=(Make sure you're sending this email from the email associated with your account)`), true)
+        }
+
         moreMenu.addItem(new Item("Log Out", "../img/icons/logout.png", () => {
             signOut(auth).then(() => {
                 // Sign-out successful.
