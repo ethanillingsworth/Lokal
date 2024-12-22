@@ -3,60 +3,55 @@ import { getDocs, limit, query, collection, where } from "https://www.gstatic.co
 import { db } from "./firebase.js";
 import { Event, User } from "./funcs.js"
 
-const content = document.getElementById("content")
+const content = $("#content");
 
-const modal = document.createElement("div")
-modal.classList.add("modal")
+const modal = $("<div/>").addClass("modal");
 
-const urlParams = new URLSearchParams(window.location.search)
+const urlParams = new URLSearchParams(window.location.search);
 
-const heading = document.createElement("h3")
-const search = urlParams.get("q").replaceAll("-", " ").toLowerCase()
+const search = urlParams.get("q").replaceAll("-", " ").toLowerCase();
+const heading = $("<h3/>").text(`Results for "${search}"`);
 
-heading.innerText = "Results for \"" + search + '"'
+const q = query(collection(db, "posts"), limit(50));
+const qu = query(collection(db, "usernames"), limit(100));
 
+const ref = await getDocs(q);
+const refU = await getDocs(qu);
 
-const q = query(collection(db, "posts"), limit(50))
-const qu = query(collection(db, "usernames"), limit(100))
-
-
-const ref = await getDocs(q)
-
-const refU = await getDocs(qu)
-
+// Process posts
 ref.forEach(async (d) => {
-    const data = d.data()
-    if (data.title.toLowerCase().includes(search) || data.desc.toLowerCase().includes(search) || data.category.toLowerCase().includes(search)
-        || data.date.toLowerCase().includes(search) || data.location.toLowerCase().includes(search)) {
-
-        const e = new Event(d.id)
-
-        await e.display(modal)
+    const data = d.data();
+    if (
+        data.title.toLowerCase().includes(search) ||
+        data.desc.toLowerCase().includes(search) ||
+        data.category.toLowerCase().includes(search) ||
+        data.date.toLowerCase().includes(search) ||
+        data.location.toLowerCase().includes(search)
+    ) {
+        const e = new Event(d.id);
+        await e.display(modal); // Pass the raw DOM element
     }
 });
 
+// Process usernames
 refU.forEach(async (d) => {
-    const uid = d.id
+    const uid = d.id;
+    const user = new User(uid);
 
-    const user = new User(uid)
+    const pub = await user.getData("public");
+    const meta = await user.getData("hidden");
 
-    const pub = await user.getData("public")
-    const meta = await user.getData("hidden")
+    const username = d.data().username;
 
-    const username = d.data().username
-
-    console.log(pub)
-
-
-    if (search.includes(pub.displayName.toLowerCase()) || pub.desc.toLowerCase().includes(search)
-        || username.toLowerCase().includes(search)) {
-
-        await User.display(username, pub, meta, modal)
-
+    if (
+        search.includes(pub.displayName.toLowerCase()) ||
+        pub.desc.toLowerCase().includes(search) ||
+        username.toLowerCase().includes(search)
+    ) {
+        await User.display(username, pub, meta, modal); // Pass the raw DOM element
     }
 });
 
-
-modal.append(heading)
-
-content.append(modal)
+// Append heading and modal to content
+modal.append(heading);
+content.append(modal);
