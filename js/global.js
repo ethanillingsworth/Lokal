@@ -1,6 +1,7 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { query, where, getDocs, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 
 import { CustomItem, Utils, Item, Menu, Sidebar, User } from "./funcs.js";
 
@@ -129,15 +130,6 @@ onAuthStateChanged(auth, async (user) => {
             sidebar.menu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"))
         }
 
-        const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
-
-        if (pub.pfp) {
-            dName.img = pub.pfp
-        }
-        dName.id = "user"
-
-        sidebar.menu.addItem(dName, true)
-
         const moreMenu = new Menu(expand)
 
         if (!meta.approved) {
@@ -187,6 +179,41 @@ onAuthStateChanged(auth, async (user) => {
         resizeChecks()
 
         sidebar.menu.addItem(new Item("More", "../img/icons/more.png", moreMenu), true)
+
+        const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
+
+        if (pub.pfp) {
+            dName.img = pub.pfp
+        }
+        dName.classList = ["user-side"]
+
+        sidebar.menu.addItem(dName, true)
+
+        const q = query(collection(db, "users"), where("group", "==", true))
+
+        const groups = await getDocs(q)
+
+        groups.forEach(async g => {
+            const group = new User(g.id)
+
+            const data = await group.getMember(uid)
+
+            if (data.admin) {
+                // show item
+                const pub = await group.getData("public")
+                const username = await group.getUsername()
+
+                const item = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
+
+                if (pub.pfp) {
+                    item.img = pub.pfp
+                }
+                item.classList = ["user-side"]
+
+                sidebar.menu.addItem(item, true)
+            }
+
+        });
 
     }
 

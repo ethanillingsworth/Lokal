@@ -123,6 +123,7 @@ export class Item {
         this.id = null
         this.bottom = false
         this.noHover = false
+        this.classList = []
     }
 }
 
@@ -190,6 +191,10 @@ export class Menu {
 
 
             if (item.id != null) i.attr("id", item.id)
+
+            item.classList.forEach(c => {
+                i.addClass(c)
+            })
 
             e.append(i)
 
