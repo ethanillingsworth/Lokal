@@ -813,7 +813,7 @@ export class Utils {
     }
 
     static getVersion() {
-        return "Lokal v5 (User Appreciation Day)"
+        return "Lokal v6 (Reconsolidation pt 2)"
     }
 
     static getBase64(file) {
