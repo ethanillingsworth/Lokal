@@ -123,6 +123,7 @@ export class Item {
         this.id = null
         this.bottom = false
         this.noHover = false
+        this.classList = []
     }
 }
 
@@ -191,6 +192,10 @@ export class Menu {
 
             if (item.id != null) i.attr("id", item.id)
 
+            item.classList.forEach(c => {
+                i.addClass(c)
+            })
+
             e.append(i)
 
             if (item.customHtml) {
@@ -226,7 +231,12 @@ export class Menu {
                 }
                 else {
                     i.on("click", function () {
-                        window.location.href = item.click
+                        if (item.click.startsWith("mailto:")) {
+                            window.open(item.click, '_blank').focus();
+                        }
+                        else {
+                            window.location.href = item.click
+                        }
                     })
                 }
 
