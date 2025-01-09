@@ -46,18 +46,18 @@ if (urlParams.get("u")) {
 
 onAuthStateChanged(auth, async (user) => {
     const authUser = new User(user.uid)
-    const meta = await authUser.getData("hidden")
 
-    const memberData = await pageUser.getMember(authUser.uid)
+    const badges = await authUser.getBadges()
 
+    const readOnlyMember = await pageUser.getMemberReadOnly(authUser.uid)
 
 
     if (urlParams.get("createGroup") && urlParams.get("u")) {
         window.location.href = "../"
         return
     }
-
-    if (user.uid == pageUser.uid || meta.admin || memberData.admin) {
+    // allow if normal user account, they are a site admin, or group admin
+    if (user.uid == pageUser.uid || badges.admin || readOnlyMember.admin) {
 
     }
     else {

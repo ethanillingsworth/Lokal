@@ -536,6 +536,18 @@ export class User {
         let userData = u.data()
         return userData
     }
+
+    async getBadges() {
+        const meta = await this.getData("hidden")
+
+        let badges = []
+
+        if (meta.badges) {
+            badges = meta.badges
+        }
+
+        return badges
+    }
     async updateUsername(newUsername) {
         await setDoc(doc(db, "usernames", this.uid), {
             username: newUsername.toLowerCase()
@@ -560,11 +572,26 @@ export class User {
         await setDoc(doc(db, "users", this.uid, "members", memberId), data, { merge: true })
     }
 
+    async updateMemberReadOnly(memberId, data) {
+        await setDoc(doc(db, "users", this.uid, "members", memberId, "readOnly", "data"), data, { merge: true })
+    }
+
     async getMember(memberId) {
         const ref = await getDoc(doc(db, "users", this.uid, "members", memberId))
 
         if (!ref.exists()) {
             console.error("Could not fetch data for member ID:" + memberId)
+            return {}
+        }
+
+        return ref.data()
+    }
+
+    async getMemberReadOnly(memberId) {
+        const ref = await getDoc(doc(db, "users", this.uid, "members", memberId, "readOnly", "data"))
+
+        if (!ref.exists()) {
+            console.error("Could not fetch read only data for member ID:" + memberId)
             return {}
         }
 
@@ -609,6 +636,7 @@ export class User {
             .addClass("badges")
             .css("display", "none")
             .css("placeContent", "start")
+
         if (meta.badges) {
 
             meta.badges.forEach((badgeName) => {

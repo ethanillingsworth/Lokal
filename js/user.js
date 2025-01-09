@@ -149,20 +149,29 @@ async function attending(uid) {
 async function members(user) {
     const tab = $("#Members")
 
-    const q = query(collection(db, "users", user.uid, "members"), where("accepted", "==", true), limit(25))
+    const q = query(collection(db, "users", user.uid, "members"), where("joined", "==", true), limit(25))
 
     const get = await getDocs(q)
 
     get.forEach(async (person) => {
         const personClass = new User(person.id)
 
+        let readOnly = await user.getMemberReadOnly(person.id)
+
+        let currentUserReadOnly = {}
+
+        if (auth.currentUser) currentUserReadOnly = await user.getMemberReadOnly(auth.currentUser.uid)
+
+        if (readOnly.accepted == false) return
+
         const username = await personClass.getUsername()
         const pub = await personClass.getData("public")
         const meta = await personClass.getData("hidden")
 
+
         let admin = false
 
-        if (person.data().admin) { admin = true }
+        if (readOnly.admin) { admin = true }
 
         const dis = await User.display(username, pub, meta, tab, admin)
 
@@ -170,13 +179,10 @@ async function members(user) {
 
         if (auth.currentUser) currentUser = new User(auth.currentUser.uid)
 
-        const currentUserMeta = await currentUser.getData("hidden")
+        const currentUserBadges = await currentUser.getBadges()
 
-        let memData = {}
 
-        if (auth.currentUser) memData = await user.getMember(auth.currentUser.uid)
-
-        if (currentUserMeta.admin || memData.admin) {
+        if (currentUserBadges.admin || currentUserReadOnly.admin) {
 
             const actions = dis.find(".actions");
             actions.empty();
@@ -189,13 +195,13 @@ async function members(user) {
                 .on("click", async function () {
                     if (p) {
                         if (confirm("Are you sure you want to promote that person?")) {
-                            await user.updateMember(person.id, { admin: true });
+                            await user.updateMemberReadOnly(person.id, { admin: true });
                         }
                         p = false;
                         $(this).attr("src", "../img/icons/down.png");
                     } else {
                         if (confirm("Are you sure you want to demote that person?")) {
-                            await user.updateMember(person.id, { admin: false });
+                            await user.updateMemberReadOnly(person.id, { admin: false });
                         }
                         p = true;
                         $(this).attr("src", "../img/icons/up.png");
@@ -207,7 +213,8 @@ async function members(user) {
                 .attr("src", "../img/icons/del.png")
                 .on("click", async function () {
                     if (confirm("Are you sure you want to remove that person from your group?")) {
-                        await user.updateMember(person.id, { pending: false, accepted: false });
+                        await user.updateMember(person.id, { pending: false, joined: false });
+                        await user.updateMemberReadOnly(person.id, { false: true })
                         actions.parent().remove();
                     }
                 });
@@ -277,7 +284,8 @@ async function requests(user) {
             .addClass("action")
             .attr("src", "../img/icons/confirm.png")
             .on("click", async function () {
-                await user.updateMember(person.id, { pending: false, accepted: true });
+                await user.updateMember(person.id, { pending: false, joined: true });
+                await user.updateMemberReadOnly(person.id, { accepted: true })
                 actions.parent().remove();
             });
 
@@ -306,11 +314,7 @@ function updateProfile(data) {
 const uid = await User.getUID(pageUser)
 const user = new User(uid)
 
-const meta = await user.getData("hidden")
-
-let bds = []
-
-if (meta.badges) bds = meta.badges
+let bds = await user.getBadges()
 
 console.log(bds)
 
@@ -329,13 +333,7 @@ onAuthStateChanged(auth, async (u) => {
 
     const currentUser = new User(u.uid)
 
-    const metaU = await currentUser.getData("hidden")
-
-    let bdsU = []
-
-    if (metaU.badges) bdsU = metaU.badges
-
-    const groupU = await user.getMember(u.uid)
+    let bdsU = await currentUser.getBadges()
 
     if ((u.uid == uid || bdsU.includes("admin")) || (bds.includes("group") && bdsU.includes("admin"))) {
 
@@ -367,45 +365,48 @@ onAuthStateChanged(auth, async (u) => {
     if (bds.includes("group")) {
         const memberData = await user.getMember(currentUser.uid)
 
+        const readOnly = await user.getMemberReadOnly(currentUser.uid)
+
 
         if (memberData.pending) {
-            join.classList.add("pending")
-            join.innerText = "Pending..."
+            join.addClass("pending")
+            join.text("Pending...")
         }
 
-        if (memberData.accepted) {
+        if (readOnly.accepted && memberData.joined) {
 
-            join.innerText = "Joined"
+            join.text("Joined")
         }
 
-        if (memberData.admin || bdsU.admin) {
+        if (readOnly.admin || bdsU.admin) {
             createTab("Requests")
             await requests(user)
         }
-        if (!memberData.admin) {
-            join.style.display = "flex"
+
+        if (!readOnly.admin) {
+            join.css("display", "flex")
         }
 
-        join.onclick = async function () {
-            if (join.innerText == "Join") {
-                join.classList.add("pending")
-                join.innerText = "Pending..."
+        join.on("click", async function () {
+            if (join.text() == "Join") {
+                join.addClass("pending")
+                join.text("Pending...")
                 await user.updateMember(currentUser.uid, { pending: true })
 
             }
-            else if (join.innerText == "Pending...") {
-                join.classList.remove("pending")
-                join.innerText = "Join"
+            else if (join.text() == "Pending...") {
+                join.removeClass("pending")
+                join.text("Join")
 
                 await user.updateMember(currentUser.uid, { pending: false })
             }
-            else if (join.innerText == "Joined") {
+            else if (join.text() == "Joined") {
 
-                join.innerText = "Join"
-                await user.updateMember(currentUser.uid, { pending: false, accepted: false })
+                join.text("Join")
+                await user.updateMember(currentUser.uid, { pending: false, joined: false })
 
             }
-        }
+        })
 
     }
 })
@@ -417,19 +418,20 @@ updateProfile(data)
 
 
 
-if (!bds.includes("group")) {
+if (bds.includes("group")) {
+    createTab("Hosting", true)
+    await hosting(uid)
+    createTab("Members")
+    await members(user)
+}
+else {
+
     createTab("Attending", true)
     await attending(uid)
 
     createTab("Groups")
 
     await groups(user)
-}
-else {
-    createTab("Hosting", true)
-    await hosting(uid)
-    createTab("Members")
-    await members(user)
 
 }
 

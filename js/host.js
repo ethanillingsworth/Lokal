@@ -426,14 +426,14 @@ if (urlParams.get("e")) {
     const location = $("#location");
 
     const currentUser = new User(auth.currentUser.uid);
-    const meta = await currentUser.getData("hidden");
+    const badges = await currentUser.getBadges();
 
     const creator = new User(data.creator);
-    const memberData = await creator.getMember(currentUser.uid);
+    const readOnlyMember = await creator.getMemberReadOnly(currentUser.uid);
 
     console.log(memberData);
 
-    if (currentUser.uid === data.creator || meta.admin || memberData.admin) {
+    if (currentUser.uid === data.creator || badges.admin || readOnlyMember.admin) {
         title.val(data.title);
         desc.val(data.desc);
         category.val(data.category);
