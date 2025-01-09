@@ -38,7 +38,7 @@ const urlParams = new URLSearchParams(window.location.search)
 
 // random username
 
-var a = ["Small", "Blue", "Pretty", "Big", "High", "Silly", "Red", "Party", "Cute", "Beautiful"];
+var a = ["Small", "Blue", "Pretty", "Big", "Silly", "Red", "Party", "Cute", "Beautiful"];
 var b = ["Bear", "Dog", "Banana", "Sheep", "Apple", "Cat", "Dog", "Possum", "Potato"];
 
 function generateUsername() {

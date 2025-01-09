@@ -108,6 +108,10 @@ onAuthStateChanged(auth, async (user) => {
 
         const meta = await u.getData("hidden")
 
+        let badges = []
+
+        if (meta.badges) badges = meta.badges
+
         // prev searches
         // if (priv.prevRes) {
         //     let count = 0
@@ -126,15 +130,12 @@ onAuthStateChanged(auth, async (user) => {
         sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
 
         // sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
-        if (meta.approved) {
+        if (badges.includes("premium") || badges.includes("admin")) {
             sidebar.menu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"))
         }
 
         const moreMenu = new Menu(expand)
 
-        if (!meta.approved) {
-            moreMenu.addItem(new Item("Request Approval", "../img/icons/approval.png", `mailto:support@lokalevents.com?subject=Account Approval, UID ${uid}&body=(Make sure you're sending this email from the email associated with your account)`), true)
-        }
 
         moreMenu.addItem(new Item("Log Out", "../img/icons/logout.png", () => {
             signOut(auth).then(() => {
@@ -189,7 +190,7 @@ onAuthStateChanged(auth, async (user) => {
 
         sidebar.menu.addItem(dName, true)
 
-        const q = query(collection(db, "users"), where("group", "==", true))
+        const q = query(collection(db, "users"), where("badges", "array-contains", "group"))
 
         const groups = await getDocs(q)
 

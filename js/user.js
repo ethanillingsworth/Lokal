@@ -109,6 +109,7 @@ modal.append(top).append(tools).append(tabs).append(divider);
 content.append(modal);
 
 
+
 async function hosting(uid) {
     const hostingTab = $("#Hosting")
 
@@ -230,7 +231,7 @@ async function members(user) {
 async function groups(user) {
     const tab = $("#Groups")
 
-    const groupQ = query(collection(db, "users"), where("group", "==", true))
+    const groupQ = query(collection(db, "users"), where("badges", "array-contains", "group"))
 
     const groups = await getDocs(groupQ)
 
@@ -307,35 +308,21 @@ const user = new User(uid)
 
 const meta = await user.getData("hidden")
 
+let bds = []
 
-if (meta.admin) {
-    const adminBadge = new Badge("Lokal Staff")
+if (meta.badges) bds = meta.badges
 
+console.log(bds)
 
-    adminBadge.css("backgroundColor", "var(--accent)")
+bds.forEach((badgeName) => {
+    const badge = Badge.getFromName(badgeName)
 
-
-    badges.append(adminBadge)
-}
-
-if (meta.partner) {
-    const adminBadge = new Badge("Partner")
-
-    adminBadge.css("backgroundColor", "var(--accent2)")
-
-    badges.append(adminBadge)
-}
-
-if (meta.group) {
-    const groupBadge = new Badge("Group")
-
-    groupBadge.css("backgroundColor", "#3577d4")
-
-    badges.append(groupBadge)
-}
+    badges.append(badge)
+})
 
 onAuthStateChanged(auth, async (u) => {
 
+    // if not logged in, do nothing
     if (!u) {
         return
     }
@@ -344,11 +331,15 @@ onAuthStateChanged(auth, async (u) => {
 
     const metaU = await currentUser.getData("hidden")
 
+    let bdsU = []
+
+    if (metaU.badges) bdsU = metaU.badges
+
     const groupU = await user.getMember(u.uid)
 
-    if ((u.uid == uid || metaU.admin) || (meta.group && groupU.admin)) {
+    if ((u.uid == uid || bdsU.includes("admin")) || (bds.includes("group") && bdsU.includes("admin"))) {
 
-        if (meta.group) {
+        if (bds.includes("group")) {
             const addEvent = document.createElement("img")
             addEvent.src = "../img/icons/plus.png"
 
@@ -373,7 +364,7 @@ onAuthStateChanged(auth, async (u) => {
         }
     }
 
-    if (meta.group) {
+    if (bds.includes("group")) {
         const memberData = await user.getMember(currentUser.uid)
 
 
@@ -387,7 +378,7 @@ onAuthStateChanged(auth, async (u) => {
             join.innerText = "Joined"
         }
 
-        if (memberData.admin || metaU.admin) {
+        if (memberData.admin || bdsU.admin) {
             createTab("Requests")
             await requests(user)
         }
@@ -424,7 +415,9 @@ const data = await user.getData("public")
 
 updateProfile(data)
 
-if (!meta.group) {
+
+
+if (!bds.includes("group")) {
     createTab("Attending", true)
     await attending(uid)
 

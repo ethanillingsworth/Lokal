@@ -6,6 +6,7 @@
     --accent: #a353b9;
     --accent2: #7c2a95;
     --red: #be2121;
+    --premium: #ddb23c;
     --light1: #e5e5e5;
     --light2: #d4d4d4;
 
@@ -71,8 +72,6 @@ input[type="file"] {
     z-index: -1;
     padding: 0;
 }
-
-
 
 input,
 textarea,

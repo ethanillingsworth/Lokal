@@ -269,6 +269,25 @@ export class Badge {
         return $(`<${labelType}/>`).text(label).addClass("badge")
     }
 
+    static getFromName(name, type = "h4") {
+        if (name == "admin") {
+            return new Badge("Lokal Staff", type)
+                .css("backgroundColor", "var(--accent)")
+        }
+        else if (name == "partner") {
+            return new Badge("Partner", type)
+                .css("backgroundColor", "var(--accent2)")
+        }
+        else if (name == "group") {
+            return new Badge("Group", type)
+                .css("backgroundColor", "#3577d4")
+        }
+        else if (name == "premium") {
+            return new Badge("Premium", type)
+                .css("backgroundColor", "var(--premium)")
+        }
+    }
+
 
 }
 
@@ -299,7 +318,7 @@ export class Event {
         // make event
         const ev = $("<div/>")
             .addClass("event")
-            .attr("id", id)
+            .attr("id", this.id)
             .html(`<img class="pfp border" src="../img/pfp.jpg">
             <div class="event-content">
             
@@ -341,30 +360,14 @@ export class Event {
             ev.find(".pfp").css("borderColor", user.accentColor)
         }
 
-        if (meta.admin) {
-            const badge = new Badge("Lokal Staff", "h5")
-            badge.css("backgroundColor", "var(--accent)")
+        if (meta.badges) {
 
-            badges.append(badge)
-            badges.css("display", flex)
-        }
+            meta.badges.forEach((badgeName) => {
+                const badge = Badge.getFromName(badgeName, "h5")
 
-        if (meta.partner) {
-            const badge = new Badge("Partner", "h5")
-            badge.css("backgroundColor", "var(--accent2)")
-
-
-            badges.append(badge)
-            badges.css("display", flex)
-        }
-
-        if (meta.group) {
-            const badge = new Badge("Group", "h5")
-            badge.css("backgroundColor", "#3577d4")
-
-
-            badges.append(badge)
-            badges.css("display", flex)
+                badges.append(badge)
+                badges.css("display", "flex")
+            })
         }
 
         // ev.querySelector(".pfp").onclick = function () {
@@ -606,38 +609,19 @@ export class User {
             .addClass("badges")
             .css("display", "none")
             .css("placeContent", "start")
+        if (meta.badges) {
 
-        if (meta.admin) {
-            const badge = new Badge("Lokal Staff", "h5")
-            badge.css("backgroundColor", "var(--accent)")
+            meta.badges.forEach((badgeName) => {
+                const badge = Badge.getFromName(badgeName, "h5")
 
-            badges.append(badge)
-            badges.css("display", "flex")
-        }
-
-        if (meta.partner) {
-            const badge = new Badge("Partner", "h5")
-            badge.css("backgroundColor", "var(--accent2)")
-
-
-            badges.append(badge)
-            badges.css("display", "flex")
-        }
-
-        if (meta.group) {
-            const badge = new Badge("Group", "h5")
-            badge.css("backgroundColor", "#3577d4")
-
-
-            badges.append(badge)
-            badges.css("display", "flex")
+                badges.append(badge)
+                badges.css("display", "flex")
+            })
         }
 
         if (groupAdmin) {
             const badge = new Badge("Admin", "h5")
             badge.css("backgroundColor", "#144a96")
-
-
 
             badges.append(badge)
             badges.css("display", "flex")
