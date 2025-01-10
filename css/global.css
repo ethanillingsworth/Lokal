@@ -314,11 +314,13 @@ h6 {
 
 }
 
-#content .event:first-child {
+#content .event:first-child,
+#content .user:first-child {
     margin-top: 20px
 }
 
-#content .event:last-child {
+#content .event:last-child,
+#content .user:last-child {
     margin-bottom: 20px;
 }
 

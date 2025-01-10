@@ -1,4 +1,4 @@
-import { getDoc, doc, query, collection, getDocs, where, limit } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, query, collection, getDocs, where, limit, orderBy } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 import { db, auth } from "./firebase.js";
@@ -113,7 +113,7 @@ content.append(modal);
 async function hosting(uid) {
     const hostingTab = $("#Hosting")
 
-    const q = query(collection(db, "posts"), where("creator", "==", uid))
+    const q = query(collection(db, "posts"), where("creator", "==", uid), orderBy("timestamp", "desc"))
 
     const get = await getDocs(q)
 

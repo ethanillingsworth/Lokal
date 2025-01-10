@@ -1,0 +1,9 @@
+.user {
+    width: 50% !important;
+}
+
+@media (max-width: 1080px) {
+    .user {
+        width: 75% !important;
+    }
+}

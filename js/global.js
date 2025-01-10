@@ -45,6 +45,8 @@ resizeChecks()
 
 sidebar.menu.addItem(new Item("Connect", "../img/icons/party.png", "../"))
 
+sidebar.menu.addItem(new Item("Group Finder", "../img/icons/groupfinder.png", "../groupfinder"))
+
 $(document.body).append(content)
 
 
@@ -89,7 +91,7 @@ onAuthStateChanged(auth, async (user) => {
         const dName = new Item("Sign in", "../img/pfp.jpg", () => {
             window.location.href = "../login"
         })
-        dName.id = "user"
+        dName.classList = ["user-side"]
 
         sidebar.menu.addItem(dName, true)
 
@@ -197,9 +199,9 @@ onAuthStateChanged(auth, async (user) => {
         groups.forEach(async g => {
             const group = new User(g.id)
 
-            const data = await group.getMember(uid)
+            const readOnly = await group.getMemberReadOnly(uid)
 
-            if (data.admin) {
+            if (readOnly.admin) {
                 // show item
                 const pub = await group.getData("public")
                 const username = await group.getUsername()

@@ -1,11 +1,10 @@
-import { getDoc, doc, setDoc, getDocs, collection, addDoc, query, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, setDoc, getDocs, collection, addDoc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { logEvent } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
 
 import { auth, db, analytics } from "./firebase.js";
 
 import "./jquery.js"
-
 
 export class Alert {
 
@@ -291,7 +290,6 @@ export class Badge {
 
 }
 
-
 export class Event {
     constructor(id) {
         this.id = id
@@ -515,6 +513,7 @@ export class User {
     async updateData(data, type) {
         await setDoc(doc(db, "users", this.uid, "data", type), data, { merge: true })
     }
+
     async getData(type = "public") {
 
         let u = undefined
@@ -548,6 +547,7 @@ export class User {
 
         return badges
     }
+
     async updateUsername(newUsername) {
         await setDoc(doc(db, "usernames", this.uid), {
             username: newUsername.toLowerCase()
@@ -557,6 +557,7 @@ export class User {
             userId: this.uid
         })
     }
+
     async getUsername() {
         let usernameRef = await getDoc(doc(db, "usernames", this.uid))
 
@@ -714,7 +715,6 @@ export class User {
         return userIdRef.data().userId
     }
 
-
     static async createUser(username, pub = {}, priv = {}, meta = {}) {
 
         const d = await addDoc(collection(db, "users"), meta)
@@ -723,7 +723,10 @@ export class User {
 
         await user.updateUsername(username.toLowerCase())
 
-        await user.updateData(pub, "public")
+        await user.updateData({
+            ...pub,
+            timestamp: Timestamp.now()
+        }, "public")
 
         await user.updateData(priv, "private")
 
@@ -814,7 +817,6 @@ export class Validation {
         return true
     }
 }
-
 
 export class Utils {
 
