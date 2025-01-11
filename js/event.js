@@ -84,7 +84,7 @@ linkAlert.setDoneFunction(async () => {
 
 const currentUser = new User(auth.currentUser.uid)
 
-const meta = await currentUser.getData("hidden")
+const badges = await currentUser.getBadges()
 
 const hr = $("<hr></hr>")
     .css("position", "relative")
@@ -189,9 +189,9 @@ addPage("Public View", async (page) => {
 
 const creator = new User(data.creator)
 
-const currentUserMemberData = await creator.getMember(currentUser.uid)
+const readOnly = await creator.getMemberReadOnly(currentUser.uid)
 
-if (currentUser.uid == data.creator || currentUserMemberData.admin || meta.admin) {
+if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin")) {
     const share = $("<img>")
         .attr("id", "share")
         .attr("src", "../img/icons/share.png")

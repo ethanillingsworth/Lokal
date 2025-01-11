@@ -2,7 +2,7 @@ import { getDoc, doc, query, collection, getDocs, where, limit, orderBy } from "
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 import { db, auth } from "./firebase.js";
-import { User, Badge, Event } from "./funcs.js";
+import { User, Badge, Event, MoreMenu, Update } from "./funcs.js";
 
 import "./jquery.js";
 
@@ -337,29 +337,26 @@ onAuthStateChanged(auth, async (u) => {
 
     if ((u.uid == uid || bdsU.includes("admin")) || (bds.includes("group") && bdsU.includes("admin"))) {
 
+
+        const moreMenu = new MoreMenu()
+
         if (bds.includes("group")) {
-            const addEvent = document.createElement("img")
-            addEvent.src = "../img/icons/plus.png"
-
-            addEvent.onclick = function () {
+            moreMenu.add("Add Event", () => {
                 window.location.href = "../host/index.html?u=" + user.uid
-            }
 
-            tools.append(addEvent)
+            })
+
+            moreMenu.add("Add Update", () => {
+                window.location.href = "../host/index.html?mode=update&u=" + user.uid
+
+            })
         }
 
-        const edit = document.createElement("img")
-        edit.id = "edit"
-        edit.src = "../img/icons/edit.png"
-        edit.width = "35"
-
-        tools.append(edit)
-
-
-        edit.onclick = function () {
+        moreMenu.add("Edit Profile", () => {
             window.location.href = "../edit/index.html?u=" + urlParams.get("u")
+        })
 
-        }
+        tools.append(moreMenu.more)
     }
 
     if (bds.includes("group")) {
@@ -416,12 +413,26 @@ const data = await user.getData("public")
 
 updateProfile(data)
 
+async function updates() {
+    const updatesTab = $("#Updates")
 
+    const q = query(collection(db, "updates"), where("creator", "==", uid), orderBy("timestamp", "desc"))
+
+    const get = await getDocs(q)
+
+    get.forEach(async (update) => {
+        const u = new Update(update.id)
+        await u.display(updatesTab)
+    })
+}
 
 if (bds.includes("group")) {
-    createTab("Hosting", true)
-    await hosting(uid)
+    createTab("Updates", true)
+    createTab("Events")
     createTab("Members")
+
+    await updates(user)
+    await hosting(uid)
     await members(user)
 }
 else {

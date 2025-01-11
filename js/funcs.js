@@ -290,6 +290,95 @@ export class Badge {
 
 }
 
+export class Update {
+    constructor(id) {
+        this.id = id
+    }
+
+    async display(content = $("#content")) {
+
+        const event = await this.get(this.id)
+
+        const u = new User(event.face)
+
+        const user = await u.getData()
+
+        const meta = await u.getData("hidden")
+
+        const username = await u.getUsername()
+
+        const readOnly = await new User(event.creator).getMemberReadOnly(event.face)
+
+        // make event
+        const ev = $("<div/>")
+            .addClass("event")
+            .attr("id", this.id)
+            .html(`<img class="pfp border" src="../img/pfp.jpg">
+            <div class="event-content">
+            
+                <div class="user-info row" style="gap: 5px; place-items: center">
+                    <h4 class="display-name">${user.displayName}</h4>
+                    <h4 class="username">(@${username})</h4>
+
+                </div>
+                <div class="row badges" style="display: none"></div>
+                <h4>${event.title}</h4>
+                <p>
+                    ${event.desc}
+                </p>                
+            </div>`)
+
+        content.append(ev)
+
+        const badges = ev.find(".badges")
+
+        if (user.accentColor) {
+            ev.find(".pfp").css("borderColor", user.accentColor)
+        }
+
+        if (meta.badges) {
+
+            meta.badges.forEach((badgeName) => {
+                const badge = Badge.getFromName(badgeName, "h5")
+
+                badges.append(badge)
+                badges.css("display", "flex")
+            })
+
+            if (readOnly.admin) {
+                const badge = new Badge("Admin", "h5")
+                badge.css("backgroundColor", "#144a96")
+
+                badges.append(badge)
+                badges.css("display", "flex")
+            }
+        }
+
+        if (user.pfp) {
+            ev.find(".pfp").attr("src", user.pfp)
+        }
+    }
+
+    async get() {
+        let e = await getDoc(doc(db, "updates", this.id))
+
+        if (!e.exists()) {
+            console.error("Could not load update with id: " + this.id)
+            return {}
+        }
+
+
+        let data = e.data()
+
+        return data
+    }
+
+    static async create(data) {
+        const up = await addDoc(collection(db, "updates"), data)
+        return up.id;
+    }
+}
+
 export class Event {
     constructor(id) {
         this.id = id
@@ -856,4 +945,51 @@ export class Utils {
     static logMetric(name, data) {
         logEvent(analytics, name, data)
     }
+}
+
+export class MoreMenu {
+    constructor() {
+        this.more = $("<div/>")
+            .addClass("moreMenu")
+        this.menu = $("<div/>")
+            .addClass("menu")
+
+        this.clicked = false
+
+        this.button = $("<img/>")
+            .attr("src", "../img/icons/more.png")
+            .css("width", 35)
+            .css("height", 35)
+            .on("click", async () => {
+
+                this.menu.css("opacity", 1)
+                this.menu.css("display", "flex")
+
+                await new Promise(r => setTimeout(r, 500));
+
+                document.onclick = () => {
+                    this.menu.css("opacity", 0)
+                    this.menu.css("display", "none")
+
+                    document.onclick = () => { }
+
+                }
+            })
+
+        this.more.append(this.button)
+        this.more.append(this.menu)
+    }
+
+    add(label, onclick) {
+
+        const button = $("<div/>")
+            .text(label)
+            .on("click", () => {
+                onclick()
+            })
+
+        this.menu.append(button)
+    }
+
+
 }

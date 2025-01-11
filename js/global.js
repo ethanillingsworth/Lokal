@@ -43,7 +43,7 @@ document.body.onresize = function () {
 
 resizeChecks()
 
-sidebar.menu.addItem(new Item("Connect", "../img/icons/party.png", "../"))
+sidebar.menu.addItem(new Item("Events", "../img/icons/party.png", "../"))
 
 sidebar.menu.addItem(new Item("Group Finder", "../img/icons/groupfinder.png", "../groupfinder"))
 
@@ -132,9 +132,6 @@ onAuthStateChanged(auth, async (user) => {
         sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
 
         // sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
-        if (badges.includes("premium") || badges.includes("admin")) {
-            sidebar.menu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"))
-        }
 
         const moreMenu = new Menu(expand)
 
@@ -148,6 +145,10 @@ onAuthStateChanged(auth, async (user) => {
                 // An error happened.
             });
         }), true)
+
+        if (badges.includes("premium") || badges.includes("admin")) {
+            moreMenu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"), true)
+        }
 
         let backAdded = false
 

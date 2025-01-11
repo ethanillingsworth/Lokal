@@ -640,7 +640,46 @@ input[type=checkbox] {
     cursor: pointer;
 }
 
-@media (max-width: 1080px) {
+.moreMenu {
+    position: relative;
+}
+
+.moreMenu .menu {
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    width: fit-content;
+    padding: 5px 5px;
+    border-radius: 15px;
+    background-color: var(--dark1);
+    border: 4px solid var(--dark0);
+    min-width: 200px;
+    z-index: 1000;
+    height: fit-content;
+    transition: all 0.25s ease-in-out;
+    gap: 10px;
+}
+
+.moreMenu .menu div {
+    background-color: var(--dark1);
+    width: calc(100% - 20px);
+    padding: 5px 10px;
+    border-radius: inherit;
+    font-weight: bold;
+    transition: all 0.25s ease-in-out;
+    user-select: none;
+
+}
+
+.moreMenu .menu div:hover {
+    background-color: var(--dark2);
+    cursor: pointer;
+}
+
+@media (max-width: 1200px) {
     .modal {
         width: 75%;
     }
@@ -662,7 +701,7 @@ input[type=checkbox] {
     }
 }
 
-@media (max-width: 512px) {
+@media (max-width: 600px) {
 
 
     .modal {
