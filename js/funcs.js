@@ -433,7 +433,7 @@ export class Event {
         this.id = id
     }
 
-    async display(content = $("#content")) {
+    async display(content = $("#content"), pinned = false) {
 
         const event = await this.get(this.id)
 
@@ -486,14 +486,44 @@ export class Event {
                 </div>
                     
                 
-            </div>`)
+            </div>
+            <div class="row tools"></div>`)
 
-        content.append(ev)
 
         const badges = ev.find(".badges")
 
         if (user.accentColor) {
             ev.find(".pfp").css("borderColor", user.accentColor)
+        }
+
+        const readOnly = await u.getMemberReadOnly(auth.currentUser.uid)
+
+
+
+        if (readOnly.admin) {
+
+            const more = new MoreMenu()
+
+            if (pinned) {
+                more.add("Unpin", async () => {
+                    await this.unpin(u)
+                    alert("Event unpinned, refresh your page to see updates")
+                })
+            }
+            else {
+                more.add("Pin", async () => {
+                    await this.pin(u)
+                    alert("Event pinned, refresh your page to see updates")
+                })
+            }
+
+            more.add("Delete", async () => {
+                if (confirm("Are you sure you want to delete this event?")) {
+                    await this.delete()
+                    ev.css("display", "none")
+                }
+            })
+            ev.find(".tools").append(more.more)
         }
 
         if (meta.badges) {
@@ -513,6 +543,15 @@ export class Event {
         // ev.querySelector(".display-name").onclick = function () {
         //     window.location.href = `../user/index.html?u=${username}`
         // }
+
+        if (pinned) {
+            if (user.accentColor) {
+                ev.css("borderColor", user.accentColor)
+            }
+            else {
+                ev.css("borderColor", "var(--accent)")
+            }
+        }
 
         if (event.preview) {
             ev.find(".event-image").attr("src", event.preview)
@@ -613,6 +652,8 @@ export class Event {
 
         actions.append(open)
 
+        content.append(ev)
+
     }
 
     async getUData() {
@@ -640,6 +681,18 @@ export class Event {
     static async create(data) {
         const event = await addDoc(collection(db, "posts"), data)
         return event.id;
+    }
+
+    async delete() {
+        await deleteDoc(doc(db, "events", this.id))
+    }
+
+    async pin(group) {
+        await group.updateData({ pinnedEvent: this.id }, "public")
+    }
+
+    async unpin(group) {
+        await group.updateData({ pinnedEvent: null }, "public")
     }
 }
 
