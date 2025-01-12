@@ -101,23 +101,31 @@ function addPage(name, prev = null, next = null, current = false) {
                 }
 
                 if (mode == "update") {
-                    const title = $("#title");
-                    const desc = $("#desc");
+                    const title = $("#update-title");
+                    const desc = $("#update-desc");
 
                     const data = {
                         title: title.val(),
                         desc: desc.val(),
                     }
 
-                    data.timestamp = Timestamp.fromDate(new Date());
-                    data.creator = auth.currentUser.uid;
-                    data.face = auth.currentUser.uid;
+                    if (urlParams.get("update")) {
+                        const up = new Update(urlParams.get("update"))
 
-                    if (urlParams.get("u")) {
-                        data.creator = urlParams.get("u");
+                        await up.update(data)
                     }
+                    else {
 
-                    await Update.create(data)
+                        data.timestamp = Timestamp.fromDate(new Date());
+                        data.creator = auth.currentUser.uid;
+                        data.face = auth.currentUser.uid;
+
+                        if (urlParams.get("u")) {
+                            data.creator = urlParams.get("u");
+                        }
+
+                        await Update.create(data)
+                    }
 
                     window.location.href = "../"
                 }
@@ -140,10 +148,10 @@ if (mode == "update") {
     const init = addPage("Details", null, "Done", true)
 
     addField(init, "Title:", (row) => {
-        const input = $("<input/>").attr("id", "title").val("Example").attr("maxlength", "25");
+        const input = $("<input/>").attr("id", "update-title").val("Example").attr("maxlength", "25");
 
         input.on("change", function () {
-            if (input.text().length < 1) {
+            if (input.val().length < 1) {
                 input.val("Example");
             }
         });
@@ -156,13 +164,11 @@ if (mode == "update") {
 
         const txtDiv = $("<div/>").css("width", "100%");
 
-        const txtArea = $("<textarea/>").attr("rows", "5").val("A brief text 250 chars or less").attr("maxlength", "250").attr("id", "desc");
-
-        const txtLimit = $("<h5/>").css("text-align", "right").css("color", "gray").html('<span id="count" style="color: gray">0</span>/250');
+        const txtArea = $("<textarea/>").attr("rows", "5").val("A brief text 250 chars or less").attr("maxlength", "250").attr("id", "update-desc");
 
         txtArea
             .on("change", function () {
-                if (txtArea.text().length < 10) {
+                if (txtArea.val().length < 10) {
                     txtArea.val("Your summary must be at least 10 characters");
                 }
             });
@@ -181,7 +187,7 @@ if (mode == "event") {
         const input = $("<input/>").attr("id", "title").val("Event Name").attr("maxlength", "25");
 
         input.on("change", function () {
-            if (input.text().length < 1) {
+            if (input.val().length < 1) {
                 input.val("Event Name");
             }
         });
@@ -205,7 +211,7 @@ if (mode == "event") {
         txtLimit.find("span").text(txtArea.text().length);
 
         txtArea.on("change", function () {
-            if (txtArea.text().length < 10) {
+            if (txtArea.val().length < 10) {
                 txtArea.val("Your summary must be at least 10 characters");
             }
             txtLimit.find("span").text(txtArea.text().length);
@@ -497,7 +503,6 @@ if (urlParams.get("e") && mode == "event") {
     const creator = new User(data.creator);
     const readOnlyMember = await creator.getMemberReadOnly(currentUser.uid);
 
-    console.log(memberData);
 
     if (currentUser.uid === data.creator || badges.admin || readOnlyMember.admin) {
         title.val(data.title);
@@ -511,6 +516,27 @@ if (urlParams.get("e") && mode == "event") {
             preview.attr("src", data.preview);
             isPlaceholder = false;
         }
+    } else {
+        console.error("idk");
+    }
+}
+
+if (urlParams.get("update")) {
+    const e = new Update(urlParams.get("update"));
+    const data = await e.get();
+
+    const title = $("#update-title");
+    const desc = $("#update-desc");
+
+    const currentUser = new User(auth.currentUser.uid);
+    const badges = await currentUser.getBadges();
+
+    const creator = new User(data.creator);
+    const readOnlyMember = await creator.getMemberReadOnly(currentUser.uid);
+
+    if (currentUser.uid === data.creator || badges.admin || readOnlyMember.admin) {
+        title.val(data.title);
+        desc.val(data.desc);
     } else {
         console.error("idk");
     }

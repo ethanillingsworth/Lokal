@@ -384,6 +384,10 @@ export class Update {
                 })
             }
 
+            more.add("Edit", async () => {
+                window.location.href = `../host/index.html?mode=update&u=${c.uid}&update=${this.id}`
+            })
+
             more.add("Delete", async () => {
                 if (confirm("Are you sure you want to delete this update?")) {
                     await this.delete()
@@ -413,6 +417,10 @@ export class Update {
     static async create(data) {
         const up = await addDoc(collection(db, "updates"), data)
         return up.id;
+    }
+
+    async update(data) {
+        await setDoc(doc(db, "updates", this.id), data, { merge: true })
     }
 
     async delete() {
