@@ -420,9 +420,18 @@ async function updates() {
 
     const get = await getDocs(q)
 
+    if (data.pinnedUpdate) {
+        const up = new Update(data.pinnedUpdate)
+
+        await up.display(updatesTab, true)
+
+    }
+
     get.forEach(async (update) => {
-        const u = new Update(update.id)
-        await u.display(updatesTab)
+        if (update.id != data.pinnedUpdate) {
+            const u = new Update(update.id)
+            await u.display(updatesTab)
+        }
     })
 }
 

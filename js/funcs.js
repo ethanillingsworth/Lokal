@@ -1,4 +1,4 @@
-import { getDoc, doc, setDoc, getDocs, collection, addDoc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, setDoc, getDocs, deleteDoc, collection, addDoc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { logEvent } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
 
@@ -295,7 +295,7 @@ export class Update {
         this.id = id
     }
 
-    async display(content = $("#content")) {
+    async display(content = $("#content"), pinned = false) {
 
         const event = await this.get(this.id)
 
@@ -306,6 +306,8 @@ export class Update {
         const meta = await u.getData("hidden")
 
         const username = await u.getUsername()
+
+        const c = new User(event.creator)
 
         const readOnly = await new User(event.creator).getMemberReadOnly(event.face)
 
@@ -326,7 +328,17 @@ export class Update {
                 <p>
                     ${event.desc}
                 </p>                
-            </div>`)
+            </div>
+            <div class="row tools"></div>`)
+
+        if (pinned) {
+            if (user.accentColor) {
+                ev.css("borderColor", user.accentColor)
+            }
+            else {
+                ev.css("borderColor", "var(--accent)")
+            }
+        }
 
         content.append(ev)
 
@@ -344,18 +356,43 @@ export class Update {
                 badges.append(badge)
                 badges.css("display", "flex")
             })
-
-            if (readOnly.admin) {
-                const badge = new Badge("Admin", "h5")
-                badge.css("backgroundColor", "#144a96")
-
-                badges.append(badge)
-                badges.css("display", "flex")
-            }
         }
 
         if (user.pfp) {
             ev.find(".pfp").attr("src", user.pfp)
+        }
+
+        if (readOnly.admin) {
+            const badge = new Badge("Admin", "h5")
+            badge.css("backgroundColor", "#144a96")
+
+            badges.append(badge)
+            badges.css("display", "flex")
+
+            const more = new MoreMenu()
+
+            if (pinned) {
+                more.add("Unpin", async () => {
+                    await this.unpin(c)
+                    alert("Update unpinned, refresh your page to see updates")
+                })
+            }
+            else {
+                more.add("Pin", async () => {
+                    await this.pin(c)
+                    alert("Update pinned, refresh your page to see updates")
+                })
+            }
+
+            more.add("Delete", async () => {
+                if (confirm("Are you sure you want to delete this update?")) {
+                    await this.delete()
+                    ev.css("display", "none")
+                }
+            })
+
+
+            ev.find(".tools").append(more.more)
         }
     }
 
@@ -376,6 +413,18 @@ export class Update {
     static async create(data) {
         const up = await addDoc(collection(db, "updates"), data)
         return up.id;
+    }
+
+    async delete() {
+        await deleteDoc(doc(db, "updates", this.id))
+    }
+
+    async pin(group) {
+        await group.updateData({ pinnedUpdate: this.id }, "public")
+    }
+
+    async unpin(group) {
+        await group.updateData({ pinnedUpdate: null }, "public")
     }
 }
 
