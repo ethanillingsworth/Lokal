@@ -600,6 +600,7 @@ export class User {
     }
 
     async updateData(data, type) {
+
         await setDoc(doc(db, "users", this.uid, "data", type), data, { merge: true })
     }
 

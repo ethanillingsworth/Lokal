@@ -131,6 +131,10 @@ onAuthStateChanged(auth, async (user) => {
 
         sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
 
+        // const notifMenu = new Menu(expand)
+
+        // sidebar.menu.addItem(new Item("Notifications", "../img/icons/notif.png", notifMenu))
+
         // sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
 
         const moreMenu = new Menu(expand)

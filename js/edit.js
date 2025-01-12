@@ -42,20 +42,22 @@ if (urlParams.get("u")) {
 
     pageUser = new User(await User.getUID(urlParams.get("u")))
 }
-
+let authUser = undefined
 
 onAuthStateChanged(auth, async (user) => {
-    const authUser = new User(user.uid)
-
+    authUser = new User(user.uid)
     const badges = await authUser.getBadges()
-
-    const readOnlyMember = await pageUser.getMemberReadOnly(authUser.uid)
-
 
     if (urlParams.get("createGroup") && urlParams.get("u")) {
         window.location.href = "../"
         return
     }
+
+    if (urlParams.get("createGroup")) {
+        return
+    }
+    const readOnlyMember = await pageUser.getMemberReadOnly(authUser.uid)
+
     // allow if normal user account, they are a site admin, or group admin
     if (user.uid == pageUser.uid || badges.admin || readOnlyMember.admin) {
 
@@ -65,6 +67,7 @@ onAuthStateChanged(auth, async (user) => {
 
         return
     }
+
 
 })
 
@@ -219,9 +222,24 @@ addButton("Done", async () => {
     }
 
     if (urlParams.get("createGroup")) {
-        const newUser = await User.createUser(usernameVal, data, {}, { group: true })
 
-        newUser.updateMember(auth.currentUser.uid, { admin: true, accepted: true })
+
+        const priv = await authUser.getData("private")
+
+        if (priv.groupsCreated + 1 > 3) {
+            alert("You already have 3 groups created, you'll have to delete one to make anymore. To do so please email support@lokalevents.com")
+            window.location.href = "../index.html"
+            return
+        }
+
+        const newUser = await User.createUser(usernameVal, data, {}, { badges: ["group"] })
+        await newUser.updateMember(auth.currentUser.uid, { joined: true })
+
+        await newUser.updateMemberReadOnly(auth.currentUser.uid, { admin: true, accepted: true })
+
+        await authUser.updateData({
+            groupsCreated: priv.groupsCreated + 1
+        }, "private")
     }
     else {
 

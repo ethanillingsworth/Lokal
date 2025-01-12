@@ -66,7 +66,8 @@ async function setUserData(user, email, username) {
     })
 
     await setDoc(doc(db, "users", user.uid, "data", "private"), {
-        prevRes: []
+        prevRes: [],
+        groupsCreated: 0
     })
     // require manual approval for now
 
