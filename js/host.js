@@ -91,7 +91,7 @@ function addPage(name, prev = null, next = null, current = false) {
                         }
 
                         const id = await Event.create(data);
-                        Utils.logMetric("event_created");
+
 
                         window.location.href = "../event/index.html?e=" + id;
                     }
