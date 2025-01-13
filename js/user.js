@@ -344,7 +344,9 @@ onAuthStateChanged(auth, async (u) => {
 
     let bdsU = await currentUser.getBadges()
 
-    if ((u.uid == uid || bdsU.includes("admin")) || (bds.includes("group") && bdsU.includes("admin"))) {
+    const readOnly = await user.getMemberReadOnly(currentUser.uid)
+
+    if ((u.uid == uid || bdsU.includes("admin")) || (bds.includes("group") && readOnly.admin)) {
 
 
         const moreMenu = new MoreMenu()
@@ -371,7 +373,6 @@ onAuthStateChanged(auth, async (u) => {
     if (bds.includes("group")) {
         const memberData = await user.getMember(currentUser.uid)
 
-        const readOnly = await user.getMemberReadOnly(currentUser.uid)
 
 
         if (memberData.pending) {

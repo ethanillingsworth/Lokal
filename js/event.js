@@ -291,8 +291,6 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
         page.append(grid);
     });
 
-
-
 }
 
 function addPage(label, func, current) {

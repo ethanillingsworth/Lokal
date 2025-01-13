@@ -106,7 +106,7 @@ function addPage(name, prev = null, next = null, current = false) {
 
                     const data = {
                         title: title.val(),
-                        desc: desc.val(),
+                        desc: desc.val().replaceAll("\n", "<br>"),
                     }
 
                     if (urlParams.get("update")) {
@@ -127,7 +127,7 @@ function addPage(name, prev = null, next = null, current = false) {
                         await Update.create(data)
                     }
 
-                    window.location.href = "../"
+                    window.location.href = "../user/index.html?u=" + await new User(urlParams.get("u")).getUsername()
                 }
             } else {
                 switchPage(next);
@@ -164,7 +164,7 @@ if (mode == "update") {
 
         const txtDiv = $("<div/>").css("width", "100%");
 
-        const txtArea = $("<textarea/>").attr("rows", "5").val("A brief text 250 chars or less").attr("maxlength", "250").attr("id", "update-desc");
+        const txtArea = $("<textarea/>").attr("rows", "5").val("A brief text 400 chars or less").attr("maxlength", "400").attr("id", "update-desc");
 
         txtArea
             .on("change", function () {
@@ -200,9 +200,9 @@ if (mode == "event") {
 
         const txtDiv = $("<div/>").css("width", "100%");
 
-        const txtArea = $("<textarea/>").attr("rows", "5").val("A summary for the event\n(displayed in the event preview)").attr("maxlength", "250").attr("id", "desc");
+        const txtArea = $("<textarea/>").attr("rows", "5").val("A summary for the event\n(displayed in the event preview)").attr("maxlength", "400").attr("id", "desc");
 
-        const txtLimit = $("<h5/>").css("text-align", "right").css("color", "gray").html('<span id="count" style="color: gray">0</span>/250');
+        const txtLimit = $("<h5/>").css("text-align", "right").css("color", "gray").html('<span id="count" style="color: gray">0</span>/400');
 
         txtArea.on("input", function () {
             txtLimit.find("span").text(txtArea.text().length);

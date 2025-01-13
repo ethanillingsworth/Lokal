@@ -299,6 +299,10 @@ export class Update {
 
         const event = await this.get(this.id)
 
+        if (Object.keys(event).length <= 0) {
+            return
+        }
+
         const u = new User(event.face)
 
         const user = await u.getData()
@@ -332,8 +336,10 @@ export class Update {
             <div class="row tools"></div>`)
 
         if (pinned) {
-            if (user.accentColor) {
-                ev.css("borderColor", user.accentColor)
+
+            const cData = await new User(event.creator).getData()
+            if (cData.accentColor) {
+                ev.css("borderColor", cData.accentColor)
             }
             else {
                 ev.css("borderColor", "var(--accent)")
@@ -442,8 +448,11 @@ export class Event {
     }
 
     async display(content = $("#content"), pinned = false) {
-
         const event = await this.get(this.id)
+
+        if (Object.keys(event).length <= 0) {
+            return
+        }
 
         const u = new User(event.creator)
 
@@ -692,7 +701,13 @@ export class Event {
     }
 
     async delete() {
-        await deleteDoc(doc(db, "events", this.id))
+        const q = await getDocs(query(collection(db, "posts", this.id, "uData")));
+
+        q.forEach(async (d) => {
+            await deleteDoc(doc(db, "posts", this.id, "uData", d.id));
+        });
+
+        await deleteDoc(doc(db, "posts", this.id));
     }
 
     async pin(group) {
@@ -922,7 +937,6 @@ export class User {
         const user = new User(d.id)
 
         await user.updateUsername(username.toLowerCase())
-
         await user.updateData({
             ...pub,
             timestamp: Timestamp.now()
