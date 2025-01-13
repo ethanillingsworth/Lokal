@@ -1,8 +1,8 @@
-import { getDoc, doc, query, collection, getDocs, where, limit } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, query, collection, getDocs, where, limit, orderBy } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 import { db, auth } from "./firebase.js";
-import { User, Badge, Event } from "./funcs.js";
+import { User, Badge, Event, MoreMenu, Update } from "./funcs.js";
 
 import "./jquery.js";
 
@@ -109,16 +109,26 @@ modal.append(top).append(tools).append(tabs).append(divider);
 content.append(modal);
 
 
-async function hosting(uid) {
-    const hostingTab = $("#Hosting")
 
-    const q = query(collection(db, "posts"), where("creator", "==", uid))
+async function hosting(uid) {
+    const hostingTab = $("#Events")
+
+    const q = query(collection(db, "posts"), where("creator", "==", uid), orderBy("timestamp", "desc"))
 
     const get = await getDocs(q)
 
+    if (data.pinnedEvent) {
+        const up = new Event(data.pinnedEvent)
+
+        await up.display(hostingTab, true)
+
+    }
+
     get.forEach(async (event) => {
-        const e = new Event(event.id)
-        await e.display(hostingTab)
+        if (event.id != data.pinnedEvent) {
+            const u = new Event(event.id)
+            await u.display(hostingTab)
+        }
     })
 }
 
@@ -148,20 +158,29 @@ async function attending(uid) {
 async function members(user) {
     const tab = $("#Members")
 
-    const q = query(collection(db, "users", user.uid, "members"), where("accepted", "==", true), limit(25))
+    const q = query(collection(db, "users", user.uid, "members"), where("joined", "==", true), limit(25))
 
     const get = await getDocs(q)
 
     get.forEach(async (person) => {
         const personClass = new User(person.id)
 
+        let readOnly = await user.getMemberReadOnly(person.id)
+
+        let currentUserReadOnly = {}
+
+        if (auth.currentUser) currentUserReadOnly = await user.getMemberReadOnly(auth.currentUser.uid)
+
+        if (readOnly.accepted == false) return
+
         const username = await personClass.getUsername()
         const pub = await personClass.getData("public")
         const meta = await personClass.getData("hidden")
 
+
         let admin = false
 
-        if (person.data().admin) { admin = true }
+        if (readOnly.admin) { admin = true }
 
         const dis = await User.display(username, pub, meta, tab, admin)
 
@@ -169,13 +188,10 @@ async function members(user) {
 
         if (auth.currentUser) currentUser = new User(auth.currentUser.uid)
 
-        const currentUserMeta = await currentUser.getData("hidden")
+        const currentUserBadges = await currentUser.getBadges()
 
-        let memData = {}
 
-        if (auth.currentUser) memData = await user.getMember(auth.currentUser.uid)
-
-        if (currentUserMeta.admin || memData.admin) {
+        if (currentUserBadges.admin || currentUserReadOnly.admin) {
 
             const actions = dis.find(".actions");
             actions.empty();
@@ -188,13 +204,13 @@ async function members(user) {
                 .on("click", async function () {
                     if (p) {
                         if (confirm("Are you sure you want to promote that person?")) {
-                            await user.updateMember(person.id, { admin: true });
+                            await user.updateMemberReadOnly(person.id, { admin: true });
                         }
                         p = false;
                         $(this).attr("src", "../img/icons/down.png");
                     } else {
                         if (confirm("Are you sure you want to demote that person?")) {
-                            await user.updateMember(person.id, { admin: false });
+                            await user.updateMemberReadOnly(person.id, { admin: false });
                         }
                         p = true;
                         $(this).attr("src", "../img/icons/up.png");
@@ -206,7 +222,8 @@ async function members(user) {
                 .attr("src", "../img/icons/del.png")
                 .on("click", async function () {
                     if (confirm("Are you sure you want to remove that person from your group?")) {
-                        await user.updateMember(person.id, { pending: false, accepted: false });
+                        await user.updateMember(person.id, { pending: false, joined: false });
+                        await user.updateMemberReadOnly(person.id, { false: true })
                         actions.parent().remove();
                     }
                 });
@@ -230,7 +247,7 @@ async function members(user) {
 async function groups(user) {
     const tab = $("#Groups")
 
-    const groupQ = query(collection(db, "users"), where("group", "==", true))
+    const groupQ = query(collection(db, "users"), where("badges", "array-contains", "group"))
 
     const groups = await getDocs(groupQ)
 
@@ -276,7 +293,8 @@ async function requests(user) {
             .addClass("action")
             .attr("src", "../img/icons/confirm.png")
             .on("click", async function () {
-                await user.updateMember(person.id, { pending: false, accepted: true });
+                await user.updateMember(person.id, { pending: false, joined: true });
+                await user.updateMemberReadOnly(person.id, { accepted: true })
                 actions.parent().remove();
             });
 
@@ -305,116 +323,97 @@ function updateProfile(data) {
 const uid = await User.getUID(pageUser)
 const user = new User(uid)
 
-const meta = await user.getData("hidden")
+let bds = await user.getBadges()
 
+console.log(bds)
 
-if (meta.admin) {
-    const adminBadge = new Badge("Lokal Staff")
+bds.forEach((badgeName) => {
+    const badge = Badge.getFromName(badgeName)
 
-
-    adminBadge.css("backgroundColor", "var(--accent)")
-
-
-    badges.append(adminBadge)
-}
-
-if (meta.partner) {
-    const adminBadge = new Badge("Partner")
-
-    adminBadge.css("backgroundColor", "var(--accent2)")
-
-    badges.append(adminBadge)
-}
-
-if (meta.group) {
-    const groupBadge = new Badge("Group")
-
-    groupBadge.css("backgroundColor", "#3577d4")
-
-    badges.append(groupBadge)
-}
+    badges.append(badge)
+})
 
 onAuthStateChanged(auth, async (u) => {
 
+    // if not logged in, do nothing
     if (!u) {
         return
     }
 
     const currentUser = new User(u.uid)
 
-    const metaU = await currentUser.getData("hidden")
+    let bdsU = await currentUser.getBadges()
 
-    const groupU = await user.getMember(u.uid)
+    const readOnly = await user.getMemberReadOnly(currentUser.uid)
 
-    if ((u.uid == uid || metaU.admin) || (meta.group && groupU.admin)) {
+    if ((u.uid == uid || bdsU.includes("admin")) || (bds.includes("group") && readOnly.admin)) {
 
-        if (meta.group) {
-            const addEvent = document.createElement("img")
-            addEvent.src = "../img/icons/plus.png"
 
-            addEvent.onclick = function () {
+        const moreMenu = new MoreMenu()
+
+        if (bds.includes("group")) {
+            moreMenu.add("Add Event", () => {
                 window.location.href = "../host/index.html?u=" + user.uid
-            }
 
-            tools.append(addEvent)
+            })
+
+            moreMenu.add("Add Update", () => {
+                window.location.href = "../host/index.html?mode=update&u=" + user.uid
+
+            })
         }
 
-        const edit = document.createElement("img")
-        edit.id = "edit"
-        edit.src = "../img/icons/edit.png"
-        edit.width = "35"
-
-        tools.append(edit)
-
-
-        edit.onclick = function () {
+        moreMenu.add("Edit Profile", () => {
             window.location.href = "../edit/index.html?u=" + urlParams.get("u")
+        })
 
-        }
+        tools.append(moreMenu.more)
     }
 
-    if (meta.group) {
+    if (bds.includes("group")) {
         const memberData = await user.getMember(currentUser.uid)
 
 
+
         if (memberData.pending) {
-            join.classList.add("pending")
-            join.innerText = "Pending..."
+            join.addClass("pending")
+            join.text("Pending...")
         }
 
-        if (memberData.accepted) {
+        if (readOnly.accepted && memberData.joined) {
 
-            join.innerText = "Joined"
+            join.text("Joined")
         }
 
-        if (memberData.admin || metaU.admin) {
+        if (readOnly.admin || bdsU.admin) {
             createTab("Requests")
             await requests(user)
         }
-        if (!memberData.admin) {
-            join.style.display = "flex"
+
+        if (!readOnly.admin) {
+            join.css("display", "flex")
         }
 
-        join.onclick = async function () {
-            if (join.innerText == "Join") {
-                join.classList.add("pending")
-                join.innerText = "Pending..."
+        join.on("click", async function () {
+            if (join.text() == "Join") {
+                join.addClass("pending")
+                join.text("Pending...")
                 await user.updateMember(currentUser.uid, { pending: true })
 
             }
-            else if (join.innerText == "Pending...") {
-                join.classList.remove("pending")
-                join.innerText = "Join"
+            else if (join.text() == "Pending...") {
+                join.removeClass("pending")
+                join.text("Join")
 
                 await user.updateMember(currentUser.uid, { pending: false })
             }
-            else if (join.innerText == "Joined") {
+            else if (join.text() == "Joined") {
 
-                join.innerText = "Join"
-                await user.updateMember(currentUser.uid, { pending: false, accepted: false })
+                join.text("Join")
+                await user.updateMember(currentUser.uid, { pending: false, joined: false })
 
             }
-        }
+        })
 
     }
 })
@@ -424,19 +423,45 @@ const data = await user.getData("public")
 
 updateProfile(data)
 
-if (!meta.group) {
+async function updates() {
+    const updatesTab = $("#Updates")
+
+    const q = query(collection(db, "updates"), where("creator", "==", uid), orderBy("timestamp", "desc"))
+
+    const get = await getDocs(q)
+
+    if (data.pinnedUpdate) {
+        const up = new Update(data.pinnedUpdate)
+
+        await up.display(updatesTab, true)
+
+    }
+
+    get.forEach(async (update) => {
+        if (update.id != data.pinnedUpdate) {
+            const u = new Update(update.id)
+            await u.display(updatesTab)
+        }
+    })
+}
+
+if (bds.includes("group")) {
+    createTab("Updates", true)
+    createTab("Events")
+    createTab("Members")
+
+    await updates(user)
+    await hosting(uid)
+    await members(user)
+}
+else {
+
     createTab("Attending", true)
     await attending(uid)
 
     createTab("Groups")
 
     await groups(user)
-}
-else {
-    createTab("Hosting", true)
-    await hosting(uid)
-    createTab("Members")
-    await members(user)
 
 }
 

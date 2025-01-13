@@ -43,7 +43,9 @@ document.body.onresize = function () {
 
 resizeChecks()
 
-sidebar.menu.addItem(new Item("Connect", "../img/icons/party.png", "../"))
+sidebar.menu.addItem(new Item("Events", "../img/icons/party.png", "../"))
+
+sidebar.menu.addItem(new Item("Group Finder", "../img/icons/groupfinder.png", "../groupfinder"))
 
 $(document.body).append(content)
 
@@ -89,7 +91,7 @@ onAuthStateChanged(auth, async (user) => {
         const dName = new Item("Sign in", "../img/pfp.jpg", () => {
             window.location.href = "../login"
         })
-        dName.id = "user"
+        dName.classList = ["user-side"]
 
         sidebar.menu.addItem(dName, true)
 
@@ -108,6 +110,10 @@ onAuthStateChanged(auth, async (user) => {
 
         const meta = await u.getData("hidden")
 
+        let badges = []
+
+        if (meta.badges) badges = meta.badges
+
         // prev searches
         // if (priv.prevRes) {
         //     let count = 0
@@ -125,16 +131,14 @@ onAuthStateChanged(auth, async (user) => {
 
         sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
 
+        // const notifMenu = new Menu(expand)
+
+        // sidebar.menu.addItem(new Item("Notifications", "../img/icons/notif.png", notifMenu))
+
         // sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
-        if (meta.approved) {
-            sidebar.menu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"))
-        }
 
         const moreMenu = new Menu(expand)
 
-        if (!meta.approved) {
-            moreMenu.addItem(new Item("Request Approval", "../img/icons/approval.png", `mailto:support@lokalevents.com?subject=Account Approval, UID ${uid}&body=(Make sure you're sending this email from the email associated with your account)`), true)
-        }
 
         moreMenu.addItem(new Item("Log Out", "../img/icons/logout.png", () => {
             signOut(auth).then(() => {
@@ -145,6 +149,10 @@ onAuthStateChanged(auth, async (user) => {
                 // An error happened.
             });
         }), true)
+
+        if (badges.includes("premium") || badges.includes("admin")) {
+            moreMenu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"), true)
+        }
 
         let backAdded = false
 
@@ -189,16 +197,16 @@ onAuthStateChanged(auth, async (user) => {
 
         sidebar.menu.addItem(dName, true)
 
-        const q = query(collection(db, "users"), where("group", "==", true))
+        const q = query(collection(db, "users"), where("badges", "array-contains", "group"))
 
         const groups = await getDocs(q)
 
         groups.forEach(async g => {
             const group = new User(g.id)
 
-            const data = await group.getMember(uid)
+            const readOnly = await group.getMemberReadOnly(uid)
 
-            if (data.admin) {
+            if (readOnly.admin) {
                 // show item
                 const pub = await group.getData("public")
                 const username = await group.getUsername()

@@ -1,11 +1,10 @@
-import { getDoc, doc, setDoc, getDocs, collection, addDoc, query, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, setDoc, getDocs, deleteDoc, collection, addDoc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { logEvent } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
 
 import { auth, db, analytics } from "./firebase.js";
 
 import "./jquery.js"
-
 
 export class Alert {
 
@@ -269,18 +268,191 @@ export class Badge {
         return $(`<${labelType}/>`).text(label).addClass("badge")
     }
 
+    static getFromName(name, type = "h4") {
+        if (name == "admin") {
+            return new Badge("Lokal Staff", type)
+                .css("backgroundColor", "var(--accent)")
+        }
+        else if (name == "partner") {
+            return new Badge("Partner", type)
+                .css("backgroundColor", "var(--accent2)")
+        }
+        else if (name == "group") {
+            return new Badge("Group", type)
+                .css("backgroundColor", "#3577d4")
+        }
+        else if (name == "premium") {
+            return new Badge("Premium", type)
+                .css("backgroundColor", "var(--premium)")
+        }
+    }
+
 
 }
 
+export class Update {
+    constructor(id) {
+        this.id = id
+    }
+
+    async display(content = $("#content"), pinned = false) {
+
+        const event = await this.get(this.id)
+
+        if (Object.keys(event).length <= 0) {
+            return
+        }
+
+        const u = new User(event.face)
+
+        const user = await u.getData()
+
+        const meta = await u.getData("hidden")
+
+        const username = await u.getUsername()
+
+        const c = new User(event.creator)
+
+        const readOnly = await new User(event.creator).getMemberReadOnly(event.face)
+
+        // make event
+        const ev = $("<div/>")
+            .addClass("event")
+            .attr("id", this.id)
+            .html(`<img class="pfp border" src="../img/pfp.jpg">
+            <div class="event-content">
+            
+                <div class="user-info row" style="gap: 5px; place-items: center">
+                    <h4 class="display-name">${user.displayName}</h4>
+                    <h4 class="username">(@${username})</h4>
+
+                </div>
+                <div class="row badges" style="display: none"></div>
+                <h4>${event.title}</h4>
+                <p>
+                    ${event.desc}
+                </p>                
+            </div>
+            <div class="row tools"></div>`)
+
+        if (pinned) {
+
+            const cData = await new User(event.creator).getData()
+            if (cData.accentColor) {
+                ev.css("borderColor", cData.accentColor)
+            }
+            else {
+                ev.css("borderColor", "var(--accent)")
+            }
+        }
+
+        content.append(ev)
+
+        const badges = ev.find(".badges")
+
+        if (user.accentColor) {
+            ev.find(".pfp").css("borderColor", user.accentColor)
+        }
+
+        if (meta.badges) {
+
+            meta.badges.forEach((badgeName) => {
+                const badge = Badge.getFromName(badgeName, "h5")
+
+                badges.append(badge)
+                badges.css("display", "flex")
+            })
+        }
+
+        if (user.pfp) {
+            ev.find(".pfp").attr("src", user.pfp)
+        }
+
+        if (readOnly.admin) {
+            const badge = new Badge("Admin", "h5")
+            badge.css("backgroundColor", "#144a96")
+
+            badges.append(badge)
+            badges.css("display", "flex")
+
+            const more = new MoreMenu()
+
+            if (pinned) {
+                more.add("Unpin", async () => {
+                    await this.unpin(c)
+                    alert("Update unpinned, refresh your page to see updates")
+                })
+            }
+            else {
+                more.add("Pin", async () => {
+                    await this.pin(c)
+                    alert("Update pinned, refresh your page to see updates")
+                })
+            }
+
+            more.add("Edit", async () => {
+                window.location.href = `../host/index.html?mode=update&u=${c.uid}&update=${this.id}`
+            })
+
+            more.add("Delete", async () => {
+                if (confirm("Are you sure you want to delete this update?")) {
+                    await this.delete()
+                    ev.css("display", "none")
+                }
+            })
+
+
+            ev.find(".tools").append(more.more)
+        }
+    }
+
+    async get() {
+        let e = await getDoc(doc(db, "updates", this.id))
+
+        if (!e.exists()) {
+            console.error("Could not load update with id: " + this.id)
+            return {}
+        }
+
+
+        let data = e.data()
+
+        return data
+    }
+
+    static async create(data) {
+        const up = await addDoc(collection(db, "updates"), data)
+        return up.id;
+    }
+
+    async update(data) {
+        await setDoc(doc(db, "updates", this.id), data, { merge: true })
+    }
+
+    async delete() {
+        await deleteDoc(doc(db, "updates", this.id))
+    }
+
+    async pin(group) {
+        await group.updateData({ pinnedUpdate: this.id }, "public")
+    }
+
+    async unpin(group) {
+        await group.updateData({ pinnedUpdate: null }, "public")
+    }
+}
 
 export class Event {
     constructor(id) {
         this.id = id
     }
 
-    async display(content = $("#content")) {
-
+    async display(content = $("#content"), pinned = false) {
         const event = await this.get(this.id)
+
+        if (Object.keys(event).length <= 0) {
+            return
+        }
 
         const u = new User(event.creator)
 
@@ -299,7 +471,7 @@ export class Event {
         // make event
         const ev = $("<div/>")
             .addClass("event")
-            .attr("id", id)
+            .attr("id", this.id)
             .html(`<img class="pfp border" src="../img/pfp.jpg">
             <div class="event-content">
             
@@ -331,9 +503,9 @@ export class Event {
                 </div>
                     
                 
-            </div>`)
+            </div>
+            <div class="row tools"></div>`)
 
-        content.append(ev)
 
         const badges = ev.find(".badges")
 
@@ -341,30 +513,44 @@ export class Event {
             ev.find(".pfp").css("borderColor", user.accentColor)
         }
 
-        if (meta.admin) {
-            const badge = new Badge("Lokal Staff", "h5")
-            badge.css("backgroundColor", "var(--accent)")
+        const readOnly = await u.getMemberReadOnly(auth.currentUser.uid)
 
-            badges.append(badge)
-            badges.css("display", flex)
+
+
+        if (readOnly.admin) {
+
+            const more = new MoreMenu()
+
+            if (pinned) {
+                more.add("Unpin", async () => {
+                    await this.unpin(u)
+                    alert("Event unpinned, refresh your page to see updates")
+                })
+            }
+            else {
+                more.add("Pin", async () => {
+                    await this.pin(u)
+                    alert("Event pinned, refresh your page to see updates")
+                })
+            }
+
+            more.add("Delete", async () => {
+                if (confirm("Are you sure you want to delete this event?")) {
+                    await this.delete()
+                    ev.css("display", "none")
+                }
+            })
+            ev.find(".tools").append(more.more)
         }
 
-        if (meta.partner) {
-            const badge = new Badge("Partner", "h5")
-            badge.css("backgroundColor", "var(--accent2)")
+        if (meta.badges) {
 
+            meta.badges.forEach((badgeName) => {
+                const badge = Badge.getFromName(badgeName, "h5")
 
-            badges.append(badge)
-            badges.css("display", flex)
-        }
-
-        if (meta.group) {
-            const badge = new Badge("Group", "h5")
-            badge.css("backgroundColor", "#3577d4")
-
-
-            badges.append(badge)
-            badges.css("display", flex)
+                badges.append(badge)
+                badges.css("display", "flex")
+            })
         }
 
         // ev.querySelector(".pfp").onclick = function () {
@@ -374,6 +560,15 @@ export class Event {
         // ev.querySelector(".display-name").onclick = function () {
         //     window.location.href = `../user/index.html?u=${username}`
         // }
+
+        if (pinned) {
+            if (user.accentColor) {
+                ev.css("borderColor", user.accentColor)
+            }
+            else {
+                ev.css("borderColor", "var(--accent)")
+            }
+        }
 
         if (event.preview) {
             ev.find(".event-image").attr("src", event.preview)
@@ -474,6 +669,8 @@ export class Event {
 
         actions.append(open)
 
+        content.append(ev)
+
     }
 
     async getUData() {
@@ -502,6 +699,24 @@ export class Event {
         const event = await addDoc(collection(db, "posts"), data)
         return event.id;
     }
+
+    async delete() {
+        const q = await getDocs(query(collection(db, "posts", this.id, "uData")));
+
+        q.forEach(async (d) => {
+            await deleteDoc(doc(db, "posts", this.id, "uData", d.id));
+        });
+
+        await deleteDoc(doc(db, "posts", this.id));
+    }
+
+    async pin(group) {
+        await group.updateData({ pinnedEvent: this.id }, "public")
+    }
+
+    async unpin(group) {
+        await group.updateData({ pinnedEvent: null }, "public")
+    }
 }
 
 export class User {
@@ -510,8 +725,10 @@ export class User {
     }
 
     async updateData(data, type) {
+
         await setDoc(doc(db, "users", this.uid, "data", type), data, { merge: true })
     }
+
     async getData(type = "public") {
 
         let u = undefined
@@ -533,6 +750,19 @@ export class User {
         let userData = u.data()
         return userData
     }
+
+    async getBadges() {
+        const meta = await this.getData("hidden")
+
+        let badges = []
+
+        if (meta.badges) {
+            badges = meta.badges
+        }
+
+        return badges
+    }
+
     async updateUsername(newUsername) {
         await setDoc(doc(db, "usernames", this.uid), {
             username: newUsername.toLowerCase()
@@ -542,6 +772,7 @@ export class User {
             userId: this.uid
         })
     }
+
     async getUsername() {
         let usernameRef = await getDoc(doc(db, "usernames", this.uid))
 
@@ -557,11 +788,26 @@ export class User {
         await setDoc(doc(db, "users", this.uid, "members", memberId), data, { merge: true })
     }
 
+    async updateMemberReadOnly(memberId, data) {
+        await setDoc(doc(db, "users", this.uid, "members", memberId, "readOnly", "data"), data, { merge: true })
+    }
+
     async getMember(memberId) {
         const ref = await getDoc(doc(db, "users", this.uid, "members", memberId))
 
         if (!ref.exists()) {
             console.error("Could not fetch data for member ID:" + memberId)
+            return {}
+        }
+
+        return ref.data()
+    }
+
+    async getMemberReadOnly(memberId) {
+        const ref = await getDoc(doc(db, "users", this.uid, "members", memberId, "readOnly", "data"))
+
+        if (!ref.exists()) {
+            console.error("Could not fetch read only data for member ID:" + memberId)
             return {}
         }
 
@@ -607,37 +853,19 @@ export class User {
             .css("display", "none")
             .css("placeContent", "start")
 
-        if (meta.admin) {
-            const badge = new Badge("Lokal Staff", "h5")
-            badge.css("backgroundColor", "var(--accent)")
+        if (meta.badges) {
 
-            badges.append(badge)
-            badges.css("display", "flex")
-        }
+            meta.badges.forEach((badgeName) => {
+                const badge = Badge.getFromName(badgeName, "h5")
 
-        if (meta.partner) {
-            const badge = new Badge("Partner", "h5")
-            badge.css("backgroundColor", "var(--accent2)")
-
-
-            badges.append(badge)
-            badges.css("display", "flex")
-        }
-
-        if (meta.group) {
-            const badge = new Badge("Group", "h5")
-            badge.css("backgroundColor", "#3577d4")
-
-
-            badges.append(badge)
-            badges.css("display", "flex")
+                badges.append(badge)
+                badges.css("display", "flex")
+            })
         }
 
         if (groupAdmin) {
             const badge = new Badge("Admin", "h5")
             badge.css("backgroundColor", "#144a96")
-
-
 
             badges.append(badge)
             badges.css("display", "flex")
@@ -702,7 +930,6 @@ export class User {
         return userIdRef.data().userId
     }
 
-
     static async createUser(username, pub = {}, priv = {}, meta = {}) {
 
         const d = await addDoc(collection(db, "users"), meta)
@@ -710,8 +937,10 @@ export class User {
         const user = new User(d.id)
 
         await user.updateUsername(username.toLowerCase())
-
-        await user.updateData(pub, "public")
+        await user.updateData({
+            ...pub,
+            timestamp: Timestamp.now()
+        }, "public")
 
         await user.updateData(priv, "private")
 
@@ -803,7 +1032,6 @@ export class Validation {
     }
 }
 
-
 export class Utils {
 
     static toTitleCase(str) {
@@ -842,4 +1070,51 @@ export class Utils {
     static logMetric(name, data) {
         logEvent(analytics, name, data)
     }
+}
+
+export class MoreMenu {
+    constructor() {
+        this.more = $("<div/>")
+            .addClass("moreMenu")
+        this.menu = $("<div/>")
+            .addClass("menu")
+
+        this.clicked = false
+
+        this.button = $("<img/>")
+            .attr("src", "../img/icons/more.png")
+            .css("width", 35)
+            .css("height", 35)
+            .on("click", async () => {
+
+                this.menu.css("opacity", 1)
+                this.menu.css("display", "flex")
+
+                await new Promise(r => setTimeout(r, 500));
+
+                document.onclick = () => {
+                    this.menu.css("opacity", 0)
+                    this.menu.css("display", "none")
+
+                    document.onclick = () => { }
+
+                }
+            })
+
+        this.more.append(this.button)
+        this.more.append(this.menu)
+    }
+
+    add(label, onclick) {
+
+        const button = $("<div/>")
+            .text(label)
+            .on("click", () => {
+                onclick()
+            })
+
+        this.menu.append(button)
+    }
+
+
 }

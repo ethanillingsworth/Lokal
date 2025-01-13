@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { auth, db } from "./firebase.js";
-import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { setDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { Validation } from "./funcs.js";
 import "./jquery.js";
 
@@ -38,7 +38,7 @@ const urlParams = new URLSearchParams(window.location.search)
 
 // random username
 
-var a = ["Small", "Blue", "Pretty", "Big", "High", "Silly", "Red", "Party", "Cute", "Beautiful"];
+var a = ["Small", "Blue", "Pretty", "Big", "Silly", "Red", "Party", "Cute", "Beautiful"];
 var b = ["Bear", "Dog", "Banana", "Sheep", "Apple", "Cat", "Dog", "Possum", "Potato"];
 
 function generateUsername() {
@@ -61,11 +61,13 @@ async function setUserData(user, email, username) {
 
     await setDoc(doc(db, "users", user.uid, "data", "public"), {
         displayName: username,
-        desc: "Set a description"
+        desc: "Set a description",
+        timestamp: Timestamp.now()
     })
 
     await setDoc(doc(db, "users", user.uid, "data", "private"), {
-        prevRes: []
+        prevRes: [],
+        groupsCreated: 0
     })
     // require manual approval for now
 

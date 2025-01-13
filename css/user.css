@@ -41,16 +41,17 @@ hr {
 
 #userDetails {
     width: 100%;
+    gap: 10px !important
 }
 
 
-@media (max-width: 1080px) {
+@media (max-width: 1200px) {
     #top {
         flex-wrap: wrap !important;
     }
 }
 
-@media (max-width: 512px) {
+@media (max-width: 600px) {
 
     #top {
         place-content: center !important;
