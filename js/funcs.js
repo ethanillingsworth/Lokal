@@ -1041,7 +1041,7 @@ export class Utils {
     }
 
     static getVersion() {
-        return "Lokal v6 (Reconsolidation pt 2)"
+        return "Lokal v7"
     }
 
     static getBase64(file) {
@@ -1067,8 +1067,8 @@ export class Utils {
         return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
     }
 
-    static logMetric(name, data) {
-        logEvent(analytics, name, data)
+    static logMetric(name) {
+        logEvent(analytics, name)
     }
 }
 
