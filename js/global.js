@@ -27,11 +27,11 @@ const content = $("<div/>").attr("id", "content")
 const sidebar = new Sidebar()
 
 function resizeChecks() {
-    if (window.innerWidth < 512) {
-        sidebar.heading.innerText = "L"
+    if (window.innerWidth < 600) {
+        sidebar.setHeading("L")
     }
     else {
-        sidebar.heading.innerText = "Lokal"
+        sidebar.setHeading("Lokal")
     }
 }
 
@@ -158,23 +158,23 @@ onAuthStateChanged(auth, async (user) => {
 
         function resizeChecks() {
             if (window.innerWidth < 512) {
-                sidebar.heading.innerText = "L"
+                sidebar.setHeading("L")
 
                 if (!backAdded) {
 
                     moreMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
-                        expand.classList.remove("showExpand")
+                        expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
 
                     searchMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
-                        expand.classList.remove("showExpand")
+                        expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
                 }
             }
             else {
-                sidebar.heading.innerText = "Lokal"
+                sidebar.setHeading("Lokal")
             }
         }
 
