@@ -704,6 +704,19 @@ input[type=checkbox] {
 @media (max-width: 600px) {
 
 
+    #bottom {
+        flex-direction: column-reverse;
+    }
+
+    .badge {
+        font-size: 0.6em;
+    }
+
+    .moreMenu img {
+        width: 25px !important;
+        height: 25px !important;
+    }
+
     .modal {
         width: 75% !important;
     }
@@ -730,6 +743,7 @@ input[type=checkbox] {
 
     .item {
         padding: 5px;
+        place-content: center;
     }
 
     #heading {
