@@ -7,7 +7,7 @@ import { db, auth } from "./firebase.js";
 onAuthStateChanged(auth, async (u) => {
 
     if (!u) {
-        window.location.href = "../"
+        window.location.href = "../login"
     }
 
     const events = await getDocs(query(collection(db, "posts"), orderBy("timestamp", "desc"), limit(100)))

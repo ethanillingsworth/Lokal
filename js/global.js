@@ -1,5 +1,5 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-import { query, where, getDocs, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { query, where, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
 
@@ -15,8 +15,6 @@ import { CustomItem, Utils, Item, Menu, Sidebar, User } from "./funcs.js";
 window.getVersion = function () {
     return Utils.getVersion()
 }
-
-// elements
 
 const expand = $("<div/>").attr("id", "expand")
 
@@ -54,6 +52,7 @@ $(document.body).append(content)
 
 onAuthStateChanged(auth, async (user) => {
 
+
     const searchMenu = new Menu(expand)
 
     const searchBar = new CustomItem(`
@@ -84,18 +83,9 @@ onAuthStateChanged(auth, async (user) => {
     searchMenu.addItem(searchBar)
 
     if (!user) {
-
-        sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
-
-
-        const dName = new Item("Sign in", "../img/pfp.jpg", () => {
-            window.location.href = "../login"
-        })
-        dName.classList = ["user-side"]
-
-        sidebar.menu.addItem(dName, true)
-
-
+        console.log(1)
+        window.location.href = "../login"
+        return
     }
     else {
 
@@ -143,7 +133,7 @@ onAuthStateChanged(auth, async (user) => {
         moreMenu.addItem(new Item("Log Out", "../img/icons/logout.png", () => {
             signOut(auth).then(() => {
                 // Sign-out successful.
-                location.href = "../login/index.html?r=" + window.location.href
+                window.location.href = "../login/index.html?r=" + window.location.href
 
             }).catch((error) => {
                 // An error happened.
