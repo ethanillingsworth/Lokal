@@ -44,6 +44,10 @@ hr {
     gap: 10px !important
 }
 
+#userDetails .row {
+    flex-wrap: wrap;
+}
+
 
 @media (max-width: 1200px) {
     #top {

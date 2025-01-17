@@ -34,7 +34,7 @@ body {
     color: white;
     color-scheme: dark;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-
+    accent-color: var(--accent);
 }
 
 h1 {
@@ -77,9 +77,10 @@ input,
 textarea,
 select,
 label,
-p.inp {
+p.inp,
+button,
+.tools img {
     font-size: 1.25em;
-
     border-color: transparent;
     background-color: var(--dark2);
     padding: 10px;
@@ -97,18 +98,13 @@ label {
     width: auto;
 }
 
-label:hover,
-select:hover {
-    cursor: pointer;
-}
-
 label {
     font-size: 1.25em;
 }
 
 hr {
     width: 100%;
-    border-color: var(--dark2);
+    border-color: var(--accent);
     border-style: solid;
     border-width: 2px;
     border-radius: 15px;
@@ -132,7 +128,7 @@ hr {
 }
 
 .item:hover {
-    border-color: var(--accent);
+    background-color: var(--dark2);
     text-decoration: none;
 }
 
@@ -165,17 +161,30 @@ button {
     border-style: solid;
     border-width: 3px;
     border-color: transparent;
-    border-color: var(--accent);
     border-radius: 15px;
     padding: 10px;
     padding-top: 5px;
     padding-bottom: 5px;
     transition: all 0.25s ease-in-out;
+    width: 100%;
+    text-wrap: nowrap;
 
 }
 
+.tools img {
+    background-color: transparent;
+    padding: 5px;
+}
 
-button:not(.gsi-material-button):hover {
+.tools img:hover {
+
+    background-color: var(--dark2);
+}
+
+button:hover,
+label:hover,
+input[type="color"]:hover {
+    background-color: var(--dark3);
     cursor: pointer;
 }
 
@@ -203,7 +212,8 @@ button:not(.gsi-material-button):hover {
     flex-direction: row;
     place-items: center;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    width: 100%;
 }
 
 .col {
@@ -343,6 +353,7 @@ h6 {
     margin: 0 !important;
     place-content: start;
     place-items: start;
+    width: auto;
 }
 
 
@@ -390,7 +401,6 @@ h6 {
 .event-content {
     display: flex;
     flex-direction: column;
-    width: 100%;
     gap: 10px
 }
 
@@ -512,23 +522,12 @@ p {
     gap: 5px
 }
 
-.tab {
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    padding: 10px;
-    padding-right: 20px;
-    padding-left: 20px;
-    border: 4px solid var(--dark0);
-    border-bottom: 4px solid var(--dark1);
-    cursor: pointer;
-    margin: 0;
-}
 
-.current {
+/* .current {
     z-index: 100;
     border: 4px solid var(--dark2);
     border-bottom: 4px solid var(--dark1);
-}
+} */
 
 .page {
     display: none;
@@ -628,7 +627,7 @@ input[type=checkbox] {
 }
 
 .tools {
-    margin-left: auto;
+    place-content: end;
 }
 
 .tools img {
@@ -678,6 +677,13 @@ input[type=checkbox] {
     background-color: var(--dark2);
     cursor: pointer;
 }
+
+.tab {
+    font-weight: bold;
+    font-size: 1em;
+}
+
+
 
 @media (max-width: 1200px) {
     .modal {
@@ -805,15 +811,8 @@ input[type=checkbox] {
         height: 20px;
     }
 
-    .tabList {
-        width: 100%;
-        gap: 5px !important;
-    }
-
     .tab {
         font-size: 0.75em;
-        width: 100%;
-        text-align: center;
     }
 
     /* .tools img {

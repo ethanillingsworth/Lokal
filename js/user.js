@@ -63,15 +63,14 @@ const join = $("<button/>")
 
 const tabs = $("<div/>")
     .addClass("row tabList")
-    .css("gap", "20px")
-    .css("margin-bottom", "0")
-    .css("margin-top", "20px")
+    .css("gap", "10px")
+    .css("margin-bottom", "10px")
+    .css("margin-top", "10px")
     .css("position", "relative")
-    .css("top", "10px");
 
 // Tab Creation Function
 function createTab(name, current) {
-    const tab = $("<h4/>")
+    const tab = $("<button/>")
         .addClass("tab")
         .text(name);
 
