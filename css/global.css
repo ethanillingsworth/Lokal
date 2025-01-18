@@ -410,7 +410,8 @@ h6 {
 .event-content {
     display: flex;
     flex-direction: column;
-    gap: 10px
+    gap: 10px;
+    width: 100%;
 }
 
 p {

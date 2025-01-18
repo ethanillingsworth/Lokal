@@ -849,6 +849,7 @@ export class User {
             .css("width", "100%")
             .css("flex-wrap", "wrap")
             .css("place-content", "start")
+            .css("gap", "5px")
 
 
         const badges = $("<div/>")
