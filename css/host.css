@@ -83,6 +83,7 @@ textarea {
     select,
     h3 {
         font-size: 1em !important;
+        width: 100%;
     }
 
     button {
@@ -91,10 +92,6 @@ textarea {
 
     .buttons button {
         font-size: 0.65em;
-    }
-
-    #agenda {
-        border-top-left-radius: 0;
     }
 
     .currenth {
@@ -106,10 +103,6 @@ textarea {
         max-width: calc(100% - 20px);
     }
 
-    #map {
-        width: auto
-    }
-
     #searchButton {
         width: 20px !important;
         height: auto !important;
@@ -117,7 +110,16 @@ textarea {
 
     .modal {
         padding: 10px;
-        max-width: calc(100% - 50px);
+        max-width: calc(100% - 20px);
         width: fit-content !important
+    }
+
+    #map {
+        width: 100% !important;
+    }
+
+    .row:not(#buttons) {
+        flex-wrap: wrap;
+        place-content: start;
     }
 }

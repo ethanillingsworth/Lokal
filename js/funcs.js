@@ -607,7 +607,7 @@ export class Event {
         actions.append(left)
 
         function addAction(l, src, func) {
-            const action = $("<div/>").addClass("action")
+            const action = $("<button/>").addClass("action")
 
             const img = $("<img/>").attr("src", src)
 
@@ -627,20 +627,23 @@ export class Event {
 
         addAction(`${attending} Attending`, "../img/icons/profile.png", (button, span) => {
             if (selfAttend) {
-                button.css("border", "3px solid var(--accent)")
+                button.addClass("active");
+
 
             }
 
             button.on("click", async () => {
                 if (selfAttend) {
                     selfAttend = false
-                    button.css("border", "3px solid transparent")
+                    button.removeClass("active");
+
                     attending -= 1
 
                 }
                 else {
                     selfAttend = true
-                    button.css("border", "3px solid var(--accent)")
+                    button.addClass("active");
+
                     attending += 1
 
                 }
