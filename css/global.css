@@ -637,12 +637,14 @@ input[type=checkbox] {
     place-content: end;
 }
 
-.tools img {
+.tools img,
+.tool {
     width: 35px;
     height: 35px;
 }
 
-.tools img:hover {
+.tools img:hover,
+.tool {
     cursor: pointer;
 }
 
@@ -707,6 +709,67 @@ input[type=checkbox] {
     background-color: var(--dark2);
 }
 
+.calandar .top {
+    background-color: var(--accent2);
+    padding: 20px;
+    width: auto;
+    place-items: center;
+}
+
+.calandar .tool {
+    transition: all 0.25s ease-in-out;
+    border-radius: 15px;
+    padding: 5px 2.5px;
+}
+
+.calandar .tool:hover {
+    background-color: var(--accent);
+}
+
+.calandar .weeks {
+    background-color: var(--dark2);
+    padding: 10px;
+    width: auto;
+    text-align: center;
+}
+
+.calandar .days {
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(5, 75px);
+    background-color: var(--dark2);
+}
+
+.calandar .week {
+    width: 100%;
+}
+
+.calandar .day {
+    background-color: var(--dark1);
+    place-items: end;
+    transition: all 0.25s ease-in-out;
+    position: relative;
+}
+
+.calandar .day .banner {
+    padding: 5px;
+    text-wrap: nowrap;
+    font-size: 0.7em;
+    width: 100%;
+    text-align: center;
+}
+
+.day:hover {
+    cursor: pointer;
+    background-color: var(--dark0);
+}
+
+.calandar .day .dayNum {
+    opacity: 0.5;
+    position: absolute;
+    top: 10px;
+
+}
+
 
 @media (max-width: 1200px) {
     .modal {
@@ -734,6 +797,10 @@ input[type=checkbox] {
 
     p {
         font-size: 0.75em;
+    }
+
+    .grid>* {
+        padding: 5px;
     }
 
     h2 {

@@ -1122,3 +1122,163 @@ export class MoreMenu {
 
 
 }
+
+export class Calandar {
+    constructor(data = null) {
+        const today = new Date();
+
+        this.currentYear = today.getFullYear();  // Gets the current year (e.g., 2025)
+        this.currentMonth = today.getMonth() + 1;  // Gets the current month (1-12, adding 1 since getMonth() is 0-based)
+        this.currentDay = today.getDate();  // Gets the current day of the month (1-31)
+
+        if (data) {
+            this.data = data
+            return
+        }
+
+        this.data = {}
+        for (let year = 2020; year < 2100; year++) {
+            this.data[year] = {}
+            for (let month = 1; month <= 12; month++) {
+                this.data[year][month] = {}
+
+                let daysInMonth = new Date(year, month, 0).getDate();
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    this.data[year][month][day] = {
+                        events: []
+                    };
+                }
+
+            }
+        }
+
+    }
+
+    getMonthName(monthNumber) {
+        const months = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        return months[monthNumber - 1] || "Invalid month"; // Adjust for 1-based input
+    }
+
+    addEvent(year, month, day, eventId) {
+        this.data[year][month][day].events.push(eventId)
+    }
+
+    display(content = $("#content")) {
+        const calandar = $("<div/>")
+            .addClass("col")
+            .addClass("calandar")
+            .css("gap", "0")
+
+        const top = $("<div/>")
+            .addClass("row")
+            .addClass("top")
+
+        const left = $("<img/>")
+            .addClass("tool")
+            .attr("src", "../img/icons/left.png")
+            .css("margin-right", "auto")
+
+        top.append(left)
+
+        const col = $("<div/>")
+            .addClass("col")
+            .css("place-items", "center")
+
+        const month = $("<h3/>").text(this.getMonthName(this.currentMonth))
+
+        const year = $("<h4/>").text(this.currentYear)
+
+        col.append(month).append(year)
+
+        top.append(col)
+
+        const right = $("<img/>")
+            .addClass("tool")
+            .attr("src", "../img/icons/right.png")
+            .css("margin-left", "auto")
+
+        top.append(right)
+
+        calandar.append(top)
+
+        const weeks = $("<div/>")
+            .addClass("weeks row")
+
+        const weeksArray = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+
+        weeksArray.forEach(w => {
+            weeks.append($("<h4/>").addClass("week").text(w))
+        });
+
+        calandar.append(weeks)
+
+        const days = $("<div/>")
+            .addClass("days grid")
+
+        calandar.append(days)
+
+        const s = this
+
+        function refreshDays() {
+            month.text(s.getMonthName(s.currentMonth))
+            year.text(s.currentYear)
+
+            days.html("")
+            const monthsDays = s.data[s.currentYear][s.currentMonth]
+
+            Object.keys(monthsDays).forEach((d) => {
+                const dayData = monthsDays[d]
+
+                const day = $("<div/>")
+                    .addClass("day")
+
+                const dayNum = $("<span/>").text(d).addClass("dayNum")
+                day.append(dayNum)
+
+                if (Object.keys(dayData.events).length > 0) {
+                    const eventsBanner = $("<span/>")
+                        .text(`${Object.keys(dayData.events).length} Events`)
+                        .addClass("banner")
+                        .css("background-color", "var(--accent)")
+
+                    day.append(eventsBanner)
+                }
+
+                days.append(day)
+            })
+        }
+        refreshDays(s)
+
+        right.on("click", () => {
+            if (s.currentYear < 2099 || s.currentMonth < 12) {
+                s.currentMonth += 1
+                if (s.currentMonth > 12) {
+
+                    s.currentMonth = 1
+                    s.currentYear += 1
+                }
+                refreshDays()
+            }
+        })
+
+        left.on("click", () => {
+            if (s.currentYear > 2020 || s.currentMonth > 1) {
+                s.currentMonth -= 1
+                if (s.currentMonth < 1) {
+
+                    s.currentMonth = 12
+                    s.currentYear -= 1
+                }
+                refreshDays()
+            }
+        })
+
+
+        content.append(calandar)
+    }
+}

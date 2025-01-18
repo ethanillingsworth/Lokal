@@ -2,7 +2,9 @@ import { getDoc, doc, query, collection, getDocs, where, limit, orderBy } from "
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 import { db, auth } from "./firebase.js";
-import { User, Badge, Event, MoreMenu, Update } from "./funcs.js";
+import {
+    User, Badge, Event, MoreMenu, Update, Calandar
+} from "./funcs.js";
 
 import "./jquery.js";
 
@@ -301,6 +303,24 @@ async function requests(user) {
     })
 }
 
+const calandar = new Calandar()
+
+async function cal(user) {
+    const tab = $("#Calandar")
+
+    const q = query(collection(db, "posts"), where("creator", "==", user.uid))
+
+    const get = await getDocs(q)
+
+    get.forEach((post) => {
+        const d = post.data()
+
+        const splitDate = d.date.split("/")
+        calandar.addEvent(splitDate[2], splitDate[0], splitDate[1], post.id)
+    })
+
+    calandar.display(tab)
+}
 
 function updateProfile(data) {
     $("#username").text(`(@${pageUser})`);
@@ -447,10 +467,12 @@ async function updates() {
 if (bds.includes("group")) {
     createTab("Updates", true)
     createTab("Events")
+    createTab("Calandar")
     createTab("Members")
 
     await updates(user)
     await hosting(uid)
+    await cal(user)
     await members(user)
 }
 else {
