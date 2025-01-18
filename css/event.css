@@ -11,12 +11,3 @@
 #share:hover {
     cursor: pointer;
 }
-
-
-@media (max-width: 600px) {
-
-    h4,
-    p {
-        font-size: 0.75em
-    }
-}

@@ -732,6 +732,31 @@ input[type=checkbox] {
 
 @media (max-width: 600px) {
 
+    p {
+        font-size: 0.75em;
+    }
+
+    h2 {
+        font-size: 1.25em
+    }
+
+    h3 {
+        font-size: 1em
+    }
+
+    h4 {
+        font-size: 0.8em
+    }
+
+    #userDetails .badge {
+        font-size: 0.75em;
+    }
+
+    #userDetails p,
+    .user-info {
+        font-size: 1em !important
+    }
+
 
     #bottom {
         flex-direction: column-reverse;
@@ -739,14 +764,23 @@ input[type=checkbox] {
 
     .badge {
         font-size: 0.6em;
+        text-wrap: nowrap;
     }
 
-    .moreMenu img {
+    #top {
+        flex-wrap: wrap !important;
+        place-items: center;
+        place-content: center !important;
+    }
+
+    .moreMenu img,
+    img.action {
         width: 25px !important;
         height: 25px !important;
     }
 
     .modal {
+        max-width: calc(100% - 40px) !important;
         width: 100% !important;
         border: none;
         margin: 0;
@@ -789,16 +823,6 @@ input[type=checkbox] {
         text-align: center;
     }
 
-    h2 {
-        font-size: 1.25em
-    }
-
-    h3,
-    h4,
-    p {
-        font-size: 1em;
-    }
-
     .row {
         gap: 5px;
     }
@@ -811,12 +835,6 @@ input[type=checkbox] {
     .event,
     .user {
         padding: 10px
-    }
-
-    .user-info,
-    .event-details,
-    .event p {
-        font-size: 0.75em;
     }
 
     .user-info * {

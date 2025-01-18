@@ -847,6 +847,7 @@ export class User {
         const userRow = $("<div/>")
             .addClass("row")
             .css("width", "100%")
+            .css("flex-wrap", "wrap")
             .css("place-content", "start")
 
 
