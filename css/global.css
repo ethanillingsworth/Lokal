@@ -748,6 +748,10 @@ input[type=checkbox] {
         font-size: 0.8em
     }
 
+    button {
+        font-size: 1em
+    }
+
     #userDetails .badge {
         font-size: 0.75em;
     }
@@ -813,6 +817,31 @@ input[type=checkbox] {
     .item {
         padding: 5px;
         place-content: center;
+    }
+
+    textarea {
+        width: calc(100% - 20px) !important;
+    }
+
+    #map {
+        width: 100% !important;
+    }
+
+    .pageh {
+        width: 100%;
+    }
+
+    .pageh .row:not(#buttons) {
+        flex-wrap: wrap;
+        place-content: start;
+    }
+
+    label {
+        width: auto
+    }
+
+    select {
+        width: 100%;
     }
 
     #heading {

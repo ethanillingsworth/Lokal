@@ -63,10 +63,6 @@ textarea {
     max-width: 50%;
 }
 
-#agenda {
-    border: 3px solid var(--dark0);
-}
-
 .buttons button {
     border-color: var(--dark0);
 }
