@@ -1207,16 +1207,16 @@ export class Calandar {
 
         calandar.append(top)
 
-        const weeks = $("<div/>")
-            .addClass("weeks row")
+        // const weeks = $("<div/>")
+        //     .addClass("weeks row")
 
-        const weeksArray = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+        // const weeksArray = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
 
-        weeksArray.forEach(w => {
-            weeks.append($("<h4/>").addClass("week").text(w))
-        });
+        // weeksArray.forEach(w => {
+        //     weeks.append($("<h4/>").addClass("week").text(w))
+        // });
 
-        calandar.append(weeks)
+        // calandar.append(weeks)
 
         const days = $("<div/>")
             .addClass("days grid")
@@ -1230,6 +1230,7 @@ export class Calandar {
             year.text(s.currentYear)
 
             days.html("")
+
             const monthsDays = s.data[s.currentYear][s.currentMonth]
 
             Object.keys(monthsDays).forEach((d) => {
