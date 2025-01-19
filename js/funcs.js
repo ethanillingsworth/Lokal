@@ -1247,6 +1247,11 @@ export class Calandar {
                         .text(`${Object.keys(dayData.events).length} Events`)
                         .addClass("banner")
                         .css("background-color", "var(--accent)")
+                    if (window.innerWidth < 600) {
+                        eventsBanner
+                            .text(`${Object.keys(dayData.events).length}`)
+
+                    }
 
                     day.append(eventsBanner)
                 }
@@ -1280,7 +1285,22 @@ export class Calandar {
             }
         })
 
-
         content.append(calandar)
+
+        const heading = $("<h3/>").text("Key:")
+
+        content.append(heading)
+
+        const key = $("<div/>")
+            .addClass("grid key")
+
+        function addItem(label, color) {
+            key.append($("<span/>").text(label).css("background-color", color))
+        }
+
+        addItem("Events", "var(--accent)")
+
+        content.append(key)
+
     }
 }
