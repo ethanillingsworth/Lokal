@@ -841,6 +841,10 @@ input[type=checkbox] {
         font-size: 0.75em;
     }
 
+    .upgrade:before {
+        display: none;
+    }
+
 
     .key {
         grid-template-columns: repeat(3, 1fr);
