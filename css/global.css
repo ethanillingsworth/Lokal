@@ -981,7 +981,7 @@ input[type=checkbox] {
 
     .pfp {
         width: 32px;
-        max-height: 32px;
+        height: 32px;
     }
 
     .event,
