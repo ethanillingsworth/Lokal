@@ -63,10 +63,6 @@ textarea {
     max-width: 50%;
 }
 
-#agenda {
-    border: 3px solid var(--dark0);
-}
-
 .buttons button {
     border-color: var(--dark0);
 }
@@ -75,49 +71,4 @@ textarea {
     top: 2px;
     display: flex;
     position: relative;
-}
-
-@media (max-width: 600px) {
-
-    input,
-    select,
-    h3 {
-        font-size: 1em !important;
-    }
-
-    button {
-        font-size: 1em;
-    }
-
-    .buttons button {
-        font-size: 0.65em;
-    }
-
-    #agenda {
-        border-top-left-radius: 0;
-    }
-
-    .currenth {
-        width: calc(100% - 20px);
-    }
-
-    textarea {
-        font-size: 0.75em;
-        max-width: calc(100% - 20px);
-    }
-
-    #map {
-        width: auto
-    }
-
-    #searchButton {
-        width: 20px !important;
-        height: auto !important;
-    }
-
-    .modal {
-        padding: 10px;
-        max-width: calc(100% - 50px);
-        width: fit-content !important
-    }
 }

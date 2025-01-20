@@ -200,22 +200,21 @@ if (mode == "event") {
         const txtArea = $("<textarea/>").attr("rows", "5").val("A summary for the event\n(displayed in the event preview)").attr("maxlength", "400").attr("id", "desc");
 
         const txtLimit = $("<h5/>").css("text-align", "right").css("color", "gray").html('<span id="count" style="color: gray">0</span>/400');
+        txtDiv.append(txtArea);
+        txtDiv.append(txtLimit);
 
         txtArea.on("input", function () {
-            txtLimit.find("span").text(txtArea.text().length);
+            $("#count").text(txtArea.val().length);
         });
 
-        txtLimit.find("span").text(txtArea.text().length);
+        $("#count").text(txtArea.val().length);
 
         txtArea.on("change", function () {
             if (txtArea.val().length < 10) {
                 txtArea.val("Your summary must be at least 10 characters");
             }
-            txtLimit.find("span").text(txtArea.text().length);
+            $("#count").text(txtArea.val().length);
         });
-
-        txtDiv.append(txtArea);
-        txtDiv.append(txtLimit);
 
         row.append(txtDiv);
     });

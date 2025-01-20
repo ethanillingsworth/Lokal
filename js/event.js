@@ -1,7 +1,7 @@
 import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
-import { Event, Prompt, User } from "./funcs.js";
+import { Event, MoreMenu, Prompt, User } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search)
 
@@ -69,7 +69,7 @@ linkAlert.addField("Auto Attend:", (row) => {
             <option value="false">False</option>
         `);
 
-    row.append(select);
+    row.append(select.get(0));
 });
 
 linkAlert.setDoneFunction(async () => {
@@ -87,8 +87,6 @@ const currentUser = new User(auth.currentUser.uid)
 const badges = await currentUser.getBadges()
 
 const hr = $("<hr></hr>")
-    .css("position", "relative")
-    .css("bottom", "4px");
 
 
 modal.append(tabs)
@@ -124,7 +122,7 @@ addPage("Public View", async (page) => {
     let selfAttend = false;
 
     function addButton(label, src, id, after) {
-        const button = $("<div></div>")
+        const button = $("<button></button>")
             .addClass("action")
             .attr("id", id);
 
@@ -153,17 +151,18 @@ addPage("Public View", async (page) => {
 
     addButton(`${attending} Attending`, "../img/icons/profile.png", "attend", (button, span) => {
         if (selfAttend) {
-            button.css("border", "3px solid var(--accent)");
+            button.addClass("active");
+
         }
 
         button.on("click", async function () {
             if (selfAttend) {
                 selfAttend = false;
-                button.css("border", "3px solid transparent");
+                button.removeClass("active");
                 attending -= 1;
             } else {
                 selfAttend = true;
-                button.css("border", "3px solid var(--accent)");
+                button.addClass("active");
                 attending += 1;
             }
 
@@ -192,43 +191,32 @@ const creator = new User(data.creator)
 const readOnly = await creator.getMemberReadOnly(currentUser.uid)
 
 if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin")) {
-    const share = $("<img>")
-        .attr("id", "share")
-        .attr("src", "../img/icons/share.png")
-        .on("click", function () {
-            linkAlert.show();
-        });
 
-    tools.append(share);
+    const more = new MoreMenu()
 
-    const edit = $("<img>")
-        .attr("id", "edit")
-        .attr("src", "../img/icons/edit.png")
-        .on("click", function () {
-            window.location.href = "../host/index.html?e=" + urlParams.get("e");
-        });
+    more.add("Share", function () {
+        linkAlert.show();
+    })
+    more.add("Edit", function () {
+        window.location.href = "../host/index.html?e=" + urlParams.get("e");
+    })
 
-    tools.append(edit);
+    more.add("Delete", async function () {
+        if (confirm("Are you sure? Deleting an event cannot be undone!")) {
 
-    const del = $("<img>")
-        .attr("id", "del")
-        .attr("src", "../img/icons/del.png")
-        .on("click", async function () {
-            if (confirm("Are you sure? Deleting an event cannot be undone!")) {
+            const q = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData")));
 
-                const q = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData")));
+            q.forEach(async (d) => {
+                await deleteDoc(doc(db, "posts", urlParams.get("e"), "uData", d.id));
+            });
 
-                q.forEach(async (d) => {
-                    await deleteDoc(doc(db, "posts", urlParams.get("e"), "uData", d.id));
-                });
+            await deleteDoc(doc(db, "posts", urlParams.get("e")));
 
-                await deleteDoc(doc(db, "posts", urlParams.get("e")));
+            window.location.href = "../";
+        }
+    })
 
-                window.location.href = "../";
-            }
-        });
-
-    tools.append(del);
+    tools.append(more.more);
 
     addPage("Attendance", async (page) => {
         const grid = $("<div></div>").addClass("grid");
@@ -294,7 +282,7 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
 }
 
 function addPage(label, func, current) {
-    const tab = $("<h4></h4>")
+    const tab = $("<button></button>")
         .addClass('tab')
         .text(label);
 

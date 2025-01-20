@@ -2,8 +2,8 @@
     width: 50% !important;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 600px) {
     .user {
-        width: 75% !important;
+        width: calc(100% - 40px) !important;
     }
 }

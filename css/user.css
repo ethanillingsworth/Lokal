@@ -44,31 +44,6 @@ hr {
     gap: 10px !important
 }
 
-
-@media (max-width: 1200px) {
-    #top {
-        flex-wrap: wrap !important;
-    }
-}
-
-@media (max-width: 600px) {
-
-    #top {
-        place-content: center !important;
-    }
-
-    h2 {
-        font-size: 1.25em;
-    }
-
-    #userDetails p {
-        font-size: 1em
-    }
-
-
-    h4 {
-        font-size: 0.9em;
-    }
-
-
+#userDetails .row {
+    flex-wrap: wrap;
 }
