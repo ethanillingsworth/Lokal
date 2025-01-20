@@ -1046,7 +1046,7 @@ export class Utils {
     }
 
     static getVersion() {
-        return "Lokal v7"
+        return "Lokal v8"
     }
 
     static getBase64(file) {
