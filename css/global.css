@@ -429,7 +429,6 @@ p {
     width: 50px;
     margin-right: 15px;
     border-radius: 100%;
-    aspect-ratio: 1/1;
     object-fit: contain;
 }
 
