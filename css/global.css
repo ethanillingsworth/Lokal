@@ -6,7 +6,7 @@
     --accent: #a353b9;
     --accent2: #7c2a95;
     --red: #be2121;
-    --premium: #ddb23c;
+    --premium: #f9c431;
     --light1: #e5e5e5;
     --light2: #d4d4d4;
 
@@ -791,7 +791,7 @@ input[type=checkbox] {
 }
 
 .upgrade:hover {
-    background-color: var(--premium);
+    background-color: #ffce47;
 }
 
 
