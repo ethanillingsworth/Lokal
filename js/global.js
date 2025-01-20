@@ -120,12 +120,12 @@ onAuthStateChanged(auth, async (user) => {
         const pub = await u.getData("public")
 
         sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
-        if (!badges.includes("premium")) {
-            const upgrade = new Item("Upgrade", "../img/icons/L.png", "../plans")
+        // if (!badges.includes("premium")) {
+        //     const upgrade = new Item("Upgrade", "../img/icons/L.png", "../plans")
 
-            upgrade.classList = ['upgrade']
-            sidebar.menu.addItem(upgrade)
-        }
+        //     upgrade.classList = ['upgrade']
+        //     sidebar.menu.addItem(upgrade)
+        // }
 
         // const notifMenu = new Menu(expand)
 
