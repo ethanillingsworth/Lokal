@@ -1124,7 +1124,7 @@ export class MoreMenu {
 
 }
 
-export class Calandar {
+export class Calendar {
     constructor(data = null) {
         const today = new Date();
 
@@ -1207,16 +1207,16 @@ export class Calandar {
 
         calandar.append(top)
 
-        // const weeks = $("<div/>")
-        //     .addClass("weeks row")
+        const weeks = $("<div/>")
+            .addClass("weeks row")
 
-        // const weeksArray = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+        const weeksArray = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
 
-        // weeksArray.forEach(w => {
-        //     weeks.append($("<h4/>").addClass("week").text(w))
-        // });
+        weeksArray.forEach(w => {
+            weeks.append($("<h4/>").addClass("week").text(w))
+        });
 
-        // calandar.append(weeks)
+        calandar.append(weeks)
 
         const days = $("<div/>")
             .addClass("days grid")
@@ -1224,6 +1224,12 @@ export class Calandar {
         calandar.append(days)
 
         const s = this
+
+        function offset(num) {
+            for (let i = 0; i < num; i++) {
+                days.append($("<div/>"))
+            }
+        }
 
         function refreshDays() {
             month.text(s.getMonthName(s.currentMonth))
@@ -1234,6 +1240,18 @@ export class Calandar {
             const monthsDays = s.data[s.currentYear][s.currentMonth]
 
             Object.keys(monthsDays).forEach((d) => {
+                if (d == 1) {
+                    const off = new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay()
+                    offset(new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay())
+
+                    if (off > 4) {
+                        days.css("grid-template-rows", "repeat(6, 75px)")
+                    }
+                    else {
+                        days.css("grid-template-rows", "repeat(5, 75px)")
+
+                    }
+                }
                 const dayData = monthsDays[d]
 
                 const day = $("<div/>")

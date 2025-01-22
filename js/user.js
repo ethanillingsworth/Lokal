@@ -3,7 +3,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/f
 
 import { db, auth } from "./firebase.js";
 import {
-    User, Badge, Event, MoreMenu, Update, Calandar
+    User, Badge, Event, MoreMenu, Update, Calendar
 } from "./funcs.js";
 
 import "./jquery.js";
@@ -303,10 +303,10 @@ async function requests(user) {
     })
 }
 
-const calandar = new Calandar()
+const calendar = new Calendar()
 
 async function cal(user) {
-    const tab = $("#Calandar")
+    const tab = $("#Calendar")
 
     const q = query(collection(db, "posts"), where("creator", "==", user.uid))
 
@@ -316,10 +316,10 @@ async function cal(user) {
         const d = post.data()
 
         const splitDate = d.date.split("/")
-        calandar.addEvent(splitDate[2], splitDate[0], splitDate[1], post.id)
+        calendar.addEvent(splitDate[2], splitDate[0], splitDate[1], post.id)
     })
 
-    calandar.display(tab)
+    calendar.display(tab)
 }
 
 function updateProfile(data) {
@@ -467,7 +467,7 @@ async function updates() {
 if (bds.includes("group")) {
     createTab("Updates", true)
     createTab("Events")
-    createTab("Calandar")
+    createTab("Calendar")
     createTab("Members")
 
     await updates(user)
