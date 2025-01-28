@@ -178,7 +178,7 @@ signUp.on("click", async () => {
         return
     }
 
-    if (Validation.username(username.val())) {
+    if (Validation.username(username.val()) !== true) {
         alert(Validation.username(username.val()))
         return
     }

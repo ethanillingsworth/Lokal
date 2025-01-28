@@ -99,12 +99,12 @@ const creator = new User(data.creator)
 
 const currentUData = await e.getUDataMember(currentUser.uid)
 
-if (Object.keys(await creator.getMember(currentUser.uid)).length < 1 && !badges.includes("admin")) {
+const readOnly = await creator.getMemberReadOnly(currentUser.uid)
+
+if (!readOnly.accepted && !badges.includes("admin")) {
     alert("You have to join the group associated with this event before viewing!")
     window.location.href = `../user/index.html?u=${await creator.getUsername()}`
 }
-
-const readOnly = await creator.getMemberReadOnly(currentUser.uid)
 
 
 addPage("Public View", async (page) => {
