@@ -600,64 +600,8 @@ export class Event {
             }
         })
 
-        const left = $("<div/>").addClass("row")
-
         const actions = ev.find(`.actions`)
 
-        actions.append(left)
-
-        function addAction(l, src, func) {
-            const action = $("<button/>").addClass("action")
-
-            const img = $("<img/>").attr("src", src)
-
-            const label = $("<span/>").text(l)
-
-            action.append(img)
-            action.append(label)
-
-            left.append(action)
-
-            if (auth.currentUser) {
-
-                if (auth.currentUser.uid != event.creator) func(action, label)
-            }
-
-        }
-
-        addAction(`${attending} Attending`, "../img/icons/profile.png", (button, span) => {
-            if (selfAttend) {
-                button.addClass("active");
-
-
-            }
-
-            button.on("click", async () => {
-                if (selfAttend) {
-                    selfAttend = false
-                    button.removeClass("active");
-
-                    attending -= 1
-
-                }
-                else {
-                    selfAttend = true
-                    button.addClass("active");
-
-                    attending += 1
-
-                }
-
-                span.text(`${attending} Attending`);
-
-                await setDoc(doc(db, "posts", this.id, "uData", auth.currentUser.uid), {
-                    attending: selfAttend
-                })
-
-            })
-
-
-        })
 
 
         const open = $("<div/>").addClass("action")
@@ -680,8 +624,27 @@ export class Event {
         return await getDocs(query(collection(db, "posts", this.id, "uData")))
     }
 
+    async getUDataMember(uid) {
+        let e = await getDoc(doc(db, "posts", this.id, "uData", uid))
+
+        if (!e.exists()) {
+            console.error("Could not user UData with id: " + this.id)
+            return {}
+        }
+
+
+        let eventData = e.data()
+
+        return eventData
+    }
+
     async update(data) {
         await setDoc(doc(db, "posts", this.id), data, { merge: true })
+    }
+
+    async updateUData(memberId, data) {
+        await setDoc(doc(db, "posts", this.id, "uData", memberId), data, { merge: true })
+
     }
 
     async get() {
@@ -1074,6 +1037,21 @@ export class Utils {
 
     static logMetric(name) {
         logEvent(analytics, name)
+    }
+}
+
+export class Dropdown {
+    constructor(id) {
+        this.menu = $("<select/>").attr("id", id)
+
+    }
+
+    addOption(text) {
+        this.menu.append($("<option/>").text(text).attr("id", text))
+    }
+
+    removeOption(text) {
+        this.menu.find(`#${text}`).remove()
     }
 }
 

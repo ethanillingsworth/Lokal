@@ -404,7 +404,7 @@ onAuthStateChanged(auth, async (u) => {
             join.text("Joined")
         }
 
-        if (readOnly.admin || bdsU.admin) {
+        if (readOnly.admin || bdsU.includes("admin")) {
             createTab("Requests")
             await requests(user)
         }

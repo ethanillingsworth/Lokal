@@ -1,7 +1,7 @@
-import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where, deleteField } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
-import { Event, MoreMenu, Prompt, User } from "./funcs.js";
+import { Dropdown, Event, MoreMenu, Prompt, User } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search)
 
@@ -93,10 +93,28 @@ modal.append(tabs)
 
 modal.append(hr)
 
+
+const creator = new User(data.creator)
+
+const currentUData = await e.getUDataMember(currentUser.uid)
+
+if (Object.keys(await creator.getMember(currentUser.uid)).length < 1 && !badges.includes("admin")) {
+    alert("You have to join the group associated with this event before viewing!")
+    window.location.href = `../user/index.html?u=${await creator.getUsername()}`
+}
+
+const readOnly = await creator.getMemberReadOnly(currentUser.uid)
+
+
 addPage("Public View", async (page) => {
     const date = $("<h4></h4>").text(`Date: ${new Date(data.date).toLocaleDateString("en-US")}`);
     const location = $("<h4></h4>").text(`Location: ${data.location}`);
     const cost = $("<h4></h4>");
+    let act = []
+
+    if (data.actions) {
+        act = data.actions
+    }
 
     if (data.cost > 0) {
         cost.text(`Cost: ${data.cost}`);
@@ -111,15 +129,175 @@ addPage("Public View", async (page) => {
 
     page.append($("<hr></hr>"));
 
+    const actions = $("<div/>").addClass("col actionsWrapper").css("gap", "5px")
+
     const buttons = $("<div></div>")
         .addClass("row")
         .addClass("actions")
         .css("place-content", "start");
 
+
+    const tools = $("<div/>").addClass("tools").css("margin-left", "auto")
+    if (readOnly.admin || badges.includes("admin")) {
+        const menu = new MoreMenu()
+
+        menu.button.css("width", "30px")
+        menu.button.css("height", "30px")
+
+
+        menu.add("Add Dropdown", async () => {
+            const label = prompt("Label for dropdown (leave blank for no label):")
+            act.push({
+                "label": label,
+                "type": "DROPDOWN",
+                "options": ["None"],
+                "defaultOption": "None"
+            })
+
+            await addDropdown(act.length - 1)
+
+            await e.update({
+                "actions": act
+            })
+
+        })
+
+        tools.append(menu.more)
+    }
+
     page.append(buttons);
+    function showActions() {
+        actions.html("")
+        act.forEach((a, index) => {
+            if (a.type == "DROPDOWN") { addDropdown(index) }
+        })
+    }
+
+    if (currentUData.attending || readOnly.admin) {
+        showActions()
+    }
+
+    page.append(actions)
 
     let attending = 0;
     let selfAttend = false;
+
+    async function addDropdown(index) {
+        const data = act[index]
+        const row = $("<div></div>")
+            .addClass("row")
+            .addClass("actions")
+            .css("place-content", "start");
+
+        const label = $("<h4/>").text(data.label)
+
+        row.append(label)
+
+        const dropdown = new Dropdown(data.label.replaceAll(" ", ""))
+
+        data.options.forEach((opt) => {
+            dropdown.addOption(opt)
+        })
+
+        if (currentUData[data.label]) {
+
+            if (currentUData[data.label] == "") {
+                dropdown.menu.val(data.defaultOption)
+            }
+            dropdown.menu.val(currentUData[data.label])
+        }
+        else {
+            await e.updateUData(currentUser.uid, {
+                [data.label]: data.defaultOption
+            })
+        }
+
+        dropdown.menu.on("change", async () => {
+            await e.updateUData(currentUser.uid, {
+                [data.label]: dropdown.menu.val()
+            })
+            console.log("updated")
+        })
+
+        row.append(dropdown.menu)
+
+        const tools = $("<div/>").addClass("tools").css("margin-left", "auto")
+
+        if (readOnly.admin || badges.includes("admin")) {
+
+            const menu = new MoreMenu()
+
+            menu.add("Add Option", async () => {
+                const option = prompt("Please type the option you'd like to add")
+                if (option.length < 1 || option.length > 25) {
+                    alert("Option is too long or short! (less than 1 char or over 25 chars)")
+                    return
+                }
+                console.log(index)
+                data.options.push(option)
+
+                dropdown.addOption(option)
+                await e.update({
+                    "actions": act
+                })
+            })
+
+            menu.add("Remove Selected Option", async () => {
+                dropdown.removeOption(dropdown.menu.val())
+                const i = data.options.indexOf(dropdown.menu.val()) + 1
+                data.options.splice(i, 1)
+                if (i > 0) {
+                    dropdown.menu.val(data.options[i - 1])
+                }
+                await e.update({
+                    "actions": act
+                })
+            })
+
+            menu.add("Make Selected Option Default", async () => {
+                data.defaultOption = dropdown.menu.val()
+                alert(`${dropdown.menu.val()} is now the default option for this dropdown`)
+                await e.update({
+                    "actions": act
+                })
+            })
+            // menu.add("Rename", async () => {
+            //     const newLabel = prompt("Enter in the new label:")
+            //     data.label = newLabel
+
+            //     label.text(newLabel)
+
+
+            //     await e.update({
+            //         "actions": act
+            //     })
+
+            // })
+
+            menu.add("Remove Dropdown", async () => {
+                if (confirm("Are you sure you want to delete this?")) {
+                    act.splice(index, 1)
+                    row.remove()
+                    await e.update({
+                        "actions": act
+                    })
+
+                    const allUData = await e.getUData()
+
+                    allUData.forEach(async (d) => {
+                        await e.updateUData(d.id, {
+                            [data.label]: deleteField()
+                        })
+                    })
+                }
+            })
+
+            tools.append(menu.more)
+        }
+        row.append(tools)
+        actions.append(row)
+
+    }
 
     function addButton(label, src, id, after) {
         const button = $("<button></button>")
@@ -139,7 +317,9 @@ addPage("Public View", async (page) => {
         }
     }
 
-    const uData = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData")));
+
+
+    const uData = await e.getUData()
 
     uData.forEach(doc => {
         const data = doc.data();
@@ -159,19 +339,24 @@ addPage("Public View", async (page) => {
             if (selfAttend) {
                 selfAttend = false;
                 button.removeClass("active");
+                actions.html("")
                 attending -= 1;
             } else {
                 selfAttend = true;
                 button.addClass("active");
+                showActions()
                 attending += 1;
             }
 
             await setDoc(doc(db, "posts", urlParams.get("e"), "uData", auth.currentUser.uid), {
-                attending: selfAttend
+                attending: selfAttend,
+                here: false
             });
             span.text(`${attending} Attending`);
         });
     });
+
+    buttons.append(tools);
 
     page.append($("<hr></hr>"));
 
@@ -185,10 +370,6 @@ addPage("Public View", async (page) => {
     const agenda = $("<p></p>").html(data.agenda);
     page.append(agenda);
 }, true);
-
-const creator = new User(data.creator)
-
-const readOnly = await creator.getMemberReadOnly(currentUser.uid)
 
 if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin")) {
 
@@ -218,68 +399,99 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
 
     tools.append(more.more);
 
-    addPage("Attendance", async (page) => {
-        const grid = $("<div></div>").addClass("grid");
-
-        const displayNameHeading = $("<h4></h4>").text("Display Name:");
-        const usernameHeading = $("<h4></h4>").text("Username:");
-        const attendingStatusHeading = $("<h4></h4>").text("Here:");
-
-        if (window.innerWidth > 512) {
-            grid.append(displayNameHeading);
-        }
-        grid.append(usernameHeading);
-        grid.append(attendingStatusHeading);
-
-        const uData = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData"), where("attending", "==", true)));
-
-        uData.forEach(async (d) => {
-            const usernameElem = $("<h4></h4>");
-            const displayElem = $("<h4></h4>");
-            const attendingElem = $("<div></div>").addClass("row");
-
-            const here = $("<input>")
-                .attr("type", "checkbox")
-                .prop("checked", d.data().here)
-                .on("change", async () => {
-                    await setDoc(doc(db, "posts", urlParams.get("e"), "uData", d.id), {
-                        here: here.prop("checked")
-                    }, { merge: true });
-                });
-
-            usernameElem.css("font-weight", "normal");
-            displayElem.css("font-weight", "normal");
-
-            usernameElem.text("N/A");
-
-            const usernameRef = await getDoc(doc(db, "usernames", d.id));
-
-            if (usernameRef.exists()) {
-                usernameElem.text("@" + usernameRef.data().username);
-            }
-
-            const publicRef = await getDoc(doc(db, "users", d.id, "data", "public"));
-
-            if (publicRef.exists()) {
-                displayElem.text(publicRef.data().displayName);
-            }
-
-            attendingElem.append(here);
-
-            if (window.innerWidth > 512) {
-                grid.append(displayElem);
-            } else {
-                grid.css("grid-template-columns", "1fr 1fr");
-            }
-
-            grid.append(usernameElem);
-            grid.append(attendingElem);
-        });
-
-        page.append(grid);
-    });
-
 }
+
+addPage("RSVPs", async (page) => {
+    const col = $("<div></div>").addClass("col");
+    const userStats = $("<div></div>").addClass("col").css("display", "none");
+
+    const uData = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData"), where("attending", "==", true)));
+
+    uData.forEach(async (d) => {
+        const aUser = new User(d.id)
+        const username = await aUser.getUsername()
+        const pub = await aUser.getData("public")
+        const meta = await aUser.getData("hidden")
+
+        const userUData = await e.getUDataMember(d.id)
+
+
+        const display = await User.display(username, pub, meta, col)
+
+        const actions = display.find(".actions")
+        console.log(actions)
+
+        function addAction(src, func) {
+            actions.prepend($("<img/>")
+                .attr("src", src)
+                .addClass("action")
+
+                .on("click", function () {
+                    func()
+                }));
+        }
+
+        function displayUserStats() {
+            userStats.html("")
+
+            const tools = $("<div/>").addClass("row tools").css("place-content", "start")
+
+            const back = $("<img/>").attr("src", "../img/icons/back.png")
+
+            back.on("click", () => {
+                col.css("display", "flex")
+                userStats.css("display", "none")
+            })
+
+            const grid = $("<div/>").addClass("grid")
+
+            grid.append($("<h4/>").text("Key:"))
+
+            grid.append($("<h4/>").text("Value:"))
+
+            Object.keys(userUData).forEach((key) => {
+                if (key != "attending") {
+                    const value = userUData[key]
+
+                    grid.append($("<h4/>").text(key))
+
+                    if (typeof value == "boolean") {
+                        const box = $("<input>").attr("type", "checkbox").attr("checked", value)
+                        box.on("change", async () => {
+                            console.log(box[0].checked)
+
+                            await e.updateUData(d.id, { [key]: box[0].checked })
+
+                        })
+                        grid.append($("<div/>").append(box))
+                    }
+                    else {
+
+                        grid.append($("<h4/>").text(value))
+                    }
+                }
+            })
+
+
+            tools.append(back)
+
+            userStats.append(tools)
+            userStats.append(grid)
+
+        }
+        if (readOnly.admin || badges.includes("admin")) {
+            addAction("../img/icons/stats.png", () => {
+                userStats.css("display", "flex")
+                col.css("display", "none")
+                displayUserStats()
+            })
+        }
+
+    })
+    page.append(col)
+    page.append(userStats)
+
+});
 
 function addPage(label, func, current) {
     const tab = $("<button></button>")

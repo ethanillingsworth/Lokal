@@ -507,9 +507,21 @@ p {
     display: flex;
     flex-direction: row;
     place-content: end;
-    width: 100%;
     margin-right: 0px;
     margin-top: 5px;
+}
+
+.actionsWrapper img {
+    width: 30px !important;
+    height: 30px !important;
+}
+
+.actions button,
+.actions select {
+    width: fit-content;
+    min-width: 150px;
+    font-size: 1em;
+    padding: 5px;
 }
 
 .actions .row {
@@ -598,7 +610,7 @@ p {
 
 .grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     grid-auto-rows: 45px;
 }
 
@@ -664,6 +676,7 @@ input[type=checkbox] {
     border-radius: 15px;
     background-color: var(--dark1);
     border: 4px solid var(--dark0);
+    max-width: 300px;
     min-width: 200px;
     z-index: 1000;
     height: fit-content;
@@ -785,12 +798,12 @@ input[type=checkbox] {
 }
 
 .upgrade {
-    background-color: var(--premium);
+    background-color: var(--accent2);
     position: relative;
 }
 
 .upgrade:hover {
-    background-color: #ffce47;
+    background-color: var(--accent);
 }
 
 
