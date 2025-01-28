@@ -782,6 +782,8 @@ export class User {
 
     static async display(uname, pub, meta, content = $("#content"), groupAdmin = false) {
 
+
+
         const user = $("<div/>")
             .addClass("user")
             .addClass("row")
@@ -790,6 +792,7 @@ export class User {
             .css("width", "calc(100% - 40px)")
             .css("place-content", "start")
             .css("place-items", "start")
+
 
         const pfp = $("<img/>")
             .addClass("pfp")
