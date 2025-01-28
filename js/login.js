@@ -178,6 +178,11 @@ signUp.on("click", async () => {
         return
     }
 
+    if (Validation.username(username.val())) {
+        alert(Validation.username(username.val()))
+        return
+    }
+
     if (!email.val().endsWith("@stu.d214.org") && !email.val().endsWith("@d214.org") && !email.val().endsWith("@lokalevents.com")) {
         alert("That email isnt an authorized @stu.d214.org or @d214.org email adress.")
         return
@@ -195,7 +200,6 @@ signUp.on("click", async () => {
 
                 if (Validation.username(username.val()) === true) {
                     finalUsername = username.val()
-
                 }
 
 
