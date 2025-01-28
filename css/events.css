@@ -1,3 +1,9 @@
 .event {
     width: 50%;
 }
+
+@media (max-width: 600px) {
+    .event {
+        width: calc(100% - 40px)
+    }
+}
