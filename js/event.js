@@ -20,7 +20,8 @@ const data = await e.get()
 const row = $("<div></div>")
     .addClass("row")
     .css("width", "100%")
-    .css("placeContent", "start");
+    .css("placeContent", "start")
+    .css("flex-wrap", "wrap")
 
 const title = $("<h2/>").text(data.title)
 
