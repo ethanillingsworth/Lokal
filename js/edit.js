@@ -194,7 +194,7 @@ addButton("Done", async () => {
     const usernameVal = $("#username").val()
     const displayNameVal = $("#displayName").val()
     const descVal = $("#desc").val()
-    const pfpVal = $("#pfp").val()
+    const pfpVal = $("#pfp").attr("src")
 
     const data = {
 
