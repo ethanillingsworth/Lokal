@@ -172,43 +172,33 @@ password.on("input", () => {
 
 // normal sign up
 signUp.on("click", async () => {
+    let uName = email.val().split("@")[0]
 
-    if (await Validation.finalUsername(username.val()) !== true) {
-        alert(await Validation.finalUsername(username.val()))
-        return
+    if (await Validation.finalUsername(uName) !== true) {
+        uName += "-" + Math.floor(Math.random() * 1000);
     }
 
-    if (Validation.username(username.val()) !== true) {
-        alert(Validation.username(username.val()))
+    if (Validation.username(uName) !== true) {
+        console.log(Validation.username(uName));
+        uName = generateUsername();
         return
     }
 
     if (!email.val().endsWith("@stu.d214.org") && !email.val().endsWith("@d214.org") && !email.val().endsWith("@lokalevents.com")) {
-        alert("That email isnt an authorized @stu.d214.org or @d214.org email adress.")
+        alert("That email isnt an authorized @stu.d214.org or @d214.org email address.")
         return
-
     }
 
     createUserWithEmailAndPassword(auth, email.val(), password.val())
         .then(async (userCredential) => {
             // Signed up 
             const user = userCredential.user;
-            var finalUsername = generateUsername()
-
-            // Username validation is screwed
-            if (username.val()) {
-
-                if (Validation.username(username.val()) === true) {
-                    finalUsername = username.val()
-                }
 
 
+            await setUserData(user, email.val(), uName)
 
-                await setUserData(user, email.val(), finalUsername)
+            redirect()
 
-                redirect()
-                // ...
-            }
         })
 })
 

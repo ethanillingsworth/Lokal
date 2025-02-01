@@ -73,9 +73,9 @@ onAuthStateChanged(auth, async (user) => {
 
 
 
-addField("Username:", (row) => {
-    const inp = $("<input></input>").attr("id", "username").attr("placeholder", "lokal")
+addField("Username:", async (row) => {
 
+    const inp = $("<input></input>").attr("id", "username").attr("placeholder", "lokal")
     row.append(inp)
 })
 
@@ -169,6 +169,13 @@ if (urlParams.get("u")) {
     const uid = await User.getUID(urlParams.get("u"))
 
     u = new User(uid)
+
+    const badges = await u.getBadges()
+    const authBadges = await authUser.getBadges()
+
+    if (!badges.includes("group") && !authBadges.includes("admin")) {
+        $("#username").attr("disabled", true)
+    }
 
     const pub = await u.getData("public")
     oldUsername = await u.getUsername()

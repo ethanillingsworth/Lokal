@@ -930,8 +930,8 @@ export class Validation {
             return name + " must be atleast 4 chars long"
         }
 
-        if (value.length > 15) {
-            return name + " cannot be over 15 chars long"
+        if (value.length > 20) {
+            return name + " cannot be over 20 chars long"
         }
 
         if (value.startsWith("_") || value.endsWith("_")) {
@@ -1012,7 +1012,7 @@ export class Utils {
     }
 
     static getVersion() {
-        return "Lokal v8"
+        return "Lokal v9"
     }
 
     static getBase64(file) {

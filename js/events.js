@@ -17,7 +17,9 @@ onAuthStateChanged(auth, async (u) => {
 
         const creator = new User(data.creator)
 
-        if (new Date(data.date).getDate() >= new Date().getDate() && Object.keys(await creator.getMember(u.uid)).length > 0) {
+        if (new Date(data.date).getMonth() >= new Date().getMonth()
+            && new Date(data.date).getDay() >= new Date().getDay()
+            && Object.keys(await creator.getMember(u.uid)).length > 0) {
             const e = new Event(ev.id)
 
             await e.getUData()

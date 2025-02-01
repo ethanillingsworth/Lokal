@@ -333,6 +333,8 @@ addPage("Public View", async (page) => {
     addButton(`${attending} Attending`, "../img/icons/profile.png", "attend", (button, span) => {
         if (selfAttend) {
             button.addClass("active");
+            attending -= 1
+            button.find("span").text(`${attending} Attending + You`)
 
         }
 
@@ -341,19 +343,19 @@ addPage("Public View", async (page) => {
                 selfAttend = false;
                 button.removeClass("active");
                 actions.html("")
-                attending -= 1;
+                button.find("span").text(`${attending} Attending`)
+
             } else {
                 selfAttend = true;
                 button.addClass("active");
                 showActions()
-                attending += 1;
+                button.find("span").text(`${attending} Attending + You`)
             }
 
             await setDoc(doc(db, "posts", urlParams.get("e"), "uData", auth.currentUser.uid), {
                 attending: selfAttend,
                 here: false
             });
-            span.text(`${attending} Attending`);
         });
     });
 
