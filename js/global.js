@@ -41,7 +41,7 @@ document.body.onresize = function () {
 
 resizeChecks()
 
-sidebar.menu.addItem(new Item("Events", "../img/icons/party.png", "../"))
+sidebar.menu.addItem(new Item("Events Feed", "../img/icons/party.png", "../"))
 
 sidebar.menu.addItem(new Item("Group Finder", "../img/icons/groupfinder.png", "../groupfinder"))
 
@@ -119,7 +119,7 @@ onAuthStateChanged(auth, async (user) => {
 
         const pub = await u.getData("public")
 
-        sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
+        // sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
         if (!badges.includes("premium")) {
             const upgrade = new Item("Upgrade", "../img/icons/hat.png", "../plans")
 
