@@ -780,6 +780,12 @@ export class User {
         return ref.data()
     }
 
+    async getMembers() {
+
+        return await getDocs(query(collection(db, "users", this.uid, "members")))
+
+    }
+
     static async display(uname, pub, meta, content = $("#content"), groupAdmin = false) {
 
 
@@ -888,6 +894,41 @@ export class User {
 
         return user
 
+    }
+
+    async getEmail() {
+        let r = await getDoc(doc(db, "emails", this.uid))
+
+        if (!r.exists()) {
+            console.error("Could not load email from uid: " + this.uid)
+            return
+        }
+
+        return r.data().email
+    }
+
+    async notify(subject, text, url, fromGroupId) {
+        await addDoc(collection(db, "notifs"), {
+            toUids: [this.uid],
+            groupId: fromGroupId,
+            message: {
+                subject: `${subject}`,
+                text: text,
+                html: `<p>${text}<p/><br><a href="${url}" style="border-radius: 15px; font-family: sans-serif; text-decoration: none; color: white; background-color: #a353b9; padding: 10px;">View on Lokal</a>`
+            }
+        })
+    }
+
+    async notifyAllMembers(subject, text, url) {
+        const members = await this.getMembers()
+
+        console.log(members)
+
+        members.forEach(async (m) => {
+            console.log(m)
+            const member = new User(m.id)
+            await member.notify(`@${await this.getUsername()} ${subject}`, text, url, this.uid)
+        })
     }
 
     static async getUID(username) {

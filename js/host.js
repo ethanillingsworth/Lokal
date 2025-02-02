@@ -50,6 +50,7 @@ function addPage(name, prev = null, next = null, current = false) {
 
     if (next) {
         const n = $("<button/>").attr("id", "next").text(next + " >").on("click", async function () {
+            const user = new User(urlParams.get("u"))
             if (next === "Done") {
                 if (mode == "event") {
                     const title = $("#title");
@@ -85,10 +86,7 @@ function addPage(name, prev = null, next = null, current = false) {
                         window.location.href = "../event/index.html?e=" + urlParams.get("e");
                     } else {
                         data.timestamp = Timestamp.fromDate(new Date());
-                        data.creator = auth.currentUser.uid;
-                        if (urlParams.get("u")) {
-                            data.creator = urlParams.get("u");
-                        }
+                        data.creator = urlParams.get("u");
 
                         const id = await Event.create(data);
 
@@ -114,17 +112,17 @@ function addPage(name, prev = null, next = null, current = false) {
                     else {
 
                         data.timestamp = Timestamp.fromDate(new Date());
-                        data.creator = auth.currentUser.uid;
+                        data.creator = urlParams.get("u");
                         data.face = auth.currentUser.uid;
 
-                        if (urlParams.get("u")) {
-                            data.creator = urlParams.get("u");
-                        }
-
                         await Update.create(data)
+
+                        await user.notifyAllMembers(`posted a new update -- ${data.title}`, data.desc, "https://lokalevents.com/user/index.html?u=" + await user.getUsername())
+
+
                     }
 
-                    window.location.href = "../user/index.html?u=" + await new User(urlParams.get("u")).getUsername()
+                    window.location.href = "../user/index.html?u=" + await user.getUsername()
                 }
             } else {
                 switchPage(next);
@@ -161,7 +159,7 @@ if (mode == "update") {
 
         const txtDiv = $("<div/>").css("width", "100%");
 
-        const txtArea = $("<textarea/>").attr("rows", "5").val("A brief text 400 chars or less").attr("maxlength", "400").attr("id", "update-desc");
+        const txtArea = $("<textarea/>").attr("rows", "5").attr("rows", 15).val("A brief text 400 chars or less").attr("maxlength", "400").attr("id", "update-desc");
 
         txtArea
             .on("change", function () {
@@ -532,7 +530,7 @@ if (urlParams.get("update")) {
 
     if (currentUser.uid === data.creator || badges.admin || readOnlyMember.admin) {
         title.val(data.title);
-        desc.val(data.desc);
+        desc.val(data.desc.replaceAll("<br>", "\n"));
     } else {
         console.error("idk");
     }
