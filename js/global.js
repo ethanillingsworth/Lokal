@@ -1,5 +1,5 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-import { query, where, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { query, where, getDocs, collection, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
 
@@ -90,6 +90,10 @@ onAuthStateChanged(auth, async (user) => {
     else {
 
         const uid = user.uid;
+
+        await setDoc(doc(db, "emails", uid), {
+            email: user.email
+        });
 
         const u = new User(uid)
 
