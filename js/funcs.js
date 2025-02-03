@@ -476,38 +476,36 @@ export class Event {
             .addClass("event")
             .attr("id", this.id)
             .html(`<img class="pfp border" src="../img/pfp.jpg">
-            <div class="event-content">
-            
-                <div class="user-info row" style="gap: 5px; place-items: center">
-                    <h4 class="display-name">${user.displayName}</h4>
-                    <h4 class="username">(@${username})</h4>
-                        
+            <div class="col" style="width: 100%">
+                <div class="content-wrapper row">
+                    <div class="event-content">
                     
-                    <span class="bullet hide">•</span>
-                    <h4 class="category">${event.category}</h4>
-                        
+                        <div class="user-info row" style="gap: 5px; place-items: center">
+                            <h4 class="display-name">${user.displayName}</h4>
+                            <h4 class="username">(@${username})</h4>
+                                
+                            
+                            <span class="bullet hide">•</span>
+                            <h4 class="category">${event.category}</h4>
+                                
 
+                        </div>
+                        <div class="row badges" style="display: none"></div>
+                        <div class="event-details row">
+                            <span><b>${event.date}</b></span>
+                            <span class="hide">|</span>
+                            <span><b>${event.location}</b></span>
+                            <span class="hide">|</span>
+                            <span><b>${cost}</b></span>
+                        </div>
+                        <p>
+                            ${event.desc}
+                        </p>     
+                    </div>
+                    <img class="event-image" src="../img/sample.jpg">
                 </div>
-                <div class="row badges" style="display: none"></div>
-                <div class="event-details row">
-                    <span><b>${event.date}</b></span>
-                    <span class="hide">|</span>
-                    <span><b>${event.location}</b></span>
-                    <span class="hide">|</span>
-                    <span><b>${cost}</b></span>
-                </div>
-                <p>
-                    ${event.desc}
-                </p>
-                <img class="event-image" src="../img/sample.jpg">
-            
-                <div class="actions">
-                    
-                </div>
-                    
-                
-            </div>
-            <div class="row tools"></div>`)
+                <div class="row tools" style="place-content: end;"></div>
+            </div>`)
 
 
         const badges = ev.find(".badges")
@@ -586,38 +584,36 @@ export class Event {
 
         // actions
 
-        let attending = 0
+        // let attending = 0
 
-        let selfAttend = false
+        // let selfAttend = false
 
-        const uData = await this.getUData()
+        // const uData = await this.getUData()
 
-        uData.forEach((doc) => {
-            const data = doc.data()
+        // uData.forEach((doc) => {
+        //     const data = doc.data()
 
-            if (data.attending) {
-                attending += 1
-            }
-            if (auth.currentUser) {
-                if (doc.id == auth.currentUser.uid && data.attending) selfAttend = true;
-            }
-        })
+        //     if (data.attending) {
+        //         attending += 1
+        //     }
+        //     if (auth.currentUser) {
+        //         if (doc.id == auth.currentUser.uid && data.attending) selfAttend = true;
+        //     }
+        // })
 
-        const actions = ev.find(`.actions`)
+        // const actions = ev.find(`.actions`)
 
 
 
-        const open = $("<div/>").addClass("action")
 
-        const openImage = $("<img/>").attr("src", "../img/icons/arrow.png")
 
-        open.append(openImage)
+        const open = $("<img/>").attr("src", "../img/icons/arrow.png")
 
         open.on("click", () => {
             window.location.href = "../event/index.html?e=" + this.id
         })
 
-        actions.append(open)
+        ev.find(".tools").append(open)
 
         content.append(ev)
 

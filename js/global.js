@@ -217,8 +217,7 @@ onAuthStateChanged(auth, async (user) => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
-
-                    searchMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                    notifMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)

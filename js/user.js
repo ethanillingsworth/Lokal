@@ -192,7 +192,7 @@ async function members(user) {
         const currentUserBadges = await currentUser.getBadges()
 
 
-        if (currentUserBadges.admin || currentUserReadOnly.admin) {
+        if (currentUserBadges.includes('admin') || currentUserReadOnly.admin) {
 
             const actions = dis.find(".actions");
             actions.empty();

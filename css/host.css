@@ -22,7 +22,8 @@
 #preview {
     object-fit: contain;
     aspect-ratio: 16 / 9;
-    width: 100%;
+    width: 75%;
+    place-self: center;
     height: auto;
     border-radius: 15px;
 }
