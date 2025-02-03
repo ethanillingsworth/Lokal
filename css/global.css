@@ -62,6 +62,7 @@ h5 {
 
 p {
     font-size: 1em;
+    white-space-collapse: preserve-breaks;
 }
 
 input[type="file"] {
@@ -1026,7 +1027,11 @@ input:disabled {
 
     .event,
     .user {
-        padding: 10px
+        padding: 10px;
+    }
+
+    .user {
+        flex-wrap: wrap !important;
     }
 
     .action span {
