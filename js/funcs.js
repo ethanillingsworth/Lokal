@@ -201,11 +201,13 @@ export class Menu {
                 i.html(item.customHtml)
 
 
-                item.after()
+                item.after(i)
 
             }
             else {
-                if (item.click instanceof Menu) {
+
+                if (item.click == "") { }
+                else if (item.click instanceof Menu) {
                     const element = item.click.element
 
                     i.on("click", function () {
@@ -238,15 +240,16 @@ export class Menu {
                         }
                     })
                 }
+                if (item.img != "") {
+                    const img = document.createElement("img")
+                    img.src = item.img
+                    img.classList.add("icon")
 
-                const img = document.createElement("img")
-                img.src = item.img
-                img.classList.add("icon")
+                    i.append(img)
+                }
 
                 const label = document.createElement("h4")
                 label.innerText = item.label
-
-                i.append(img)
                 i.append(label)
             }
         })
@@ -909,8 +912,9 @@ export class User {
 
     async notify(subject, text, url, fromGroupId) {
         await addDoc(collection(db, "notifs"), {
-            toUids: [this.uid],
+            bccUids: [this.uid],
             groupId: fromGroupId,
+            url: url,
             message: {
                 subject: `${subject}`,
                 text: text,
@@ -919,15 +923,55 @@ export class User {
         })
     }
 
+    async getNotifs() {
+        return await getDocs(query(collection(db, "notifs"), where("bccUids", "array-contains", this.uid)))
+    }
+    async getNotif(id) {
+        let r = await getDoc(doc(db, "notifs", id))
+
+        if (!r.exists()) {
+            console.error("Could not load notif from uid: " + id)
+            return
+        }
+
+        return r.data()
+    }
+
+    async removeNotif(id) {
+        const notif = await this.getNotif(id)
+
+        const i = notif.bccUids.indexOf(this.uid)
+
+        notif.bccUids.splice(i, 1)
+
+        await setDoc(doc(db, "notifs", id), {
+            bccUids: notif.bccUids
+        }, { merge: true })
+
+        $("#" + id).remove()
+    }
+
     async notifyAllMembers(subject, text, url) {
         const members = await this.getMembers()
 
         console.log(members)
 
+        const uids = []
+
         members.forEach(async (m) => {
-            console.log(m)
-            const member = new User(m.id)
-            await member.notify(`@${await this.getUsername()} ${subject}`, text, url, this.uid)
+            uids.push(m.id)
+        })
+        // batch send
+
+        await addDoc(collection(db, "notifs"), {
+            bccUids: uids,
+            groupId: this.uid,
+            url: url,
+            message: {
+                subject: `@${await this.getUsername()} ${subject}`,
+                text: text,
+                html: `<p>${text}<p/><br><a href="${url}" style="border-radius: 15px; font-family: sans-serif; text-decoration: none; color: white; background-color: #a353b9; padding: 10px;">View on Lokal</a>`
+            }
         })
     }
 
