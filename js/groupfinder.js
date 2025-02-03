@@ -4,12 +4,20 @@ import { db } from "./firebase.js";
 
 const groups = await getDocs(query(collection(db, "users"), where("badges", "array-contains", "group"), limit(100)))
 
+let index = 0;
+
 groups.forEach(async g => {
     const u = new User(g.id)
     const username = await u.getUsername()
     const pub = await u.getData("public")
     const hidden = await u.getData("hidden")
 
+    if (index != 0) {
+        $("#content").append($("<hr/>"))
+    }
+
     await User.display(username, pub, hidden)
+
+    index++
 
 });

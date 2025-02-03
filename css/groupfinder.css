@@ -3,3 +3,7 @@
     margin-left: 10px;
     margin-right: 10px;
 }
+
+hr {
+    width: calc(100% - 68px) !important;
+}
