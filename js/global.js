@@ -43,7 +43,7 @@ resizeChecks()
 
 sidebar.menu.addItem(new Item("Events Feed", "../img/icons/party.png", "../"))
 
-sidebar.menu.addItem(new Item("Group Finder", "../img/icons/groupfinder.png", "../groupfinder"))
+sidebar.menu.addItem(new Item("Group Finder", "../img/icons/groupfind.png", "../groupfinder"))
 
 $(document.body).append(content)
 
@@ -207,6 +207,8 @@ onAuthStateChanged(auth, async (user) => {
 
         let backAdded = false
 
+        const groupMenu = new Menu(expand)
+
         function resizeChecks() {
             if (window.innerWidth < 512) {
                 sidebar.setHeading("L")
@@ -218,6 +220,10 @@ onAuthStateChanged(auth, async (user) => {
                         Menu.clicked = false
                     }), true)
                     notifMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                        expand.removeClass("showExpand")
+                        Menu.clicked = false
+                    }), true)
+                    groupMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
@@ -236,6 +242,7 @@ onAuthStateChanged(auth, async (user) => {
 
         resizeChecks()
 
+
         sidebar.menu.addItem(new Item("More", "../img/icons/more.png", moreMenu), true)
 
         const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
@@ -247,6 +254,9 @@ onAuthStateChanged(auth, async (user) => {
 
         sidebar.menu.addItem(dName, true)
 
+
+        sidebar.menu.addItem(new Item("Your Groups", "../img/icons/groupfinder.png", groupMenu), true)
+
         const q = query(collection(db, "users"), where("badges", "array-contains", "group"))
 
         const groups = await getDocs(q)
@@ -254,9 +264,10 @@ onAuthStateChanged(auth, async (user) => {
         groups.forEach(async g => {
             const group = new User(g.id)
 
-            const readOnly = await group.getMemberReadOnly(uid)
+            const mem = await group.getMember(uid)
 
-            if (readOnly.admin) {
+
+            if (mem.joined) {
                 // show item
                 const pub = await group.getData("public")
                 const username = await group.getUsername()
@@ -268,7 +279,7 @@ onAuthStateChanged(auth, async (user) => {
                 }
                 item.classList = ["user-side"]
 
-                sidebar.menu.addItem(item, true)
+                groupMenu.addItem(item)
             }
 
         });
