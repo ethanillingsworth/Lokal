@@ -1288,7 +1288,9 @@ export class Calendar {
         const s = this
 
         function offset(num) {
-            calandar.css("grid-column-start", num)
+            for (let i = 0; i < num; i++) {
+                days.append($("<div/>").addClass("day"))
+            }
         }
 
         function refreshDays() {
