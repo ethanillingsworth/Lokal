@@ -1278,7 +1278,7 @@ export class Calendar {
             weeks.append($("<h4/>").addClass("week").text(w))
         });
 
-        calandar.append(weeks)
+        // calandar.append(weeks)
 
         const days = $("<div/>")
             .addClass("days grid")
@@ -1302,18 +1302,18 @@ export class Calendar {
             const monthsDays = s.data[s.currentYear][s.currentMonth]
 
             Object.keys(monthsDays).forEach((d) => {
-                if (d == 1) {
-                    const off = new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay()
-                    offset(new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay())
+                // if (d == 1) {
+                //     const off = new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay()
+                //     offset(new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay())
 
-                    if (off > 4) {
-                        days.css("grid-template-rows", "repeat(6, 75px)")
-                    }
-                    else {
-                        days.css("grid-template-rows", "repeat(5, 75px)")
+                //     if (off > 4) {
+                //         days.css("grid-template-rows", "repeat(6, 75px)")
+                //     }
+                //     else {
+                //         days.css("grid-template-rows", "repeat(5, 75px)")
 
-                    }
-                }
+                //     }
+                // }
                 const dayData = monthsDays[d]
 
                 const day = $("<div/>")
