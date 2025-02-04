@@ -48,3 +48,10 @@ input {
 #forgotpass {
     cursor: pointer;
 }
+
+@media (max-width: 600px) {
+
+    #inputs {
+        width: 100%;
+    }
+}

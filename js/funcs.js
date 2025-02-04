@@ -1289,7 +1289,7 @@ export class Calendar {
 
         function offset(num) {
             for (let i = 0; i < num; i++) {
-                days.append($("<div/>").addClass("day"))
+                days.append($("<div/>").addClass("day").append($("<span/>").text("test")))
             }
         }
 

@@ -800,8 +800,8 @@ input:disabled {
     position: relative;
     overflow: hidden;
     border-radius: 15px;
-    height: calc(100% - 20px);
-    width: calc(100% - 20px) !important;
+    height: auto;
+    width: auto;
 }
 
 .calandar .day .banner {
@@ -887,6 +887,10 @@ input:disabled {
 
     p {
         font-size: 0.75em;
+    }
+
+    .calandar .days {
+        gap: 5px;
     }
 
     .upgrade:before {
