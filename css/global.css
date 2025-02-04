@@ -803,7 +803,8 @@ input:disabled {
     position: relative;
     overflow: hidden;
     border-radius: 15px;
-    height: auto;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
 }
 
 .calandar .day .banner {
