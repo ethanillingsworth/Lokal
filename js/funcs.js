@@ -858,7 +858,7 @@ export class User {
         userRow.append(displayName)
         userRow.append(username)
 
-        const desc = $("<p/>").text(pub.desc)
+        const desc = $("<p/>").html(pub.desc.replaceAll("\n", "<br>"))
 
         userDetails.append(userRow)
         userDetails.append(badges)
@@ -961,6 +961,19 @@ export class User {
 
         await addDoc(collection(db, "notifs"), {
             bccUids: uids,
+            groupId: this.uid,
+            url: url,
+            message: {
+                subject: `@${await this.getUsername()} ${subject}`,
+                text: text,
+                html: `<p>${text}<p/><br><a href="${url}" style="border-radius: 15px; font-family: sans-serif; text-decoration: none; color: white; background-color: #a353b9; padding: 10px;">View on Lokal</a>`
+            }
+        })
+    }
+
+    async notifyMember(memberId, subject, text, url) {
+        await addDoc(collection(db, "notifs"), {
+            bccUids: [memberId],
             groupId: this.uid,
             url: url,
             message: {

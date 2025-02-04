@@ -296,6 +296,7 @@ async function requests(user) {
             .on("click", async function () {
                 await user.updateMember(person.id, { pending: false, joined: true });
                 await user.updateMemberReadOnly(person.id, { accepted: true })
+                await user.notifyMember(personClass.uid, "has accepted you into their group!", "View their page on Lokal below", `https://lokalevents.com/user/index.html?u=${await user.getUsername()}`)
                 actions.parent().remove();
             });
 
@@ -327,7 +328,8 @@ function updateProfile(data) {
     document.title = `Lokal - @${pageUser}`;
     displayName.text(data.displayName);
 
-    desc.text(data.desc.replaceAll("<br>", "\n"));
+
+    desc.html(data.desc.replaceAll("\n", "<br>"));
 
     if (data.pfp) {
         $("#pfp").attr("src", data.pfp);
@@ -488,12 +490,12 @@ async function feed(uid) {
 
 if (bds.includes("group")) {
     createTab("Feed", true)
-    createTab("Events")
+    // createTab("Events")
     createTab("Calendar")
     createTab("Members")
 
     await feed(uid)
-    await hosting(uid)
+    // await hosting(uid)
     await cal(user)
     await members(user)
 }
