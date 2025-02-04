@@ -804,7 +804,7 @@ input:disabled {
     overflow: hidden;
     border-radius: 15px;
     height: calc(100% - 20px);
-    width: calc(100% - 20px);
+    width: calc(100% - 20px) !important;
 }
 
 .calandar .day .banner {
