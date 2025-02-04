@@ -781,7 +781,7 @@ export class User {
 
     async getMembers() {
 
-        return await getDocs(query(collection(db, "users", this.uid, "members")))
+        return await getDocs(query(collection(db, "users", this.uid, "members"), where("joined", "==", true)))
 
     }
 
@@ -1288,9 +1288,7 @@ export class Calendar {
         const s = this
 
         function offset(num) {
-            for (let i = 0; i < num; i++) {
-                days.append($("<div/>"))
-            }
+            calandar.css("grid-column-start", num)
         }
 
         function refreshDays() {

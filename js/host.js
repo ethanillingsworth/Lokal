@@ -90,6 +90,7 @@ function addPage(name, prev = null, next = null, current = false) {
 
                         const id = await Event.create(data);
 
+                        await user.notifyAllMembers(`posted a new event -- ${data.title}`, data.desc, "https://lokalevents.com/event/index.html?e=" + id)
 
                         window.location.href = "../event/index.html?e=" + id;
                     }
