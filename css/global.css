@@ -96,9 +96,6 @@ button,
 
 label {
     width: auto;
-}
-
-label {
     font-size: 1.25em;
 }
 
@@ -854,14 +851,23 @@ input:disabled {
     /* Animation */
 }
 
+.content-wrapper .event-image {
+    width: 100%;
+}
+
 
 @media (max-width: 1200px) {
-    .modal {
-        width: 75%;
-    }
 
     .hide {
         display: none;
+    }
+
+    .content-wrapper {
+        flex-wrap: wrap;
+    }
+
+    .content-wrapper .event-image {
+        width: 100%;
     }
 
     #expand {
