@@ -210,7 +210,7 @@ onAuthStateChanged(auth, async (user) => {
         const groupMenu = new Menu(expand)
 
         function resizeChecks() {
-            if (window.innerWidth < 512) {
+            if (window.innerWidth < 600) {
                 sidebar.setHeading("L")
 
                 if (!backAdded) {
