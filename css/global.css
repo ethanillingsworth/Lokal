@@ -767,13 +767,21 @@ input:disabled {
 }
 
 .calandar .days {
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(5, 75px);
+    grid-template-columns: repeat(7, calc(100% / 7));
+    grid-template-rows: repeat(5, calc(100% / 7));
     background-color: var(--dark0);
 }
 
 .days>* {
     border-color: var(--dark0);
+}
+
+.day:before {
+    content: "";
+    display: block;
+    height: 0;
+    width: 0;
+    padding-bottom: 100%;
 }
 
 .key {
