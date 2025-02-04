@@ -227,6 +227,7 @@ onAuthStateChanged(auth, async (user) => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
+                    backAdded = true
                 }
             }
             else {

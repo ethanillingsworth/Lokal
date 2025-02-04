@@ -747,6 +747,7 @@ input:disabled {
     padding: 20px;
     width: auto;
     place-items: center;
+    border-radius: 15px;
 }
 
 .calandar .tool {
@@ -795,6 +796,7 @@ input:disabled {
     padding: 5px;
     place-content: center;
     width: calc(100% - 10px);
+    border-radius: 15px;
 }
 
 .calandar .week {
@@ -895,10 +897,6 @@ input:disabled {
 
     p {
         font-size: 0.75em;
-    }
-
-    .calandar .days {
-        gap: 5px;
     }
 
     .upgrade:before {

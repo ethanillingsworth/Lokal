@@ -442,35 +442,57 @@ const data = await user.getData("public")
 
 updateProfile(data)
 
-async function updates() {
-    const updatesTab = $("#Updates")
+async function feed(uid) {
+    const feedTab = $("#Feed")
 
-    const q = query(collection(db, "updates"), where("creator", "==", uid), orderBy("timestamp", "desc"))
+    if (data.pinnedEvent) {
+        const up = new Event(data.pinnedEvent)
 
-    const get = await getDocs(q)
+        await up.display(feedTab, true)
+
+    }
 
     if (data.pinnedUpdate) {
         const up = new Update(data.pinnedUpdate)
 
-        await up.display(updatesTab, true)
+        await up.display(feedTab, true)
 
     }
 
-    get.forEach(async (update) => {
+    console.log(uid)
+
+    const updates = await getDocs(query(collection(db, "updates"), where("creator", "==", uid), orderBy("timestamp", "desc")))
+
+    const events = await getDocs(query(collection(db, "posts"), where("creator", "==", uid), orderBy("timestamp", "desc")))
+
+    const feed = []
+
+    updates.forEach(async (update) => {
         if (update.id != data.pinnedUpdate) {
             const u = new Update(update.id)
-            await u.display(updatesTab)
+            feed.push({ "value": u, "timestamp": update.data().timestamp })
         }
+    })
+
+    events.forEach(async (event) => {
+        if (event.id != data.pinnedEvent) {
+            const u = new Event(event.id)
+            feed.push({ "value": u, "timestamp": event.data().timestamp })
+        }
+    })
+
+    feed.sort((a, b) => { return b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime() }).forEach(async (v) => {
+        await v.value.display(feedTab)
     })
 }
 
 if (bds.includes("group")) {
-    createTab("Updates", true)
+    createTab("Feed", true)
     createTab("Events")
     createTab("Calendar")
     createTab("Members")
 
-    await updates(user)
+    await feed(uid)
     await hosting(uid)
     await cal(user)
     await members(user)
