@@ -192,7 +192,7 @@ async function members(user) {
         const currentUserBadges = await currentUser.getBadges()
 
 
-        if (currentUserBadges.admin || currentUserReadOnly.admin) {
+        if (currentUserBadges.includes('admin') || currentUserReadOnly.admin) {
 
             const actions = dis.find(".actions");
             actions.empty();
@@ -296,6 +296,9 @@ async function requests(user) {
             .on("click", async function () {
                 await user.updateMember(person.id, { pending: false, joined: true });
                 await user.updateMemberReadOnly(person.id, { accepted: true })
+                if (pub.notifs) {
+                    await user.notifyMember(personClass.uid, "has accepted you into their group!", "View their page on Lokal below", `https://lokalevents.com/user/index.html?u=${await user.getUsername()}`)
+                }
                 actions.parent().remove();
             });
 
@@ -327,7 +330,8 @@ function updateProfile(data) {
     document.title = `Lokal - @${pageUser}`;
     displayName.text(data.displayName);
 
-    desc.text(data.desc.replaceAll("<br>", "\n"));
+
+    desc.html(data.desc.replaceAll("\n", "<br>"));
 
     if (data.pfp) {
         $("#pfp").attr("src", data.pfp);
@@ -341,6 +345,8 @@ function updateProfile(data) {
 
 const uid = await User.getUID(pageUser)
 const user = new User(uid)
+
+const pub = await user.getData("public")
 
 let bds = await user.getBadges()
 
@@ -360,6 +366,8 @@ onAuthStateChanged(auth, async (u) => {
     }
 
     const currentUser = new User(u.uid)
+
+
 
     let bdsU = await currentUser.getBadges()
 
@@ -385,6 +393,23 @@ onAuthStateChanged(auth, async (u) => {
         moreMenu.add("Edit Profile", () => {
             window.location.href = "../edit/index.html?u=" + urlParams.get("u")
         })
+
+        if (pub.notifs) {
+            moreMenu.add("Turn Off Notifications", async () => {
+                await user.updateData({ notifs: false }, "public")
+                alert("We've updated your notification preferences")
+                location.reload()
+            })
+        }
+        else {
+            moreMenu.add("Turn On Notifications", async () => {
+                await user.updateData({ notifs: true }, "public")
+                alert("We've updated your notification preferences")
+                location.reload()
+            })
+        }
+
+
 
         tools.append(moreMenu.more)
     }
@@ -442,36 +467,58 @@ const data = await user.getData("public")
 
 updateProfile(data)
 
-async function updates() {
-    const updatesTab = $("#Updates")
+async function feed(uid) {
+    const feedTab = $("#Feed")
 
-    const q = query(collection(db, "updates"), where("creator", "==", uid), orderBy("timestamp", "desc"))
+    if (data.pinnedEvent) {
+        const up = new Event(data.pinnedEvent)
 
-    const get = await getDocs(q)
+        await up.display(feedTab, true)
+
+    }
 
     if (data.pinnedUpdate) {
         const up = new Update(data.pinnedUpdate)
 
-        await up.display(updatesTab, true)
+        await up.display(feedTab, true)
 
     }
 
-    get.forEach(async (update) => {
+    console.log(uid)
+
+    const updates = await getDocs(query(collection(db, "updates"), where("creator", "==", uid), orderBy("timestamp", "desc")))
+
+    const events = await getDocs(query(collection(db, "posts"), where("creator", "==", uid), orderBy("timestamp", "desc")))
+
+    const feed = []
+
+    updates.forEach(async (update) => {
         if (update.id != data.pinnedUpdate) {
             const u = new Update(update.id)
-            await u.display(updatesTab)
+            feed.push({ "value": u, "timestamp": update.data().timestamp })
         }
+    })
+
+    events.forEach(async (event) => {
+        if (event.id != data.pinnedEvent) {
+            const u = new Event(event.id)
+            feed.push({ "value": u, "timestamp": event.data().timestamp })
+        }
+    })
+
+    feed.sort((a, b) => { return b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime() }).forEach(async (v) => {
+        await v.value.display(feedTab)
     })
 }
 
 if (bds.includes("group")) {
-    createTab("Updates", true)
-    createTab("Events")
+    createTab("Feed", true)
+    // createTab("Events")
     createTab("Calendar")
     createTab("Members")
 
-    await updates(user)
-    await hosting(uid)
+    await feed(uid)
+    // await hosting(uid)
     await cal(user)
     await members(user)
 }

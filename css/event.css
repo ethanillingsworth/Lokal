@@ -11,3 +11,14 @@
 #share:hover {
     cursor: pointer;
 }
+
+
+.event-image {
+    width: 50%;
+}
+
+@media (max-width: 600px) {
+    .event-image {
+        width: 100%;
+    }
+}

@@ -55,6 +55,10 @@ async function setUserData(user, email, username) {
         username: username.toLowerCase()
     });
 
+    await setDoc(doc(db, "emails", user.uid), {
+        email: email
+    });
+
     await setDoc(doc(db, "uids", username.toLowerCase()), {
         userId: user.uid
     })
@@ -62,7 +66,8 @@ async function setUserData(user, email, username) {
     await setDoc(doc(db, "users", user.uid, "data", "public"), {
         displayName: username,
         desc: "Set a description",
-        timestamp: Timestamp.now()
+        timestamp: Timestamp.now(),
+        notifs: $('#notifs').is(':checked')
     })
 
     await setDoc(doc(db, "users", user.uid, "data", "private"), {
@@ -205,11 +210,12 @@ signUp.on("click", async () => {
 // normal sign in
 signIn.on("click", () => {
     signInWithEmailAndPassword(auth, email.val(), password.val())
-        .then((userCredential) => {
+        .then(async (userCredential) => {
             localStorage.clear()
 
             // Signed in 
             const user = userCredential.user;
+
             redirect()
 
             // ...

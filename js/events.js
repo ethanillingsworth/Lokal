@@ -12,6 +12,7 @@ onAuthStateChanged(auth, async (u) => {
 
     const events = await getDocs(query(collection(db, "posts"), orderBy("timestamp", "desc"), limit(100)))
 
+    let index = 0;
     events.forEach(async ev => {
         const data = ev.data()
 
@@ -21,9 +22,12 @@ onAuthStateChanged(auth, async (u) => {
             && new Date(data.date).getDay() >= new Date().getDay()
             && Object.keys(await creator.getMember(u.uid)).length > 0) {
             const e = new Event(ev.id)
+            if (index != 0) {
+                $("#content").append($("<hr/>"))
+            }
 
-            await e.getUData()
             await e.display()
+            index++;
         }
     });
 

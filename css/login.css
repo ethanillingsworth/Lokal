@@ -48,3 +48,12 @@ input {
 #forgotpass {
     cursor: pointer;
 }
+
+#inputs {
+    width: 100%;
+}
+
+input[type=checkbox] {
+    height: 25px;
+    width: 25px;
+}

@@ -4,10 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="apple-touch-icon" href="../img/iconMobile.png">
-
+    <link rel="apple-touch-icon" href="../img/icon.png">
+    <link rel="shortcut icon" href="../img/icon.png" type="image/png">
     <title>Lokal - Login</title>
-    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
     <script type="module" src="../js/firebase.js"></script>
     <script type="module" src="../js/login.js"></script>
     <link rel="stylesheet" href="../css/global.css">
@@ -17,7 +16,7 @@
 
 <body>
     <div class="modal">
-        <h2>Welcome to Lokal!</h2>
+        <h1 style="margin: 0;">Welcome to Lokal!</h1>
         <hr>
         <div id="inputs">
             <!-- <div class="row" style="gap: 0px; flex-wrap: nowrap; border-radius: 15px;" id="usernameDiv">
@@ -33,14 +32,24 @@
             <span id="passwordError" style="color: var(--red)"></span>
 
         </div>
+
+        <div class="row">
+            <input type="checkbox" checked id="notifs">
+            <h4 style="text-wrap: wrap;">I would like to
+                recieve non-marketing<br> related emails (notifications)</h4>
+
+        </div>
+
         <div class="row">
             <button id="signin">Login</button>
             <button id="signup">Sign Up</button>
         </div>
         <hr>
         <p id="forgotpass">Forgot your password?</p>
-        <p>Need Help? <a href="mailto:support@lokalevents.com" style="color: var(--accent)" target="_blank">Email
-                Us.</a></p>
+        <p style="display: flex; gap: 5px;">Need Help?
+            <a href="mailto:support@lokalevents.com" style="color: var(--accent);text-wrap: nowrap;"
+                target="_blank">Email Us.</a>
+        </p>
 
     </div>
 </body>

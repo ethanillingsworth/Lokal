@@ -1,9 +1,9 @@
 .user {
-    width: 50% !important;
+    width: calc(100% - 68px) !important;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
-@media (max-width: 600px) {
-    .user {
-        width: calc(100% - 40px) !important;
-    }
+hr {
+    width: calc(100% - 68px) !important;
 }

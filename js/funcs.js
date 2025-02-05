@@ -201,11 +201,13 @@ export class Menu {
                 i.html(item.customHtml)
 
 
-                item.after()
+                item.after(i)
 
             }
             else {
-                if (item.click instanceof Menu) {
+
+                if (item.click == "") { }
+                else if (item.click instanceof Menu) {
                     const element = item.click.element
 
                     i.on("click", function () {
@@ -238,15 +240,16 @@ export class Menu {
                         }
                     })
                 }
+                if (item.img != "") {
+                    const img = document.createElement("img")
+                    img.src = item.img
+                    img.classList.add("icon")
 
-                const img = document.createElement("img")
-                img.src = item.img
-                img.classList.add("icon")
+                    i.append(img)
+                }
 
                 const label = document.createElement("h4")
                 label.innerText = item.label
-
-                i.append(img)
                 i.append(label)
             }
         })
@@ -473,38 +476,36 @@ export class Event {
             .addClass("event")
             .attr("id", this.id)
             .html(`<img class="pfp border" src="../img/pfp.jpg">
-            <div class="event-content">
-            
-                <div class="user-info row" style="gap: 5px; place-items: center">
-                    <h4 class="display-name">${user.displayName}</h4>
-                    <h4 class="username">(@${username})</h4>
-                        
+            <div class="col" style="width: 100%">
+                <div class="content-wrapper row">
+                    <div class="event-content">
                     
-                    <span class="bullet hide">•</span>
-                    <h4 class="category">${event.category}</h4>
-                        
+                        <div class="user-info row" style="gap: 5px; place-items: center">
+                            <h4 class="display-name">${user.displayName}</h4>
+                            <h4 class="username">(@${username})</h4>
+                                
+                            
+                            <span class="bullet hide">•</span>
+                            <h4 class="category">${event.category}</h4>
+                                
 
+                        </div>
+                        <div class="row badges" style="display: none"></div>
+                        <div class="event-details row">
+                            <span><b>${event.date}</b></span>
+                            <span class="hide">|</span>
+                            <span><b>${event.location}</b></span>
+                            <span class="hide">|</span>
+                            <span><b>${cost}</b></span>
+                        </div>
+                        <p>
+                            ${event.desc}
+                        </p>     
+                    </div>
+                    <img class="event-image" src="../img/sample.jpg">
                 </div>
-                <div class="row badges" style="display: none"></div>
-                <div class="event-details row">
-                    <span><b>${event.date}</b></span>
-                    <span class="hide">|</span>
-                    <span><b>${event.location}</b></span>
-                    <span class="hide">|</span>
-                    <span><b>${cost}</b></span>
-                </div>
-                <p>
-                    ${event.desc}
-                </p>
-                <img class="event-image" src="../img/sample.jpg">
-            
-                <div class="actions">
-                    
-                </div>
-                    
-                
-            </div>
-            <div class="row tools"></div>`)
+                <div class="row tools" style="place-content: end;"></div>
+            </div>`)
 
 
         const badges = ev.find(".badges")
@@ -583,38 +584,36 @@ export class Event {
 
         // actions
 
-        let attending = 0
+        // let attending = 0
 
-        let selfAttend = false
+        // let selfAttend = false
 
-        const uData = await this.getUData()
+        // const uData = await this.getUData()
 
-        uData.forEach((doc) => {
-            const data = doc.data()
+        // uData.forEach((doc) => {
+        //     const data = doc.data()
 
-            if (data.attending) {
-                attending += 1
-            }
-            if (auth.currentUser) {
-                if (doc.id == auth.currentUser.uid && data.attending) selfAttend = true;
-            }
-        })
+        //     if (data.attending) {
+        //         attending += 1
+        //     }
+        //     if (auth.currentUser) {
+        //         if (doc.id == auth.currentUser.uid && data.attending) selfAttend = true;
+        //     }
+        // })
 
-        const actions = ev.find(`.actions`)
+        // const actions = ev.find(`.actions`)
 
 
 
-        const open = $("<div/>").addClass("action")
 
-        const openImage = $("<img/>").attr("src", "../img/icons/arrow.png")
 
-        open.append(openImage)
+        const open = $("<img/>").attr("src", "../img/icons/arrow.png")
 
         open.on("click", () => {
             window.location.href = "../event/index.html?e=" + this.id
         })
 
-        actions.append(open)
+        ev.find(".tools").append(open)
 
         content.append(ev)
 
@@ -780,6 +779,12 @@ export class User {
         return ref.data()
     }
 
+    async getMembers() {
+
+        return await getDocs(query(collection(db, "users", this.uid, "members"), where("joined", "==", true)))
+
+    }
+
     static async display(uname, pub, meta, content = $("#content"), groupAdmin = false) {
 
 
@@ -853,7 +858,7 @@ export class User {
         userRow.append(displayName)
         userRow.append(username)
 
-        const desc = $("<p/>").text(pub.desc)
+        const desc = $("<p/>").html(pub.desc.replaceAll("\n", "<br>"))
 
         userDetails.append(userRow)
         userDetails.append(badges)
@@ -888,6 +893,100 @@ export class User {
 
         return user
 
+    }
+
+    async getEmail() {
+        let r = await getDoc(doc(db, "emails", this.uid))
+
+        if (!r.exists()) {
+            console.error("Could not load email from uid: " + this.uid)
+            return
+        }
+
+        return r.data().email
+    }
+
+    async notify(subject, text, url, fromGroupId) {
+        await addDoc(collection(db, "notifs"), {
+            bccUids: [this.uid],
+            groupId: fromGroupId,
+            url: url,
+            message: {
+                subject: `${subject}`,
+                text: text,
+                html: `<p>${text}<p/><br><a href="${url}" style="border-radius: 15px; font-family: sans-serif; text-decoration: none; color: white; background-color: #a353b9; padding: 10px;">View on Lokal</a>`
+            }
+        })
+    }
+
+    async getNotifs() {
+        return await getDocs(query(collection(db, "notifs"), where("bccUids", "array-contains", this.uid)))
+    }
+    async getNotif(id) {
+        let r = await getDoc(doc(db, "notifs", id))
+
+        if (!r.exists()) {
+            console.error("Could not load notif from uid: " + id)
+            return
+        }
+
+        return r.data()
+    }
+
+    async removeNotif(id) {
+        const notif = await this.getNotif(id)
+
+        const i = notif.bccUids.indexOf(this.uid)
+
+        notif.bccUids.splice(i, 1)
+
+        await setDoc(doc(db, "notifs", id), {
+            bccUids: notif.bccUids
+        }, { merge: true })
+
+        $("#" + id).remove()
+    }
+
+    async notifyAllMembers(subject, text, url) {
+        const members = await this.getMembers()
+
+        console.log(members)
+
+        const uids = []
+
+        members.forEach(async (m) => {
+            const member = new User(m.id)
+            const pub = await member.getData("public")
+
+            if (pub.notifs) {
+                uids.push(m.id)
+            }
+        })
+        // batch send
+
+        await addDoc(collection(db, "notifs"), {
+            bccUids: uids,
+            groupId: this.uid,
+            url: url,
+            message: {
+                subject: `@${await this.getUsername()} ${subject}`,
+                text: text,
+                html: `<p>${text}<p/><br><a href="${url}" style="border-radius: 15px; font-family: sans-serif; text-decoration: none; color: white; background-color: #a353b9; padding: 10px;">View on Lokal</a>`
+            }
+        })
+    }
+
+    async notifyMember(memberId, subject, text, url) {
+        await addDoc(collection(db, "notifs"), {
+            bccUids: [memberId],
+            groupId: this.uid,
+            url: url,
+            message: {
+                subject: `@${await this.getUsername()} ${subject}`,
+                text: text,
+                html: `<p>${text}<p/><br><a href="${url}" style="border-radius: 15px; font-family: sans-serif; text-decoration: none; color: white; background-color: #a353b9; padding: 10px;">View on Lokal</a>`
+            }
+        })
     }
 
     static async getUID(username) {
@@ -1012,7 +1111,7 @@ export class Utils {
     }
 
     static getVersion() {
-        return "Lokal v9"
+        return "Lokal v10"
     }
 
     static getBase64(file) {
@@ -1197,7 +1296,7 @@ export class Calendar {
             weeks.append($("<h4/>").addClass("week").text(w))
         });
 
-        calandar.append(weeks)
+        // calandar.append(weeks)
 
         const days = $("<div/>")
             .addClass("days grid")
@@ -1208,7 +1307,7 @@ export class Calendar {
 
         function offset(num) {
             for (let i = 0; i < num; i++) {
-                days.append($("<div/>"))
+                days.append($("<div/>").addClass("day").append($("<span/>").text("test")))
             }
         }
 
@@ -1221,18 +1320,18 @@ export class Calendar {
             const monthsDays = s.data[s.currentYear][s.currentMonth]
 
             Object.keys(monthsDays).forEach((d) => {
-                if (d == 1) {
-                    const off = new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay()
-                    offset(new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay())
+                // if (d == 1) {
+                //     const off = new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay()
+                //     offset(new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay())
 
-                    if (off > 4) {
-                        days.css("grid-template-rows", "repeat(6, 75px)")
-                    }
-                    else {
-                        days.css("grid-template-rows", "repeat(5, 75px)")
+                //     if (off > 4) {
+                //         days.css("grid-template-rows", "repeat(6, 75px)")
+                //     }
+                //     else {
+                //         days.css("grid-template-rows", "repeat(5, 75px)")
 
-                    }
-                }
+                //     }
+                // }
                 const dayData = monthsDays[d]
 
                 const day = $("<div/>")

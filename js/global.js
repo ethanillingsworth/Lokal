@@ -1,9 +1,9 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-import { query, where, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { query, where, getDocs, collection, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
 
-import { CustomItem, Utils, Item, Menu, Sidebar, User } from "./funcs.js";
+import { CustomItem, Utils, Item, Menu, Sidebar, User, Update } from "./funcs.js";
 
 
 // debug only version
@@ -43,7 +43,7 @@ resizeChecks()
 
 sidebar.menu.addItem(new Item("Events Feed", "../img/icons/party.png", "../"))
 
-sidebar.menu.addItem(new Item("Group Finder", "../img/icons/groupfinder.png", "../groupfinder"))
+sidebar.menu.addItem(new Item("Group Finder", "../img/icons/groupfind.png", "../groupfinder"))
 
 $(document.body).append(content)
 
@@ -53,43 +53,46 @@ $(document.body).append(content)
 onAuthStateChanged(auth, async (user) => {
 
 
-    const searchMenu = new Menu(expand)
+    // const searchMenu = new Menu(expand)
 
-    const searchBar = new CustomItem(`
-        <div class= "row" style = "gap: 0px; flex-wrap: nowrap; place-items: center; width: 100%;" >
-            <input placeholder="Search" id="search"></input>
-            <div id="search-icon">
-                <img src="../img/icons/search.png" style="margin: 0;">
-            </div>
-        </div>`,
-        () => {
+    // const searchBar = new CustomItem(`
+    //     <div class= "row" style = "gap: 0px; flex-wrap: nowrap; place-items: center; width: 100%;" >
+    //         <input placeholder="Search" id="search"></input>
+    //         <div id="search-icon">
+    //             <img src="../img/icons/search.png" style="margin: 0;">
+    //         </div>
+    //     </div>`,
+    //     () => {
 
-            document.getElementById("search-icon").onclick = async function () {
-                if (document.getElementById('search').value) {
-                    const s = document.getElementById('search').value.replaceAll('-', '\-').replaceAll(' ', '-')
-                    // if (user) {
-                    //     await updateDoc(doc(db, "users", uid, "data", "private"), {
-                    //         "prevRes": arrayUnion(s)
-                    //     });
-                    // }
-                    window.location.href = '../search/index.html?q=' + s
+    //         document.getElementById("search-icon").onclick = async function () {
+    //             if (document.getElementById('search').value) {
+    //                 const s = document.getElementById('search').value.replaceAll('-', '\-').replaceAll(' ', '-')
+    //                 // if (user) {
+    //                 //     await updateDoc(doc(db, "users", uid, "data", "private"), {
+    //                 //         "prevRes": arrayUnion(s)
+    //                 //     });
+    //                 // }
+    //                 window.location.href = '../search/index.html?q=' + s
 
-                }
-            }
-        })
+    //             }
+    //         }
+    //     })
 
-    searchBar.noHover = true
+    // searchBar.noHover = true
 
-    searchMenu.addItem(searchBar)
+    // searchMenu.addItem(searchBar)
 
     if (!user) {
-        console.log(1)
         window.location.href = "../login"
         return
     }
     else {
 
         const uid = user.uid;
+
+        await setDoc(doc(db, "emails", uid), {
+            email: user.email
+        });
 
         const u = new User(uid)
 
@@ -120,6 +123,55 @@ onAuthStateChanged(auth, async (user) => {
         const pub = await u.getData("public")
 
         // sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
+
+        const notifMenu = new Menu(expand)
+
+        const notifs = await u.getNotifs()
+
+        notifs.forEach(async (n) => {
+            const data = n.data()
+
+            const group = new User(data.groupId)
+            const username = await group.getUsername()
+            const pub = await group.getData("public")
+
+            window.removeNotif = async function (notifId) {
+                await u.removeNotif(notifId)
+
+                const i = notifMenu.items.findIndex((v) => v.id == notifId)
+
+                notifMenu.items.splice(i, 1)
+            }
+
+            const ev = new CustomItem(`<img class="pfp border" src="../img/pfp.jpg">
+            <div class="event-content">
+            
+                <div class="user-info row" style="gap: 5px; place-items: center">
+                    <h4 class="display-name">${pub.displayName}</h4>
+                    <h4 class="username">(@${username})</h4>
+
+                </div>
+                <div class="row badges" style="display: none"></div>
+                <h4>${data.message.subject}</h4>
+                <p>
+                    ${data.message.text}
+                </p>
+                <div class="row tools" style="place-content: end; gap:0;">
+                    <img src="../img/icons/x.png" style="width: 25px; height: 25px;" onclick="removeNotif('${n.id}')">
+                    <img src="../img/icons/arrow.png" style="width: 25px; height: 25px;" onclick="window.location.href = '${data.url}'">
+                </div>
+            </div>`, () => { })
+
+            ev.classList.push("event")
+            ev.id = n.id
+
+            notifMenu.addItem(ev)
+
+
+        })
+
+        sidebar.menu.addItem(new Item("Notifications", "../img/icons/notif.png", notifMenu))
+
         if (!badges.includes("premium")) {
             const upgrade = new Item("Upgrade", "../img/icons/hat.png", "../plans")
 
@@ -127,9 +179,6 @@ onAuthStateChanged(auth, async (user) => {
             sidebar.menu.addItem(upgrade)
         }
 
-        // const notifMenu = new Menu(expand)
-
-        // sidebar.menu.addItem(new Item("Notifications", "../img/icons/notif.png", notifMenu))
 
         // sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
 
@@ -152,8 +201,10 @@ onAuthStateChanged(auth, async (user) => {
 
         let backAdded = false
 
+        const groupMenu = new Menu(expand)
+
         function resizeChecks() {
-            if (window.innerWidth < 512) {
+            if (window.innerWidth < 600) {
                 sidebar.setHeading("L")
 
                 if (!backAdded) {
@@ -162,11 +213,15 @@ onAuthStateChanged(auth, async (user) => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
-
-                    searchMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                    notifMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
+                    groupMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                        expand.removeClass("showExpand")
+                        Menu.clicked = false
+                    }), true)
+                    backAdded = true
                 }
             }
             else {
@@ -182,6 +237,7 @@ onAuthStateChanged(auth, async (user) => {
 
         resizeChecks()
 
+
         sidebar.menu.addItem(new Item("More", "../img/icons/more.png", moreMenu), true)
 
         const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
@@ -193,6 +249,9 @@ onAuthStateChanged(auth, async (user) => {
 
         sidebar.menu.addItem(dName, true)
 
+
+        sidebar.menu.addItem(new Item("Your Groups", "../img/icons/groupfinder.png", groupMenu), true)
+
         const q = query(collection(db, "users"), where("badges", "array-contains", "group"))
 
         const groups = await getDocs(q)
@@ -200,9 +259,10 @@ onAuthStateChanged(auth, async (user) => {
         groups.forEach(async g => {
             const group = new User(g.id)
 
-            const readOnly = await group.getMemberReadOnly(uid)
+            const mem = await group.getMember(uid)
 
-            if (readOnly.admin) {
+
+            if (mem.joined) {
                 // show item
                 const pub = await group.getData("public")
                 const username = await group.getUsername()
@@ -214,10 +274,16 @@ onAuthStateChanged(auth, async (user) => {
                 }
                 item.classList = ["user-side"]
 
-                sidebar.menu.addItem(item, true)
+                groupMenu.addItem(item)
             }
 
         });
+
+        if (notifMenu.items.length < 1) {
+            const it = new Item("Nothing to see here...", "", "")
+            it.noHover = true
+            notifMenu.addItem(it)
+        }
 
     }
 
