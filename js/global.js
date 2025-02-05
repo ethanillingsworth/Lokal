@@ -170,12 +170,6 @@ onAuthStateChanged(auth, async (user) => {
 
         })
 
-        if (notifMenu.items.length < 1) {
-            const it = new Item("Nothing to see here...", "", "")
-            it.noHover = true
-            notifMenu.addItem(it)
-        }
-
         sidebar.menu.addItem(new Item("Notifications", "../img/icons/notif.png", notifMenu))
 
         if (!badges.includes("premium")) {
@@ -284,6 +278,12 @@ onAuthStateChanged(auth, async (user) => {
             }
 
         });
+
+        if (notifMenu.items.length < 1) {
+            const it = new Item("Nothing to see here...", "", "")
+            it.noHover = true
+            notifMenu.addItem(it)
+        }
 
     }
 

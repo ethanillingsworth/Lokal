@@ -955,7 +955,12 @@ export class User {
         const uids = []
 
         members.forEach(async (m) => {
-            uids.push(m.id)
+            const member = new User(m.id)
+            const pub = await member.getData("public")
+
+            if (pub.notifs) {
+                uids.push(m.id)
+            }
         })
         // batch send
 

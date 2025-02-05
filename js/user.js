@@ -296,7 +296,9 @@ async function requests(user) {
             .on("click", async function () {
                 await user.updateMember(person.id, { pending: false, joined: true });
                 await user.updateMemberReadOnly(person.id, { accepted: true })
-                await user.notifyMember(personClass.uid, "has accepted you into their group!", "View their page on Lokal below", `https://lokalevents.com/user/index.html?u=${await user.getUsername()}`)
+                if (pub.notifs) {
+                    await user.notifyMember(personClass.uid, "has accepted you into their group!", "View their page on Lokal below", `https://lokalevents.com/user/index.html?u=${await user.getUsername()}`)
+                }
                 actions.parent().remove();
             });
 
@@ -344,6 +346,8 @@ function updateProfile(data) {
 const uid = await User.getUID(pageUser)
 const user = new User(uid)
 
+const pub = await user.getData("public")
+
 let bds = await user.getBadges()
 
 console.log(bds)
@@ -362,6 +366,8 @@ onAuthStateChanged(auth, async (u) => {
     }
 
     const currentUser = new User(u.uid)
+
+
 
     let bdsU = await currentUser.getBadges()
 
@@ -387,6 +393,23 @@ onAuthStateChanged(auth, async (u) => {
         moreMenu.add("Edit Profile", () => {
             window.location.href = "../edit/index.html?u=" + urlParams.get("u")
         })
+
+        if (pub.notifs) {
+            moreMenu.add("Turn Off Notifications", async () => {
+                await user.updateData({ notifs: false }, "public")
+                alert("We've updated your notification preferences")
+                location.reload()
+            })
+        }
+        else {
+            moreMenu.add("Turn On Notifications", async () => {
+                await user.updateData({ notifs: true }, "public")
+                alert("We've updated your notification preferences")
+                location.reload()
+            })
+        }
+
+
 
         tools.append(moreMenu.more)
     }

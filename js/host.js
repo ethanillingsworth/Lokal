@@ -118,6 +118,8 @@ function addPage(name, prev = null, next = null, current = false) {
 
                         await Update.create(data)
 
+
+
                         await user.notifyAllMembers(`posted a new update -- ${data.title}`, data.desc, "https://lokalevents.com/user/index.html?u=" + await user.getUsername())
 
 

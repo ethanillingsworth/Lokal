@@ -66,7 +66,8 @@ async function setUserData(user, email, username) {
     await setDoc(doc(db, "users", user.uid, "data", "public"), {
         displayName: username,
         desc: "Set a description",
-        timestamp: Timestamp.now()
+        timestamp: Timestamp.now(),
+        notifs: $('#notifs').is(':checked')
     })
 
     await setDoc(doc(db, "users", user.uid, "data", "private"), {

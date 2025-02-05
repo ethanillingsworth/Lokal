@@ -49,9 +49,11 @@ input {
     cursor: pointer;
 }
 
-@media (max-width: 600px) {
+#inputs {
+    width: 100%;
+}
 
-    #inputs {
-        width: 100%;
-    }
+input[type=checkbox] {
+    height: 25px;
+    width: 25px;
 }
