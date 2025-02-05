@@ -273,6 +273,7 @@ h6 {
     position: absolute;
     left: calc((100vw / 5) + 10px);
     z-index: 1000;
+    border-right: 4px solid var(--accent2)
 }
 
 #expand .event {
@@ -290,7 +291,7 @@ h6 {
 .showExpand {
     min-width: 20vw !important;
     padding: 5px !important;
-    height: calc(100% - 10px) !important
+    height: calc(100% - 10px) !important;
 }
 
 #sidebar {
