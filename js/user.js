@@ -259,9 +259,10 @@ async function groups(user) {
 
         const pub = await group.getData("public")
         const meta = await group.getData("hidden")
+        const mem = await group.getMember(user.uid)
 
 
-        if (Object.keys(await group.getMember(user.uid)).length != 0) {
+        if (mem.joined) {
             await User.display(username, pub, meta, tab)
         }
     })

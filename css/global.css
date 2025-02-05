@@ -273,7 +273,8 @@ h6 {
     position: absolute;
     left: calc((100vw / 5) + 10px);
     z-index: 1000;
-    border-right: 4px solid var(--accent2)
+    border-right: 4px solid var(--accent2);
+    height: calc(100%) !important;
 }
 
 #expand .event {
@@ -291,7 +292,7 @@ h6 {
 .showExpand {
     min-width: 20vw !important;
     padding: 5px !important;
-    height: calc(100% - 10px) !important;
+    height: calc(100%) !important;
 }
 
 #sidebar {
@@ -848,19 +849,25 @@ input:disabled {
 }
 
 
+.upgrade:hover::before {
+    background-image: linear-gradient(120deg,
+            rgba(255, 255, 255, 0) 30%,
+            rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 0) 70%);
+}
 
 .upgrade:before {
     content: '';
     position: absolute;
-    width: 150px;
+    width: 50%;
     height: 100%;
     background-image: linear-gradient(120deg,
             rgba(255, 255, 255, 0) 30%,
-            rgba(255, 255, 255, .8),
+            var(--accent),
             rgba(255, 255, 255, 0) 70%);
     top: 0;
     opacity: 0.75;
-    left: calc(100% - 150px);
+    left: calc(50%);
 
     /* Animation */
 }
@@ -1066,10 +1073,6 @@ input:disabled {
         padding: 5px;
     }
 
-    .showExpand {
-        min-width: 25vw !important;
-    }
-
     .tab {
         font-size: 0.75em;
     }
@@ -1083,6 +1086,9 @@ input:disabled {
 
     .showExpand {
         min-width: calc(100vw - 10px) !important;
+    }
+
+    #expand {
         border: none !important;
     }
 
