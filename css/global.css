@@ -256,13 +256,17 @@ h6 {
     background-color: var(--dark0);
 }
 
+.hide-item {
+    display: none !important;
+}
+
 #expand {
-    overflow: hidden;
+    overflow-y: auto;
     width: 0;
     min-width: 0;
     padding: 0;
     transition: all 0.25s ease-in-out;
-    place-content: end;
+    place-content: start;
     /*position: absolute;
     left: calc(20% + 14px); */
     background-color: var(--dark0);
