@@ -128,8 +128,14 @@ onAuthStateChanged(auth, async (user) => {
 
         const notifs = await u.getNotifs()
 
+        const it = new Item("Nothing to see here...", "", "")
+        it.noHover = true
+        notifMenu.addItem(it)
+
         notifs.forEach(async (n) => {
             const data = n.data()
+
+            it.classList.push("hide-item")
 
             const group = new User(data.groupId)
             const username = await group.getUsername()
@@ -278,12 +284,6 @@ onAuthStateChanged(auth, async (user) => {
             }
 
         });
-
-        if (notifMenu.items.length < 1) {
-            const it = new Item("Nothing to see here...", "", "")
-            it.noHover = true
-            notifMenu.addItem(it)
-        }
 
     }
 
