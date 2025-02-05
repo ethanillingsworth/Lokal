@@ -6,6 +6,44 @@ import { auth, db, analytics } from "./firebase.js";
 
 import "./jquery.js"
 
+export const graphColors = [
+    "#FF6B6B",  // Bright Coral Red
+    "#1E90FF",  // Vivid Blue
+    "#FFD166",  // Warm Gold
+    "#06D6A0",  // Neon Green
+    "#9B5DE5",  // Electric Purple
+    "#F4A261",  // Sunset Orange
+    "#4ECDC4",  // Cyan
+    "#FF4D6D",  // Hot Pink
+    "#8338EC",  // Deep Violet
+    "#48CAE4",  // Light Neon Blue
+    "#00C49A",  // Emerald Green
+    "#FF007F",  // Neon Pink
+    "#8A2BE2",  // Blue Violet
+    "#FF4500",  // Bright Orange Red
+    "#3D5AFE",  // Bright Indigo
+    "#E63946",  // Warm Crimson
+    "#26A69A",  // Deep Teal
+    "#F72585",  // Magenta
+    "#B5179E",  // Dark Pink
+    "#4361EE",  // Electric Blue
+    "#3A0CA3",  // Deep Indigo
+    "#FB8B24",  // Vibrant Orange
+    "#43AA8B",  // Rich Teal Green
+    "#EF233C",  // Bright Red
+    "#2A9D8F",  // Muted Teal
+    "#E76F51",  // Soft Brick Red
+    "#D00000",  // Intense Red
+    "#6A0572",  // Deep Purple
+    "#00A6FB",  // Sky Blue
+    "#9F86C0",  // Lavender Purple
+    "#A7C957",  // Fresh Lime Green
+    "#833471",  // Dark Magenta
+    "#118AB2",  // Cool Ocean Blue
+    "#E63946"   // Bright Crimson
+];
+
+
 export class Alert {
 
     constructor(text) {
@@ -499,7 +537,7 @@ export class Event {
                             <span><b>${cost}</b></span>
                         </div>
                         <p>
-                            ${event.desc}
+                            ${event.desc.replaceAll("\n", "<br>")}
                         </p>     
                     </div>
                     <img class="event-image" src="../img/sample.jpg">

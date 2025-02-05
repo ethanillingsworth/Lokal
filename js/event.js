@@ -1,7 +1,7 @@
 import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where, deleteField } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
-import { Dropdown, Event, MoreMenu, Prompt, User } from "./funcs.js";
+import { Dropdown, Event, graphColors, MoreMenu, Prompt, User } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search)
 
@@ -125,7 +125,7 @@ addPage("Public View", async (page) => {
     page.append(date);
     page.append(location);
 
-    const desc = $("<p></p>").html(`<b>Summary:</b> ${data.desc}`);
+    const desc = $("<p></p>").html(`<b>Summary:</b> ${data.desc.replaceAll("\n", "<br>")}`);
     page.append(desc);
 
     page.append($("<hr></hr>"));
@@ -374,35 +374,6 @@ addPage("Public View", async (page) => {
     page.append(agenda);
 }, true);
 
-if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin")) {
-
-    const more = new MoreMenu()
-
-    more.add("Share", function () {
-        linkAlert.show();
-    })
-    more.add("Edit", function () {
-        window.location.href = "../host/index.html?e=" + urlParams.get("e");
-    })
-
-    more.add("Delete", async function () {
-        if (confirm("Are you sure? Deleting an event cannot be undone!")) {
-
-            const q = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData")));
-
-            q.forEach(async (d) => {
-                await deleteDoc(doc(db, "posts", urlParams.get("e"), "uData", d.id));
-            });
-
-            await deleteDoc(doc(db, "posts", urlParams.get("e")));
-
-            window.location.href = "../";
-        }
-    })
-
-    tools.append(more.more);
-
-}
 
 addPage("RSVPs", async (page) => {
     const col = $("<div></div>").addClass("col");
@@ -422,7 +393,6 @@ addPage("RSVPs", async (page) => {
         const display = await User.display(username, pub, meta, col)
 
         const actions = display.find(".actions")
-        console.log(actions)
 
         function addAction(src, func) {
             actions.prepend($("<img/>")
@@ -495,6 +465,103 @@ addPage("RSVPs", async (page) => {
     page.append(userStats)
 
 });
+
+if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin")) {
+
+    const more = new MoreMenu()
+
+    more.add("Share", function () {
+        linkAlert.show();
+    })
+    more.add("Edit", function () {
+        window.location.href = "../host/index.html?e=" + urlParams.get("e");
+    })
+
+    more.add("Delete", async function () {
+        if (confirm("Are you sure? Deleting an event cannot be undone!")) {
+
+            const q = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData")));
+
+            q.forEach(async (d) => {
+                await deleteDoc(doc(db, "posts", urlParams.get("e"), "uData", d.id));
+            });
+
+            await deleteDoc(doc(db, "posts", urlParams.get("e")));
+
+            window.location.href = "../";
+        }
+    })
+
+    tools.append(more.more);
+
+    addPage("Stats", async (page) => {
+        const col = $("<div></div>").addClass("col");
+
+        const uData = await e.getUData()
+
+        data.actions.forEach(async (a) => {
+            const key = a.label
+
+            const canvas = document.createElement("canvas")
+
+
+            const dat = {
+                labels: [
+                ],
+                datasets: [{
+                    label: 'My First Dataset',
+                    data: [],
+                    backgroundColor: [],
+                    hoverOffset: 4
+                }]
+            };
+
+            const config = {
+                type: 'pie',
+                data: dat,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: a.label,
+                            font: {
+                                size: 32,
+                                weight: 'bold',
+                            }
+                        }
+                    }
+                }
+            };
+
+            dat.datasets[0].label = key
+            const optionsIndex = {}
+
+            a.options.forEach((v, index) => {
+                dat.labels.push(v)
+                dat.datasets[0].backgroundColor.push(graphColors[index])
+                dat.datasets[0].data.push(0)
+                optionsIndex[v] = index
+            })
+
+
+            uData.forEach((d) => {
+                const da = d.data()
+
+                dat.datasets[0].data[optionsIndex[da[key]]] += 1;
+            })
+
+            new Chart(canvas, config)
+
+            col.append(canvas)
+        })
+
+
+        page.append(col)
+    })
+
+}
+
+
 
 function addPage(label, func, current) {
     const tab = $("<button></button>")
