@@ -184,7 +184,7 @@ export class Menu {
 
             if (item.bottom) e = bottom
 
-            const i = $("<div/>").addClass("item")
+            const i = $("<div/>").addClass("item").attr("tabindex", 0)
 
             if (item.noHover) i.addClass("no-hov")
 
