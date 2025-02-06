@@ -837,6 +837,9 @@ export class User {
             .css("place-items", "start")
 
 
+        const r = $("<div/>").addClass("row").css("width", "100%").css("place-content", "start").css("place-items", "start")
+
+
         const pfp = $("<img/>")
             .addClass("pfp")
             .addClass("border")
@@ -902,8 +905,10 @@ export class User {
         userDetails.append(badges)
         userDetails.append(desc)
 
-        user.append(pfp)
-        user.append(userDetails)
+        r.append(pfp)
+        r.append(userDetails)
+
+        user.append(r)
 
         const actions = $("<div/>")
             .addClass("actions")

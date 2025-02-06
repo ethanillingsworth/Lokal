@@ -274,7 +274,7 @@ h6 {
     left: calc((100vw / 5) + 10px);
     z-index: 1000;
     border-right: 4px solid var(--accent2);
-    height: calc(100%) !important;
+    height: calc(100% - 8px) !important;
 }
 
 #expand .event {
