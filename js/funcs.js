@@ -1153,6 +1153,10 @@ export class Utils {
         });
     }
 
+    static async sleep(ms) {
+        await new Promise(r => setTimeout(r, ms));
+    }
+
     static getVersion() {
         return "Lokal v10"
     }
