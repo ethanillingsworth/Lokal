@@ -87,6 +87,17 @@ addField("Display Name:", (row) => {
     row.append(inp)
 })
 
+const bdgs = await pageUser.getBadges()
+
+if (bdgs.includes("group")) {
+
+    addField("Contact Email:", (row) => {
+        const inp = $("<input></input>").attr("id", "email").attr("placeholder", "support@lokalevents.com")
+
+        row.append(inp)
+    })
+}
+
 addField("Description:", (row) => {
     row.css("placeItems", "start")
     row.css("flexDirection", "column")
@@ -203,6 +214,7 @@ addButton("Done", async () => {
     const usernameVal = $("#username").val()
     const displayNameVal = $("#displayName").val()
     const descVal = $("#desc").val()
+
     const pfpVal = $("#pfp").attr("src")
 
     const data = {
@@ -214,11 +226,29 @@ addButton("Done", async () => {
 
     }
 
+    data["contactEmail"] = $("#email").val()
+
+    if (!data["contactEmail"]) {
+        data["contactEmail"] = null
+    }
+
+    if (bdgs.includes("group")) {
+        if (data["contactEmail"] == null) {
+            alert("As a group you are required to have a contact email!")
+            return
+        }
+        if (Validation.email(data["contactEmail"]) != true) {
+            alert(Validation.email(data["contactEmail"]))
+            return
+        }
+    }
+
 
     if (Validation.username(usernameVal) != true) {
         alert(Validation.username(usernameVal))
         return
     }
+
 
     if (usernameVal != oldUsername && await Validation.finalUsername(usernameVal) != true) {
         alert(await Validation.finalUsername(usernameVal))
