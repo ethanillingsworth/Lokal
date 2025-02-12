@@ -837,6 +837,9 @@ export class User {
             .css("place-items", "start")
 
 
+        const r = $("<div/>").addClass("row").css("width", "100%").css("place-content", "start").css("place-items", "start")
+
+
         const pfp = $("<img/>")
             .addClass("pfp")
             .addClass("border")
@@ -902,8 +905,10 @@ export class User {
         userDetails.append(badges)
         userDetails.append(desc)
 
-        user.append(pfp)
-        user.append(userDetails)
+        r.append(pfp)
+        r.append(userDetails)
+
+        user.append(r)
 
         const actions = $("<div/>")
             .addClass("actions")
@@ -1146,6 +1151,10 @@ export class Utils {
         return str.replace(/\w\S*/g, function (txt) {
             return txt.charAt(0).toUpperCase() + txt.substr(1);
         });
+    }
+
+    static async sleep(ms) {
+        await new Promise(r => setTimeout(r, ms));
     }
 
     static getVersion() {
