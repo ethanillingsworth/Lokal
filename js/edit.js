@@ -86,16 +86,17 @@ addField("Display Name:", (row) => {
 
     row.append(inp)
 })
+if (pageUser) {
+    const bdgs = await pageUser.getBadges()
 
-const bdgs = await pageUser.getBadges()
+    if (bdgs.includes("group")) {
 
-if (bdgs.includes("group")) {
+        addField("Contact Email:", (row) => {
+            const inp = $("<input></input>").attr("id", "email").attr("placeholder", "support@lokalevents.com")
 
-    addField("Contact Email:", (row) => {
-        const inp = $("<input></input>").attr("id", "email").attr("placeholder", "support@lokalevents.com")
-
-        row.append(inp)
-    })
+            row.append(inp)
+        })
+    }
 }
 
 addField("Description:", (row) => {

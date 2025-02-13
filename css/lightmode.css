@@ -1,0 +1,29 @@
+body.lightmode .item:not(.user-side) .icon,
+body.lightmode .tools img,
+body.lightmode .action img,
+body.lightmode img.tool,
+body.lightmode img.action,
+#open,
+#searchButton {
+    filter: brightness(0%);
+}
+
+body.lightmode .item:not(.user-side) .icon:hover,
+body.lightmode .tools img:hover,
+body.lightmode .action:hover,
+body.lightmode img.tool:hover {
+    background-color: transparent !important;
+}
+
+body.lightmode {
+    --dark0: #d4d4d4;
+    --dark1: #bababa;
+    --dark2: #9d9d9d;
+    --accent: #7c2a95;
+    --accent2: #a353b9;
+}
+
+body.lightmode * {
+    color: black;
+    color-scheme: light;
+}
