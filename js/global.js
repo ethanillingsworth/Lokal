@@ -5,6 +5,9 @@ import { auth, db } from "./firebase.js";
 
 import { CustomItem, Utils, Item, Menu, Sidebar, User, Update } from "./funcs.js";
 
+if (localStorage.getItem("mode") == "light") {
+    $(document.body).addClass("lightmode")
+}
 
 // debug only version
 // const ver = document.createElement("span")
@@ -190,7 +193,6 @@ onAuthStateChanged(auth, async (user) => {
 
         const moreMenu = new Menu(expand)
 
-
         moreMenu.addItem(new Item("Log Out", "../img/icons/logout.png", () => {
             signOut(auth).then(() => {
                 // Sign-out successful.
@@ -199,6 +201,17 @@ onAuthStateChanged(auth, async (user) => {
             }).catch((error) => {
                 // An error happened.
             });
+        }), true)
+
+        moreMenu.addItem(new Item("Change Mode", "../img/icons/switchmode.png", () => {
+            if (localStorage.getItem("mode") != "light") {
+                $(document.body).addClass("lightmode")
+                localStorage.setItem("mode", "light")
+            }
+            else {
+                $(document.body).removeClass("lightmode")
+                localStorage.setItem("mode", "dark")
+            }
         }), true)
 
         if (badges.includes("premium") || badges.includes("admin")) {
