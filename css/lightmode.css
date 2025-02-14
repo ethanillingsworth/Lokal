@@ -3,8 +3,8 @@ body.lightmode .tools img,
 body.lightmode .action img,
 body.lightmode img.tool,
 body.lightmode img.action,
-#open,
-#searchButton {
+body.lightmode #open,
+body.lightmode #searchButton {
     filter: brightness(0%);
 }
 
