@@ -86,8 +86,9 @@ addField("Display Name:", (row) => {
 
     row.append(inp)
 })
+let bdgs = undefined
 if (pageUser) {
-    const bdgs = await pageUser.getBadges()
+    bdgs = await pageUser.getBadges()
 
     if (bdgs.includes("group")) {
 
