@@ -44,10 +44,10 @@
 }
 
 .key {
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(5, 1fr);
+    grid-template-columns: repeat(5, 1fr) !important;
+    grid-template-rows: repeat(5, 1fr) !important;
     place-items: center;
-    gap: 10px;
+    gap: 10px !important;
 }
 
 .key span {
@@ -70,6 +70,7 @@
     border-radius: 15px;
     height: auto;
     width: auto;
+    margin: 5px;
 }
 
 .calandar .day .banner {
