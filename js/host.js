@@ -1,6 +1,8 @@
-import { Utils, Event, User, Update } from "./funcs.js"
+import { Utils, Event, User, Update, CSS } from "./funcs.js"
 import { auth } from "./firebase.js"
 import { Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+CSS.loadFiles(["../css/host.css"])
 
 
 const urlParams = new URLSearchParams(window.location.search);

@@ -44,111 +44,15 @@ export const graphColors = [
 ];
 
 
-export class Alert {
+export class CSS {
+    static loadFile(url) {
+        $('head').append(`<link rel="stylesheet" type="text/css" href="${url}">`);
+    }
 
-    constructor(text) {
-        this.element = document.createElement("div")
-        this.element.classList.add("alert")
-
-        this.background = document.createElement("div")
-        this.background.id = "bg"
-
-        this.element.append(this.background)
-
-        this.modal = document.createElement("div")
-        this.modal.classList.add("modal")
-        this.element.append(this.modal)
-        this.modal.style.gap = "20px"
-
-        this.textElement = document.createElement("p")
-        this.textElement.innerText = text
-        this.textElement.classList.add("alert-text")
-
-        this.modal.append(this.textElement)
-
-        this.buttons = document.createElement("div")
-        this.buttons.classList.add("row")
-        this.buttons.style.width = "100%"
-
-        this.modal.append(this.buttons)
-
-        this.addButton("Okay", () => {
-            this.hide()
+    static loadFiles(urls) {
+        urls.forEach((url) => {
+            CSS.loadFile(url);
         })
-    }
-
-    addButton(label, func) {
-        const button = document.createElement("button")
-        button.innerText = label
-        button.onclick = () => {
-            func()
-        }
-
-        this.buttons.append(button)
-    }
-
-    show() {
-        document.body.append(this.element)
-
-    }
-
-    hide() {
-        this.element.remove()
-    }
-}
-
-export class Prompt extends Alert {
-    constructor(text) {
-        super(text)
-
-        this.buttons.remove()
-
-        this.buttons = document.createElement("div")
-        this.buttons.classList.add("row")
-        this.buttons.style.width = "100%"
-
-        this.fields = document.createElement("div")
-        this.fields.classList.add("col")
-        this.fields.style.width = "100%"
-
-        this.modal.append(this.fields)
-
-        this.addButton("Cancel", () => {
-            this.hide()
-        })
-
-        this.doneFunction = () => { }
-
-        this.addButton("Done", () => {
-            this.doneFunction()
-            this.hide()
-        })
-
-        this.modal.append(this.buttons)
-    }
-
-    addField(label, after) {
-
-        const row = document.createElement("div")
-        row.classList.add("row")
-        row.style.placeContent = "start"
-        row.style.flexWrap = "nowrap"
-
-
-        const lab = document.createElement("h3")
-        lab.innerText = label
-        lab.style.textWrap = "nowrap"
-
-        row.append(lab)
-
-        after(row)
-
-        this.fields.append(row)
-
-    }
-
-    setDoneFunction(func) {
-        this.doneFunction = func
     }
 }
 
@@ -1343,7 +1247,7 @@ export class Calendar {
             weeks.append($("<h4/>").addClass("week").text(w))
         });
 
-        // calandar.append(weeks)
+        calandar.append(weeks)
 
         const days = $("<div/>")
             .addClass("days grid")
@@ -1367,18 +1271,11 @@ export class Calendar {
             const monthsDays = s.data[s.currentYear][s.currentMonth]
 
             Object.keys(monthsDays).forEach((d) => {
-                // if (d == 1) {
-                //     const off = new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay()
-                //     offset(new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay())
+                if (d == 1) {
+                    const off = new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay()
+                    offset(off)
 
-                //     if (off > 4) {
-                //         days.css("grid-template-rows", "repeat(6, 75px)")
-                //     }
-                //     else {
-                //         days.css("grid-template-rows", "repeat(5, 75px)")
-
-                //     }
-                // }
+                }
                 const dayData = monthsDays[d]
 
                 const day = $("<div/>")

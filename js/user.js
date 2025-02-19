@@ -3,8 +3,11 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/f
 
 import { db, auth } from "./firebase.js";
 import {
-    User, Badge, Event, MoreMenu, Update, Calendar
+    User, Badge, Event, MoreMenu, Update, Calendar, CSS
 } from "./funcs.js";
+
+CSS.loadFiles(["../css/user.css"])
+
 
 import "./jquery.js";
 
@@ -515,12 +518,12 @@ async function feed(uid) {
 if (bds.includes("group")) {
     createTab("Feed", true)
     // createTab("Events")
-    createTab("Calendar")
+    // createTab("Calendar")
     createTab("Members")
 
     await feed(uid)
     // await hosting(uid)
-    await cal(user)
+    // await cal(user)
     await members(user)
 }
 else {

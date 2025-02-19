@@ -1,7 +1,10 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 import { db, auth } from "./firebase.js";
+import { CSS } from "./funcs.js";
 import "./jquery.js";
+CSS.loadFiles(["../css/edit.css"])
+
 
 
 import { User, Validation, Utils } from "./funcs.js";

@@ -1,0 +1,95 @@
+.event .row {
+    margin: 0 !important;
+    place-content: start;
+    place-items: start;
+    width: auto;
+}
+
+
+.event,
+.user {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    padding: 20px;
+    border-radius: 15px;
+    background-color: var(--dark0);
+    transition: 0.25s all ease-in-out;
+    border: 4px solid transparent;
+    animation: fadeIn 1s;
+}
+
+.event-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.user-info {
+    flex-wrap: wrap;
+}
+
+.event h3 {
+    margin: 0;
+    width: fit-content
+}
+
+.pfp {
+    height: 50px;
+    width: 50px;
+    margin-right: 15px;
+    border-radius: 100%;
+    object-fit: cover;
+}
+
+
+.event-image {
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+    margin-top: 10px;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+
+}
+
+
+.event p {
+    text-wrap: wrap;
+    word-break: normal;
+}
+
+.user-info *:not(.display-name) {
+    color: gray;
+    font-weight: normal;
+    margin: 0;
+}
+
+.display-name {
+    color: white;
+    font-weight: bold;
+    margin: 0;
+}
+
+.bullet {
+    margin: 0;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.event .event-details {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.event-details :first-child {
+    margin-left: 0;
+}
+
+.content-wrapper .event-image {
+    width: 100%;
+}

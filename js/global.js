@@ -1,9 +1,9 @@
+import { CustomItem, Utils, Item, Menu, Sidebar, User, Update, CSS } from "./funcs.js";
+
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { query, where, getDocs, collection, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
-
-import { CustomItem, Utils, Item, Menu, Sidebar, User, Update } from "./funcs.js";
 
 if (localStorage.getItem("mode") == "light") {
     $(document.body).addClass("lightmode")

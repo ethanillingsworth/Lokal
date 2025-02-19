@@ -1,9 +1,11 @@
 import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where, deleteField } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
-import { Dropdown, Event, graphColors, MoreMenu, Prompt, User } from "./funcs.js";
+import { Dropdown, Event, graphColors, MoreMenu, User, CSS } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search)
+CSS.loadFiles(["../css/event.css"])
+
 
 
 const content = $("#content")
@@ -60,28 +62,6 @@ const tabs = $("<div></div>")
     .css("top", "10px")
     .css("gap", "20px");
 
-const linkAlert = new Prompt("Select options for your link")
-
-linkAlert.addField("Auto Attend:", (row) => {
-    const select = $("<select></select>")
-        .attr("id", "select")
-        .html(`
-            <option value="true">True</option>
-            <option value="false">False</option>
-        `);
-
-    row.append(select.get(0));
-});
-
-linkAlert.setDoneFunction(async () => {
-    let href = window.location.href
-
-    if ($("#select").val() == "true") {
-        href += "&autoJoin=true"
-    }
-
-    await navigator.clipboard.writeText(href)
-})
 
 const currentUser = new User(auth.currentUser.uid)
 
@@ -470,9 +450,6 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
 
     const more = new MoreMenu()
 
-    more.add("Share", function () {
-        linkAlert.show();
-    })
     more.add("Edit", function () {
         window.location.href = "../host/index.html?e=" + urlParams.get("e");
     })
