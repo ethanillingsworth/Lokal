@@ -518,12 +518,12 @@ async function feed(uid) {
 if (bds.includes("group")) {
     createTab("Feed", true)
     // createTab("Events")
-    createTab("Calendar")
+    // createTab("Calendar")
     createTab("Members")
 
     await feed(uid)
     // await hosting(uid)
-    await cal(user)
+    // await cal(user)
     await members(user)
 }
 else {
