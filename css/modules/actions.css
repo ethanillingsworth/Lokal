@@ -39,6 +39,7 @@
 
 .actions img {
     aspect-ratio: 1 / 1;
-    width: 30px;
+    width: 40px;
+    padding: 5px;
     height: 100%;
 }

@@ -44,6 +44,7 @@ body {
     font-family: sans-serif;
     accent-color: var(--accent);
     transition: all 0.25s ease-in-out;
+    box-sizing: border-box;
 }
 
 h1 {
@@ -143,12 +144,12 @@ button {
 .modal {
     display: flex;
     flex-direction: column;
-    width: calc(100% - 40px);
+    width: calc(100% - 60px);
     transition: all 0.25s ease-in-out;
     border-radius: 15px;
     place-self: center;
     place-items: center;
-    padding: 20px;
+    padding: 30px;
     background-color: var(--dark0);
     margin-top: 20px;
     margin-bottom: 20px;
@@ -403,15 +404,34 @@ input:disabled {
     img.action,
     .tools img,
     .actions img {
-        width: 25px !important;
-        height: 25px !important;
+        width: 35px !important;
+        height: 35px !important;
+    }
+
+    element {
+        border: 3px solid transparent;
+
+    }
+
+    #attend {
+        background-color: var(--accent2);
+
+    }
+
+    .actions button {
+        padding: 2.5px;
     }
 
     .modal {
-        max-width: calc(100% - 40px) !important;
         width: 100% !important;
+
+        padding: 20px;
         border: none;
         margin: 0;
+    }
+
+    .tabList {
+        gap: 10px !important;
     }
 
     #expand {
