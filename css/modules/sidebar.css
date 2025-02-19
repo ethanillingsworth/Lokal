@@ -105,7 +105,11 @@
 #pfp,
 .user-side .icon {
     aspect-ratio: 1 / 1;
-    border-radius: 15px;
     object-fit: cover;
+    border-radius: 15px;
     background-color: var(--dark0);
+}
+
+.user-side .icon {
+    border-radius: 7.5px;
 }
