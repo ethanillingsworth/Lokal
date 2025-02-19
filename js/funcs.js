@@ -1273,15 +1273,8 @@ export class Calendar {
             Object.keys(monthsDays).forEach((d) => {
                 if (d == 1) {
                     const off = new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay()
-                    offset(new Date(`${s.currentYear}-${s.currentMonth}-${d}`).getDay())
+                    offset(off)
 
-                    if (off > 4) {
-                        days.css("grid-template-rows", "repeat(6, 75px)")
-                    }
-                    else {
-                        days.css("grid-template-rows", "repeat(5, 75px)")
-
-                    }
                 }
                 const dayData = monthsDays[d]
 
