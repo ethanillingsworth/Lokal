@@ -1,0 +1,44 @@
+.actions {
+    display: flex;
+    flex-direction: row;
+    place-content: end;
+    margin-right: 0px;
+    margin-top: 5px;
+}
+
+.actionsWrapper img {
+    width: 30px !important;
+    height: 30px !important;
+}
+
+.actions button,
+.actions select {
+    width: fit-content;
+    font-size: 1em;
+    padding: 5px;
+}
+
+.actions .row {
+    width: 100%;
+}
+
+.action {
+    font-size: 1em;
+    background-color: transparent;
+    display: flex;
+    border: 3px solid transparent;
+    flex-direction: row;
+    place-items: center;
+    place-content: center;
+    padding: 5px;
+    border-radius: 15px;
+    transition: all 0.25s ease-in-out;
+    gap: 5px;
+    width: auto;
+}
+
+.actions img {
+    aspect-ratio: 1 / 1;
+    width: 30px;
+    height: 100%;
+}

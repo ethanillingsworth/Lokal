@@ -1,0 +1,29 @@
+.page {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pageContent {
+    display: none;
+}
+
+.currentPage {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.tab {
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.tabList {
+    gap: 10px;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    overflow-x: auto;
+    place-content: start;
+}

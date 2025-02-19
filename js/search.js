@@ -1,7 +1,10 @@
 import { getDocs, limit, query, collection, where } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { db } from "./firebase.js";
-import { Event, User } from "./funcs.js"
+import { Event, User, CSS } from "./funcs.js"
+
+CSS.loadFiles(["../css/search.css"])
+
 
 const content = $("#content");
 

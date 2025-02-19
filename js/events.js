@@ -1,8 +1,10 @@
 import { getDocs, query, collection, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-import { Event, User } from "./funcs.js";
+import { Event, User, CSS } from "./funcs.js";
+CSS.loadFiles(["../css/events.css"])
 import { db, auth } from "./firebase.js";
+
 
 onAuthStateChanged(auth, async (u) => {
 

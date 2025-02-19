@@ -1,8 +1,11 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { auth, db } from "./firebase.js";
 import { setDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-import { Validation } from "./funcs.js";
+import { Validation, CSS } from "./funcs.js";
 import "./jquery.js";
+
+CSS.loadFiles(["../css/login.css"])
+
 
 
 // elements

@@ -3,8 +3,11 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/f
 
 import { db, auth } from "./firebase.js";
 import {
-    User, Badge, Event, MoreMenu, Update, Calendar
+    User, Badge, Event, MoreMenu, Update, Calendar, CSS
 } from "./funcs.js";
+
+CSS.loadFiles(["../css/user.css"])
+
 
 import "./jquery.js";
 
