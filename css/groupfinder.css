@@ -1,9 +1,9 @@
 .user {
-    width: calc(100% - 94px) !important;
-    margin-left: 20px;
-    margin-right: 20px;
+    width: calc(100% - 60px) !important;
+    margin-left: 30px;
+    margin-right: 30px;
 }
 
 hr {
-    width: calc(100% - 68px) !important;
+    width: calc(100% - 60px) !important;
 }

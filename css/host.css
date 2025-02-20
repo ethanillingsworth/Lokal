@@ -46,6 +46,10 @@
     cursor: pointer;
 }
 
+#searchButton {
+    height: 100%;
+}
+
 textarea {
     font-size: 1em
 }

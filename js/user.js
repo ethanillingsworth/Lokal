@@ -329,17 +329,22 @@ async function cal(user) {
     calendar.display(tab)
 }
 
-function updateProfile(data) {
+
+const uid = await User.getUID(pageUser)
+const user = new User(uid)
+
+function updateProfile(data, pfp) {
     $("#username").text(`(@${pageUser})`);
     document.title = `Lokal - @${pageUser}`;
     displayName.text(data.displayName);
 
 
+
+
     desc.html(data.desc.replaceAll("\n", "<br>"));
 
-    if (data.pfp) {
-        $("#pfp").attr("src", data.pfp);
-    }
+    $("#pfp").attr("src", pfp);
+
 
     if (data.accentColor) {
         $("#pfp").css("border-color", data.accentColor);
@@ -347,8 +352,6 @@ function updateProfile(data) {
 
 }
 
-const uid = await User.getUID(pageUser)
-const user = new User(uid)
 
 const pub = await user.getData("public")
 
@@ -468,8 +471,9 @@ onAuthStateChanged(auth, async (u) => {
 
 // get actual data
 const data = await user.getData("public")
+const profilePicture = await user.getPfp()
 
-updateProfile(data)
+updateProfile(data, profilePicture)
 
 async function feed(uid) {
     const feedTab = $("#Feed")

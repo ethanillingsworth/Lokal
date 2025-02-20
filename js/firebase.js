@@ -4,6 +4,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/fireba
 
 import { GoogleAuthProvider, getAuth } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { getFirestore, persistentLocalCache, CACHE_SIZE_UNLIMITED, enableNetwork, disableNetwork } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
 
 
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
@@ -25,7 +26,7 @@ const firebaseConfig = {
 
     projectId: "lokal-fb",
 
-    storageBucket: "lokal-fb.appspot.com",
+    storageBucket: "lokal-fb.firebasestorage.app",
 
     messagingSenderId: "1030066574762",
 
@@ -44,6 +45,8 @@ export const analytics = getAnalytics(app);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+export const imgDB = getStorage(app)
 
 
 export const google = new GoogleAuthProvider();

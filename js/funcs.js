@@ -2,7 +2,9 @@ import { getDoc, doc, setDoc, getDocs, deleteDoc, collection, addDoc, query, whe
 
 import { logEvent } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
 
-import { auth, db, analytics } from "./firebase.js";
+import { ref, getDownloadURL, uploadBytes } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+
+import { auth, db, analytics, imgDB } from "./firebase.js";
 
 import "./jquery.js"
 
@@ -309,9 +311,9 @@ export class Update {
             })
         }
 
-        if (user.pfp) {
-            ev.find(".pfp").attr("src", user.pfp)
-        }
+
+        ev.find(".pfp").attr("src", await u.getPfp())
+
 
         if (readOnly.admin) {
             const badge = new Badge("Admin", "h5")
@@ -520,9 +522,8 @@ export class Event {
             ev.find(".event-image").css("display", "none")
         }
 
-        if (user.pfp) {
-            ev.find(".pfp").attr("src", user.pfp)
-        }
+        ev.find(".pfp").attr("src", await u.getPfp())
+
 
         // actions
 
@@ -629,6 +630,7 @@ export class Event {
 export class User {
     constructor(uid) {
         this.uid = uid
+        this.bucket = new ImageBucket(uid);
     }
 
     async updateData(data, type) {
@@ -656,6 +658,14 @@ export class User {
 
         let userData = u.data()
         return userData
+    }
+
+    async getPfp() {
+        return await this.bucket.getImage("pfp.jpg")
+    }
+
+    async setPfp(file) {
+        await this.bucket.uploadImage(file, "pfp.jpg")
     }
 
     async getBadges() {
@@ -730,6 +740,8 @@ export class User {
     static async display(uname, pub, meta, content = $("#content"), groupAdmin = false) {
 
 
+        const uObj = new User(await User.getUID(uname))
+
 
         const user = $("<div/>")
             .addClass("user")
@@ -749,9 +761,8 @@ export class User {
             .addClass("border")
             .attr("src", "../img/pfp.jpg")
 
-        if (pub.pfp) {
-            pfp.attr("src", pub.pfp)
-        }
+        pfp.attr("src", await uObj.getPfp())
+
 
         if (pub.accentColor) {
             pfp.css("border-color", pub.accentColor)
@@ -1344,5 +1355,24 @@ export class Calendar {
 
         content.append(key)
 
+    }
+}
+
+
+export class ImageBucket {
+    constructor(id) {
+        this.id = id
+    }
+
+    async getImage(url) {
+        const r = ref(imgDB, `users/${this.id}/${url}`)
+
+        return await getDownloadURL(r)
+    }
+
+    async uploadImage(file, name) {
+        const r = ref(imgDB, `users/${this.id}/${name}`)
+
+        console.log(await uploadBytes(r, file))
     }
 }
