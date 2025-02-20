@@ -121,7 +121,7 @@ const preview = $("<img>").attr("id", "pfp").addClass("border").attr("src", "../
 
 modal.append(preview)
 
-
+let file = null
 
 addField("Upload:", (row) => {
 
@@ -138,13 +138,16 @@ addField("Upload:", (row) => {
 
     inp.on("change", async (event) => {
 
-        if (event.target.files[0].size > 1000000) {
-            alert("That image is over 1 megabyte, please upload one under that size!")
+        if (event.target.files[0].size > 2000000) {
+            alert("That image is over 2 megabyte, please upload one under that size!")
             return
         }
 
 
-        preview.attr("src", await Utils.getBase64(event.target.files[0]))
+        file = event.target.files[0]
+
+        preview.attr("src", await Utils.getBase64(file))
+
     })
 
     row.append(lab)
@@ -190,6 +193,7 @@ if (urlParams.get("u")) {
 
     const badges = await u.getBadges()
     const authBadges = await authUser.getBadges()
+    const pfp = await u.getPfp()
 
     if (!badges.includes("group") && !authBadges.includes("admin")) {
         $("#username").attr("disabled", true)
@@ -203,10 +207,13 @@ if (urlParams.get("u")) {
     $("#displayName").val(pub.displayName)
 
     $("#desc").val(pub.desc)
-
-    if (pub.pfp) {
-        preview.attr("src", pub.pfp)
+    if (pub.contactEmail) {
+        $("#email").val(pub.contactEmail)
     }
+
+
+    preview.attr("src", pfp)
+
 
     if (pub.accentColor) {
         preview.css("borderColor", pub.accentColor)
@@ -220,13 +227,10 @@ addButton("Done", async () => {
     const displayNameVal = $("#displayName").val()
     const descVal = $("#desc").val()
 
-    const pfpVal = $("#pfp").attr("src")
-
     const data = {
 
         displayName: displayNameVal,
         desc: descVal,
-        pfp: pfpVal,
         accentColor: preview.css("borderColor")
 
     }
@@ -288,6 +292,10 @@ addButton("Done", async () => {
     else {
 
         await u.updateUsername(usernameVal)
+
+        if (file != null) {
+            await u.setPfp(file)
+        }
 
         await u.updateData(data, "public")
     }

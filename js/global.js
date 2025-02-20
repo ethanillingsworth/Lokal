@@ -261,9 +261,8 @@ onAuthStateChanged(auth, async (user) => {
 
         const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
 
-        if (pub.pfp) {
-            dName.img = pub.pfp
-        }
+        dName.img = await u.getPfp()
+
         dName.classList = ["user-side"]
 
         sidebar.menu.addItem(dName, true)
@@ -288,9 +287,9 @@ onAuthStateChanged(auth, async (user) => {
 
                 const item = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
 
-                if (pub.pfp) {
-                    item.img = pub.pfp
-                }
+
+                item.img = await group.getPfp()
+
                 item.classList = ["user-side"]
 
                 groupMenu.addItem(item)
