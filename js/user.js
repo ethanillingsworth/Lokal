@@ -114,27 +114,27 @@ content.append(modal);
 
 
 
-async function hosting(uid) {
-    const hostingTab = $("#Events")
+// async function hosting(uid) {
+//     const hostingTab = $("#Events")
 
-    const q = query(collection(db, "posts"), where("creator", "==", uid), orderBy("timestamp", "desc"))
+//     const q = query(collection(db, "posts"), where("creator", "==", uid), orderBy("timestamp", "desc"))
 
-    const get = await getDocs(q)
+//     const get = await getDocs(q)
 
-    if (data.pinnedEvent) {
-        const up = new Event(data.pinnedEvent)
+//     if (data.pinnedEvent) {
+//         const up = new Event(data.pinnedEvent)
 
-        await up.display(hostingTab, true)
+//         await up.display(hostingTab, true)
 
-    }
+//     }
 
-    get.forEach(async (event) => {
-        if (event.id != data.pinnedEvent) {
-            const u = new Event(event.id)
-            await u.display(hostingTab)
-        }
-    })
-}
+//     get.forEach(async (event) => {
+//         if (event.id != data.pinnedEvent) {
+//             const u = new Event(event.id)
+//             await u.display(hostingTab)
+//         }
+//     })
+// }
 
 async function attending(uid) {
     const attendingTab = $("#Attending")
@@ -310,24 +310,24 @@ async function requests(user) {
     })
 }
 
-const calendar = new Calendar()
+// const calendar = new Calendar()
 
-async function cal(user) {
-    const tab = $("#Calendar")
+// async function cal(user) {
+//     const tab = $("#Calendar")
 
-    const q = query(collection(db, "posts"), where("creator", "==", user.uid))
+//     const q = query(collection(db, "posts"), where("creator", "==", user.uid))
 
-    const get = await getDocs(q)
+//     const get = await getDocs(q)
 
-    get.forEach((post) => {
-        const d = post.data()
+//     get.forEach((post) => {
+//         const d = post.data()
 
-        const splitDate = d.date.split("/")
-        calendar.addEvent(splitDate[2], splitDate[0], splitDate[1], post.id)
-    })
+//         const splitDate = d.date.split("/")
+//         calendar.addEvent(splitDate[2], splitDate[0], splitDate[1], post.id)
+//     })
 
-    calendar.display(tab)
-}
+//     calendar.display(tab)
+// }
 
 
 const uid = await User.getUID(pageUser)

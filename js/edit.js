@@ -275,7 +275,7 @@ addButton("Done", async () => {
         const priv = await authUser.getData("private")
 
         if (priv.groupsCreated + 1 > 3) {
-            alert("You already have 3 groups created, you'll have to delete one to make anymore. To do so please email support@lokalevents.com")
+            alert("You already have 3 groups created, you'll have to delete one to make anymore.")
             window.location.href = "../index.html"
             return
         }
@@ -284,6 +284,10 @@ addButton("Done", async () => {
         await newUser.updateMember(auth.currentUser.uid, { joined: true })
 
         await newUser.updateMemberReadOnly(auth.currentUser.uid, { admin: true, accepted: true })
+
+        if (file != null) {
+            await newUser.setPfp(file)
+        }
 
         await authUser.updateData({
             groupsCreated: priv.groupsCreated + 1
