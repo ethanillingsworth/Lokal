@@ -1,7 +1,7 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { auth, db } from "./firebase.js";
 import { setDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-import { Validation, CSS } from "./funcs.js";
+import { Validation, CSS, User } from "./funcs.js";
 import "./jquery.js";
 
 CSS.loadFiles(["../css/login.css"])
@@ -77,6 +77,18 @@ async function setUserData(user, email, username) {
         prevRes: [],
         groupsCreated: 0
     })
+
+    const u = new User(user.uid)
+
+    const response = await fetch("/img/pfp.jpg");
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+
+    await u.setPfp(new File([blob], "default.jpg"))
     // require manual approval for now
 
     // if (email.endsWith("@d214.org")) {
