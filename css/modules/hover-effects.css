@@ -50,7 +50,8 @@ select:hover {
     border-color: var(--accent2);
 }
 
-#heading:hover {
+#heading:hover,
+.pfp {
     cursor: pointer;
     user-select: none;
 }

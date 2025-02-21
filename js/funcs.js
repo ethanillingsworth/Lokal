@@ -293,6 +293,10 @@ export class Update {
             }
         }
 
+        ev.find(".pfp").on("click", async () => {
+            window.location.href = "../user/index.html?u=" + username
+        })
+
         content.append(ev)
 
         const badges = ev.find(".badges")
@@ -454,6 +458,10 @@ export class Event {
 
 
         const badges = ev.find(".badges")
+
+        ev.find(".pfp").on("click", async () => {
+            window.location.href = "../user/index.html?u=" + username
+        })
 
         if (user.accentColor) {
             ev.find(".pfp").css("borderColor", user.accentColor)
@@ -771,6 +779,10 @@ export class User {
             .attr("src", "../img/pfp.jpg")
 
         pfp.attr("src", await uObj.getPfp())
+
+        pfp.on("click", async () => {
+            window.location.href = "../user/index.html?u=" + await uObj.getUsername()
+        })
 
 
         if (pub.accentColor) {
