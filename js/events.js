@@ -20,8 +20,10 @@ onAuthStateChanged(auth, async (u) => {
 
         const creator = new User(data.creator)
 
-        if (new Date(data.date).getMonth() >= new Date().getMonth()
-            && new Date(data.date).getDay() >= new Date().getDay()
+        console.log(Object.keys(await creator.getMember(u.uid)))
+
+        if ((new Date(data.date).getMonth() >= new Date().getMonth()
+            || new Date(data.date).getDay() >= new Date().getDay())
             && Object.keys(await creator.getMember(u.uid)).length > 0) {
             const e = new Event(ev.id)
             if (index != 0) {
