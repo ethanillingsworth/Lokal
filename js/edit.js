@@ -139,7 +139,7 @@ addField("Upload:", (row) => {
     inp.on("change", async (event) => {
 
         if (event.target.files[0].size > 2000000) {
-            alert("That image is over 2 megabyte, please upload one under that size!")
+            alert("That image is over 2 megabytes, please upload one under that size!")
             return
         }
 

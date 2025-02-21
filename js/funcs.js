@@ -392,6 +392,7 @@ export class Update {
 export class Event {
     constructor(id) {
         this.id = id
+        this.bucket = new ImageBucket(id, "EVENT")
     }
 
     async display(content = $("#content"), pinned = false) {
@@ -515,10 +516,10 @@ export class Event {
             }
         }
 
-        if (event.preview) {
-            ev.find(".event-image").attr("src", event.preview)
+        try {
+            ev.find(".event-image").attr("src", await this.bucket.getImage("preview.jpg"))
         }
-        else {
+        catch {
             ev.find(".event-image").css("display", "none")
         }
 
@@ -578,6 +579,14 @@ export class Event {
         let eventData = e.data()
 
         return eventData
+    }
+
+    async getImage(url) {
+        return await this.bucket.getImage(url)
+    }
+
+    async setImage(file, name) {
+        await this.bucket.uploadImage(file, name)
     }
 
     async update(data) {
@@ -1360,19 +1369,25 @@ export class Calendar {
 
 
 export class ImageBucket {
-    constructor(id) {
+    constructor(id, type) {
         this.id = id
+        this.type = type
+        this.typeName = "users"
+
+        if (type == "EVENT") {
+            this.typeName = "posts"
+        }
     }
 
     async getImage(url) {
-        const r = ref(imgDB, `users/${this.id}/${url}`)
+        const r = ref(imgDB, `${this.typeName}/${this.id}/${url}`)
 
         return await getDownloadURL(r)
     }
 
     async uploadImage(file, name) {
-        const r = ref(imgDB, `users/${this.id}/${name}`)
+        const r = ref(imgDB, `${this.typeName}/${this.id}/${name}`)
 
-        console.log(await uploadBytes(r, file))
+        await uploadBytes(r, file)
     }
 }

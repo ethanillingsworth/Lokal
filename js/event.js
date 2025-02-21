@@ -47,10 +47,11 @@ modal.append(row)
 
 const preview = $("<img/>").addClass("event-image")
 
-if (data.preview) {
-    preview.attr("src", data.preview)
+try {
+    preview.attr("src", await e.bucket.getImage("preview.jpg"))
     modal.append(preview)
 }
+catch { }
 
 modal.append(tools)
 
@@ -476,61 +477,64 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
 
         const uData = await e.getUData()
 
-        data.actions.forEach(async (a) => {
-            const key = a.label
+        if (data.actions) {
 
-            const canvas = document.createElement("canvas")
+            data.actions.forEach(async (a) => {
+                const key = a.label
+
+                const canvas = document.createElement("canvas")
 
 
-            const dat = {
-                labels: [
-                ],
-                datasets: [{
-                    label: 'My First Dataset',
-                    data: [],
-                    backgroundColor: [],
-                    hoverOffset: 4
-                }]
-            };
+                const dat = {
+                    labels: [
+                    ],
+                    datasets: [{
+                        label: 'My First Dataset',
+                        data: [],
+                        backgroundColor: [],
+                        hoverOffset: 4
+                    }]
+                };
 
-            const config = {
-                type: 'pie',
-                data: dat,
-                options: {
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: a.label,
-                            font: {
-                                size: 32,
-                                weight: 'bold',
+                const config = {
+                    type: 'pie',
+                    data: dat,
+                    options: {
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: a.label,
+                                font: {
+                                    size: 32,
+                                    weight: 'bold',
+                                }
                             }
                         }
                     }
-                }
-            };
+                };
 
-            dat.datasets[0].label = key
-            const optionsIndex = {}
+                dat.datasets[0].label = key
+                const optionsIndex = {}
 
-            a.options.forEach((v, index) => {
-                dat.labels.push(v)
-                dat.datasets[0].backgroundColor.push(graphColors[index])
-                dat.datasets[0].data.push(0)
-                optionsIndex[v] = index
+                a.options.forEach((v, index) => {
+                    dat.labels.push(v)
+                    dat.datasets[0].backgroundColor.push(graphColors[index])
+                    dat.datasets[0].data.push(0)
+                    optionsIndex[v] = index
+                })
+
+
+                uData.forEach((d) => {
+                    const da = d.data()
+
+                    dat.datasets[0].data[optionsIndex[da[key]]] += 1;
+                })
+
+                new Chart(canvas, config)
+
+                col.append(canvas)
             })
-
-
-            uData.forEach((d) => {
-                const da = d.data()
-
-                dat.datasets[0].data[optionsIndex[da[key]]] += 1;
-            })
-
-            new Chart(canvas, config)
-
-            col.append(canvas)
-        })
+        }
 
 
         page.append(col)

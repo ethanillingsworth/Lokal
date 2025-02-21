@@ -32,6 +32,8 @@ function switchPage(name) {
     $("#" + name).addClass("currenth");
 }
 
+let file = null
+
 function addPage(name, prev = null, next = null, current = false) {
     const page = $("<div/>").attr("id", name).addClass("pageh");
 
@@ -61,7 +63,6 @@ function addPage(name, prev = null, next = null, current = false) {
                     const date = $("#date");
                     const loc = $("#location");
                     const cost = $("#cost");
-                    const preview = $("#preview");
                     const agenda = $("#agenda");
 
                     if (!loc.val()) loc.val("None");
@@ -76,14 +77,14 @@ function addPage(name, prev = null, next = null, current = false) {
                         agenda: agenda.val().replaceAll("\n", "<br>"),
                     };
 
-                    if (!isPlaceholder) {
-                        data.preview = preview.attr("src");
-                    }
 
                     // upload
                     if (urlParams.get("e")) {
                         const e = new Event(urlParams.get("e"));
                         await e.update(data);
+                        if (!isPlaceholder && file != null) {
+                            await e.bucket.uploadImage(file, "preview.jpg")
+                        }
 
                         window.location.href = "../event/index.html?e=" + urlParams.get("e");
                     } else {
@@ -91,6 +92,10 @@ function addPage(name, prev = null, next = null, current = false) {
                         data.creator = urlParams.get("u");
 
                         const id = await Event.create(data);
+
+                        if (!isPlaceholder && file != null) {
+                            await new Event(id).bucket.uploadImage(file, "preview.jpg")
+                        }
 
                         await user.notifyAllMembers(`posted a new event -- ${data.title}`, data.desc, "https://lokalevents.com/event/index.html?e=" + id)
 
@@ -410,7 +415,7 @@ if (mode == "event") {
             name: "upload",
             id: "upload",
         }).on("change", async function () {
-            const file = input[0].files[0];
+            file = input[0].files[0];
             preview.attr("src", await Utils.getBase64(file));
             isPlaceholder = false;
         });
@@ -508,10 +513,11 @@ if (urlParams.get("e") && mode == "event") {
         cost.val(data.cost);
         agenda.val(data.agenda.replaceAll("<br>", "\n"));
         location.val(data.location);
-        if (data.preview) {
-            preview.attr("src", data.preview);
+        try {
+            preview.attr("src", await e.getImage("preview.jpg"));
             isPlaceholder = false;
         }
+        catch { }
     } else {
         console.error("idk");
     }
