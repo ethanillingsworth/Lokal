@@ -1,8 +1,10 @@
 import { getDoc, doc, setDoc, getDocs, deleteDoc, collection, addDoc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { logEvent } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
+import { deleteUser } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-import { ref, getDownloadURL, uploadBytes } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+
+import { ref, getDownloadURL, uploadBytes, listAll, deleteObject } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
 
 import { auth, db, analytics, imgDB } from "./firebase.js";
 
@@ -648,6 +650,70 @@ export class User {
     constructor(uid) {
         this.uid = uid
         this.bucket = new ImageBucket(uid);
+    }
+
+
+    async getEvents() {
+        return await getDocs(query(collection(db, "posts"), where("creator", "==", this.uid)))
+    }
+
+    async getUpdates() {
+        return await getDocs(query(collection(db, "updates"), where("creator", "==", this.uid)))
+
+    }
+
+    async deleteMembers() {
+        const m = await getDocs(query(collection(db, "users", this.uid, "members")))
+
+
+        m.forEach(async (member) => {
+            const id = member.id
+
+            await deleteDoc(doc(db, "users", this.uid, "members", id))
+            await deleteDoc(doc(db, "users", this.uid, "members", id, "readOnly", "data"))
+
+        })
+    }
+
+    async deleteEvents() {
+        const e = await this.getEvents()
+
+        e.forEach(async (event) => {
+            const id = event.id
+
+            await deleteDoc(doc(db, "posts", id))
+        })
+    }
+
+    async deleteUpdates() {
+        const e = await this.getUpdates()
+
+        e.forEach(async (update) => {
+            const id = update.id
+
+            await deleteDoc(doc(db, "updates", id))
+        })
+    }
+
+    async delete() {
+        if (!confirm("Are you sure you want to delete this account?") || !confirm("THIS CANNOT BE UNDONE ARE YOU SURE YOU WANT TO DELETE IT?")) {
+            return
+        }
+        await deleteDoc(doc(db, "users", this.uid))
+
+        await deleteDoc(doc(db, "users", this.uid, "data", "public"))
+        await deleteDoc(doc(db, "users", this.uid, "data", "private"))
+        const uname = await this.getUsername()
+        await deleteDoc(doc(db, "usernames", this.uid))
+        await deleteDoc(doc(db, "uids", uname))
+
+        await this.deleteEvents()
+        await this.deleteUpdates()
+        await this.deleteMembers()
+
+        await this.bucket.removeImages();
+
+
     }
 
     async updateData(data, type) {
@@ -1401,5 +1467,22 @@ export class ImageBucket {
         const r = ref(imgDB, `${this.typeName}/${this.id}/${name}`)
 
         await uploadBytes(r, file)
+    }
+
+    async removeImages() {
+        const r = ref(imgDB, `${this.typeName}/${this.id}/`)
+
+        listAll(r)
+            .then((res) => {
+                res.items.forEach((itemRef) => {
+                    deleteObject(itemRef).then(() => {
+                        // File deleted successfully
+                    }).catch((error) => {
+                        // Uh-oh, an error occurred!
+                    });
+                });
+            }).catch((error) => {
+                // Uh-oh, an error occurred!
+            });
     }
 }

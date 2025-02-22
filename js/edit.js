@@ -241,7 +241,7 @@ addButton("Done", async () => {
         data["contactEmail"] = null
     }
 
-    if (bdgs.includes("group")) {
+    if (bdgs != null && bdgs.includes("group")) {
         if (data["contactEmail"] == null) {
             alert("As a group you are required to have a contact email!")
             return
@@ -287,6 +287,17 @@ addButton("Done", async () => {
 
         if (file != null) {
             await newUser.setPfp(file)
+        }
+        else {
+            const response = await fetch("/img/pfp.jpg");
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const blob = await response.blob();
+
+            await newUser.setPfp(new File([blob], "default.jpg"))
         }
 
         await authUser.updateData({

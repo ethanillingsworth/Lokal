@@ -471,7 +471,22 @@ onAuthStateChanged(auth, async (u) => {
                 window.location.href = "../host/index.html?mode=update&u=" + user.uid
 
             })
+
         }
+
+        moreMenu.add("Delete Profile", async () => {
+            await user.delete()
+
+            const priv = await currentUser.getData("private")
+            await currentUser.updateData({
+                groupsCreated: priv.groupsCreated - 1
+            }, "private")
+
+            window.location.href = "../"
+
+        })
+
+
 
         moreMenu.add("Edit Profile", () => {
             window.location.href = "../edit/index.html?u=" + urlParams.get("u")
