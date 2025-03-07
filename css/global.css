@@ -7,6 +7,11 @@
 @import url(./modules/animations.css);
 @import url(./modules/tools.css);
 @import url(./modules/actions.css);
+@import url(./modules/imageviewer.css);
+
+/* fonts */
+
+@import url(https://fonts.googleapis.com/css?family=Montserrat);
 
 :root {
     --dark0: #1a1a1a;
@@ -32,7 +37,7 @@ body {
     height: 100%;
     margin: 0;
     background-color: var(--dark0);
-    font-family: sans-serif;
+    font-family: Montserrat;
     align-items: center;
     place-content: center;
 }
@@ -41,7 +46,7 @@ body {
 * {
     color: white;
     color-scheme: dark;
-    font-family: sans-serif;
+    font-family: Montserrat;
     accent-color: var(--accent);
     transition: all 0.25s ease-in-out;
     box-sizing: border-box;

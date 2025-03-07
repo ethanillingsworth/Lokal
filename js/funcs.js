@@ -4,7 +4,7 @@ import { logEvent } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-an
 import { deleteUser } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 
-import { ref, getDownloadURL, uploadBytes, listAll, deleteObject } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+import { ref, getDownloadURL, uploadBytes, getBlob, listAll, deleteObject } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
 
 import { auth, db, analytics, imgDB } from "./firebase.js";
 
@@ -751,6 +751,10 @@ export class User {
         await this.bucket.uploadImage(file, "pfp.jpg")
     }
 
+    async getGallery() {
+        return await this.bucket.getAllFolders("gallery")
+    }
+
     async getBadges() {
         const meta = await this.getData("hidden")
 
@@ -1160,7 +1164,7 @@ export class Utils {
     }
 
     static getVersion() {
-        return "Lokal v10"
+        return "Lokal v11"
     }
 
     static getBase64(file) {
@@ -1463,10 +1467,44 @@ export class ImageBucket {
         return await getDownloadURL(r)
     }
 
+    async getImageFromRef(r) {
+        return await getDownloadURL(r)
+    }
+
     async uploadImage(file, name) {
         const r = ref(imgDB, `${this.typeName}/${this.id}/${name}`)
 
         await uploadBytes(r, file)
+    }
+
+    async createBlob(r) {
+        const response = await fetch(await getDownloadURL(r), {
+            method: "GET",
+            mode: "cors"
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+
+        return blob
+    }
+
+    async moveImages(from, to) {
+        const images = await this.getAllImages(ref(imgDB, `${this.typeName}/${this.id}/${from}`))
+
+        images.forEach(async (imageRef) => {
+            console.log(1)
+
+            const blob = await this.createBlob(imageRef)
+
+            console.log(imageRef.name)
+
+
+            await this.uploadImage(new File([blob], imageRef.name, { "type": blob.type }), `${to}/${imageRef.name}`)
+        })
     }
 
     async removeImages() {
@@ -1483,6 +1521,72 @@ export class ImageBucket {
                 });
             }).catch((error) => {
                 // Uh-oh, an error occurred!
-            });
+            })
+
+    }
+
+    async removeImage(path) {
+        const r = ref(imgDB, `${this.typeName}/${this.id}/${path}`)
+
+        await deleteObject(r)
+    }
+
+    async removeImagesFromPath(path) {
+        const r = ref(imgDB, `${this.typeName}/${this.id}/${path}`)
+
+        listAll(r)
+            .then((res) => {
+                res.items.forEach((itemRef) => {
+                    deleteObject(itemRef).then(() => {
+                        // File deleted successfully
+                    }).catch((error) => {
+                        // Uh-oh, an error occurred!
+                    });
+                });
+            }).catch((error) => {
+                // Uh-oh, an error occurred!
+            })
+
+    }
+
+    async getAllFolders(url) {
+        const r = ref(imgDB, `${this.typeName}/${this.id}/${url}`)
+
+        const list = []
+
+        const res = await listAll(r)
+
+        res.prefixes.forEach((itemRef) => {
+            list.push(itemRef)
+        });
+
+        return list;
+    }
+
+    async getAllImages(re) {
+        const r = re
+
+        const list = []
+
+        const res = await listAll(r)
+
+        res.items.forEach((itemRef) => {
+            list.push(itemRef)
+        });
+
+        return list;
+    }
+}
+
+
+export class ImageViewer {
+    constructor(params) {
+        this.content = $("<div/>").attr("id", "imageViewer")
+
+        $(body).append(this.content)
+    }
+
+    delete() {
+
     }
 }
