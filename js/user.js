@@ -1,7 +1,8 @@
 import { getDoc, doc, query, collection, getDocs, where, limit, orderBy } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { listAll, deleteObject, ref } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
 
-import { db, auth } from "./firebase.js";
+import { db, auth, imgDB } from "./firebase.js";
 import {
     User, Badge, Event, MoreMenu, Update, Calendar, CSS
 } from "./funcs.js";
@@ -111,6 +112,9 @@ top.append(userDetails);
 modal.append(top).append(tools).append(tabs).append(divider);
 
 content.append(modal);
+
+const uid = await User.getUID(pageUser)
+const user = new User(uid)
 
 
 
@@ -248,6 +252,12 @@ async function members(user) {
     })
 }
 
+// fetch new names everytime
+const nameExists = async (value) => {
+    const g = await user.getGallery()
+    g.some((folder) => folder.name === value)
+};
+
 async function groups(user) {
     const tab = $("#Groups")
 
@@ -310,6 +320,158 @@ async function requests(user) {
     })
 }
 
+async function gallery(user) {
+    const tab = $("#Gallery")
+    tab.html("")
+
+    const g = await user.getGallery();
+
+    const none = $("<h2/>").text("Nothing to see here...").css("font-size", "1.5em").attr("id", "none")
+
+    tab.append(none)
+
+    if (g.length > 0) {
+        none.css("display", "none")
+    }
+
+    g.forEach(async (folder) => {
+        const head = $("<div/>").addClass("row").css("place-content", "start").css("place-items", "center").addClass("head")
+
+        const l = $("<h2/>").text(folder.name).css("font-size", "1.75em")
+        let removeMode = false
+
+        head.append(l)
+        const tools = $("<div/>").addClass("tools").css("width", "100%")
+
+        const more = new MoreMenu()
+
+        const scroll = $("<div/>").addClass("row scroll")
+
+        async function refreshImages() {
+            scroll.html("")
+            const images = await user.bucket.getAllImages(folder)
+            images.forEach(async (image) => {
+
+                const url = await user.bucket.getImage("gallery/" + folder.name + "/" + image.name)
+
+                scroll.append($("<img/>").addClass("image").attr("src", url).attr("data_path", "gallery/" + folder.name + "/" + image.name))
+            })
+        }
+
+        more.add("Upload Images", async () => {
+            const inp = $("<input/>")
+                .attr("type", "file")
+                .attr("multiple", true)
+                .css("z-index", "-10000")
+                .css("position", "absolute")
+            $(document.body).append(inp)
+
+            inp.on("change", async () => {
+                console.log(inp[0].files)
+                for (let index = 0; index < inp[0].files.length; index++) {
+                    const file = inp[0].files[index];
+
+                    await user.bucket.uploadImage(new File([file], crypto.randomUUID(), { type: file.type }), `gallery/${folder.name}/${crypto.randomUUID()}`);
+
+                }
+                await refreshImages()
+                inp.remove()
+            });
+
+            inp.trigger("click")
+
+
+
+
+        })
+
+        more.add("Remove Images", async () => {
+            if (!removeMode) {
+                removeMode = true
+                scroll.addClass("remove")
+                for (let index = 0; index < scroll.children().length; index++) {
+                    const element = $(scroll.children()[index]);
+
+                    element[0].onclick = async () => {
+                        await user.bucket.removeImage(element.attr("data_path"))
+                        element.remove()
+                        if (scroll.children().length < 1) {
+                            head.remove()
+                        }
+                    }
+                }
+            }
+            else {
+                removeMode = false
+                scroll.removeClass("remove")
+                for (let index = 0; index < scroll.children().length; index++) {
+                    const element = $(scroll.children()[index]);
+
+                    element[0].onclick = async () => {
+                        // open viewer like normal
+                    }
+                }
+            }
+        })
+
+        more.add("Edit Name", async () => {
+            const name = prompt("Enter new folder name:")
+
+            if (name.length < 1 || name.length > 30) {
+                alert("Name cannot be blank, and cannot be over 30 chars.")
+                return
+            }
+            else if (await nameExists(name)) {
+                alert("You already have a folder with this name.")
+                return
+            }
+            console.log(folder.name)
+            console.log(name)
+
+
+            await user.bucket.moveImages(`gallery/${folder.name}`, `gallery/${name}`)
+            await user.bucket.removeImagesFromPath(`gallery/${folder.name}`)
+
+            l.text(name)
+
+        })
+
+        more.add("Remove Folder", async () => {
+            if (confirm("Are you sure you want to delete this folder?") && confirm("This will delete all of the images in the folder.")) {
+                listAll(folder)
+                    .then((res) => {
+                        res.items.forEach((itemRef) => {
+                            deleteObject(itemRef).then(() => {
+                                // File deleted successfully
+                            }).catch((error) => {
+                                // Uh-oh, an error occurred!
+                            });
+                        });
+                    }).catch((error) => {
+                        // Uh-oh, an error occurred!
+                    })
+
+                head.remove()
+                scroll.remove()
+
+            }
+        })
+
+        tab.append(head)
+        more.more.css("margin-left", "auto")
+        more.more.css("width", "fit-content")
+        tools.append(more.more)
+        head.append(tools)
+        tab.append(scroll)
+
+        // for (let index = 0; index < 100; index++) {
+        //     scroll.append($("<img/>").addClass("image").attr("src", `https://picsum.photos/${Math.floor(Math.random() * (1500 - 500) + 500)}/${Math.floor(Math.random() * (1000 - 500) + 500)}`))
+        // }
+        await refreshImages()
+
+    })
+}
+
 // const calendar = new Calendar()
 
 // async function cal(user) {
@@ -330,8 +492,6 @@ async function requests(user) {
 // }
 
 
-const uid = await User.getUID(pageUser)
-const user = new User(uid)
 
 function updateProfile(data, pfp) {
     $("#username").text(`(@${pageUser})`);
@@ -422,21 +582,27 @@ onAuthStateChanged(auth, async (u) => {
         return
     }
 
-
-
     const currentUser = new User(u.uid)
+
+    let bdsU = await currentUser.getBadges()
+
+    const readOnly = await user.getMemberReadOnly(currentUser.uid)
 
     if (bds.includes("group")) {
         createTab("Feed", true)
         // createTab("Events")
         // createTab("Calendar")
+        createTab("Gallery")
         createTab("Members")
 
         await feed(uid)
         // await hosting(uid)
         // await cal(user)
         await members(user)
+        await gallery(user)
+
     }
+
     else {
 
         createTab("Attending", true)
@@ -448,13 +614,10 @@ onAuthStateChanged(auth, async (u) => {
 
     }
 
-
-
-
-
-    let bdsU = await currentUser.getBadges()
-
-    const readOnly = await user.getMemberReadOnly(currentUser.uid)
+    if (readOnly.admin || bdsU.includes("admin")) {
+        createTab("Requests")
+        await requests(user)
+    }
 
     if ((u.uid == uid || bdsU.includes("admin")) || (bds.includes("group") && readOnly.admin)) {
 
@@ -472,7 +635,54 @@ onAuthStateChanged(auth, async (u) => {
 
             })
 
+            moreMenu.add("Add Gallery Folder", async () => {
+                const label = prompt("Enter new folder name:")
+
+                if (label.length < 1 || label.length > 30) {
+                    alert("Name cannot be blank, and cannot be over 30 chars.")
+                    return
+                }
+                else if (await nameExists(label)) {
+                    alert("You already have a folder with this name.")
+                    return
+                }
+
+                const response = await fetch("../img/placeholder.png");
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const blob = await response.blob();
+
+                // add folder
+                await user.bucket.uploadImage(new File([blob], "placeholder.png", { "type": "image/png" }), `/gallery/${label}/placeholder.png`)
+                // refresh gallery
+                await gallery(user)
+
+            })
+
         }
+        else {
+            if (pub.notifs) {
+                moreMenu.add("Turn Off Notifications", async () => {
+                    await user.updateData({ notifs: false }, "public")
+                    alert("We've updated your notification preferences")
+                    location.reload()
+                })
+            }
+            else {
+                moreMenu.add("Turn On Notifications", async () => {
+                    await user.updateData({ notifs: true }, "public")
+                    alert("We've updated your notification preferences")
+                    location.reload()
+                })
+            }
+        }
+
+        moreMenu.add("Edit Profile", () => {
+            window.location.href = "../edit/index.html?u=" + urlParams.get("u")
+        })
 
         moreMenu.add("Delete Profile", async () => {
             await user.delete()
@@ -486,26 +696,6 @@ onAuthStateChanged(auth, async (u) => {
 
         })
 
-
-
-        moreMenu.add("Edit Profile", () => {
-            window.location.href = "../edit/index.html?u=" + urlParams.get("u")
-        })
-
-        if (pub.notifs) {
-            moreMenu.add("Turn Off Notifications", async () => {
-                await user.updateData({ notifs: false }, "public")
-                alert("We've updated your notification preferences")
-                location.reload()
-            })
-        }
-        else {
-            moreMenu.add("Turn On Notifications", async () => {
-                await user.updateData({ notifs: true }, "public")
-                alert("We've updated your notification preferences")
-                location.reload()
-            })
-        }
 
 
 
@@ -525,11 +715,6 @@ onAuthStateChanged(auth, async (u) => {
         if (readOnly.accepted && memberData.joined) {
 
             join.text("Joined")
-        }
-
-        if (readOnly.admin || bdsU.includes("admin")) {
-            createTab("Requests")
-            await requests(user)
         }
 
         if (!readOnly.admin) {

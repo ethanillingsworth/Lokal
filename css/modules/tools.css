@@ -44,7 +44,7 @@
 
 .moreMenu .menu div {
     background-color: var(--dark1);
-    width: calc(100% - 20px);
+    width: 100%;
     padding: 5px 10px;
     border-radius: inherit;
     font-weight: bold;
