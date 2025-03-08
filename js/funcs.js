@@ -10,6 +10,8 @@ import { auth, db, analytics, imgDB } from "./firebase.js";
 
 import "./jquery.js"
 
+import "https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.40/jquery.csv.min.js"
+
 export const graphColors = [
     "#FF6B6B",  // Bright Coral Red
     "#1E90FF",  // Vivid Blue
@@ -1580,13 +1582,109 @@ export class ImageBucket {
 
 
 export class ImageViewer {
-    constructor(params) {
+    constructor(photos, startIndex = 0) {
         this.content = $("<div/>").attr("id", "imageViewer")
 
-        $(body).append(this.content)
+        this.bg = $("<div/>").attr("id", "bg")
+
+        this.index = startIndex;
+
+        this.photos = photos
+
+        const topBar = $("<div/>").addClass("tools")
+
+        const exit = $("<img/>").attr("src", "../img/icons/x.png")
+
+        topBar.append(exit)
+
+        topBar.append($("<h3/>").text(photos[startIndex].name).css("height", "fit-content"))
+
+        exit.on("click", () => {
+            this.delete()
+        })
+
+        const row = $("<div/>").addClass("row")
+
+        topBar.append(row)
+
+        const download = $("<img/>").attr("src", "../img/icons/download.png")
+
+        row.append(download)
+
+        download.on("click", () => {
+            const a = $("<a/>").attr("href", photos[startIndex].url).attr("target", "_blank")
+            a[0].download = true
+            a[0].click()
+
+            a.remove()
+        })
+
+        this.content.append(topBar)
+
+        const midRow = $("<div/>").addClass("row midrow")
+
+        const left = $("<img/>").attr("src", "../img/icons/left.png").addClass("tool").css("margin-right", "auto")
+
+        left.on("click", () => {
+            this.moveLeft()
+        })
+
+        this.image = $("<img/>").attr("src", photos[startIndex].url).addClass("image")
+
+        const right = $("<img/>").attr("src", "../img/icons/right.png").addClass("tool").css("margin-left", "auto")
+
+        right.on("click", () => {
+            this.moveRight()
+        })
+
+        midRow.append(left)
+        midRow.append(this.image)
+        midRow.append(right)
+
+        document.onkeyup = (ev) => {
+            if (ev.code == "ArrowRight") {
+                this.moveRight()
+            }
+
+            if (ev.code == "ArrowLeft") {
+                this.moveLeft()
+            }
+
+            if (ev.code == "Escape") {
+                this.delete()
+            }
+        }
+
+
+
+        this.content.append(midRow)
+
+        $(document.body).append(this.bg)
+        $(document.body).append(this.content)
     }
 
     delete() {
+        this.bg.remove()
+        this.content.remove()
+    }
 
+    moveRight() {
+        if (this.index + 1 < this.photos.length) {
+            this.index += 1
+            this.image.attr("src", this.photos[this.index].url)
+        }
+    }
+
+    moveLeft() {
+        if (this.index - 1 >= 0) {
+            this.index -= 1
+            this.image.attr("src", this.photos[this.index].url)
+        }
     }
 }
+
+// export class CSV {
+//     static async import(csv) {
+//         return $.csv.toObjects(csv);
+//     }
+// }
