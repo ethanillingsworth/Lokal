@@ -4,7 +4,8 @@ import { listAll, deleteObject, ref } from "https://www.gstatic.com/firebasejs/1
 
 import { db, auth, imgDB } from "./firebase.js";
 import {
-    User, Badge, Event, MoreMenu, Update, Calendar, CSS
+    User, Badge, Event, MoreMenu, Update, Calendar, CSS,
+    ImageViewer
 } from "./funcs.js";
 
 CSS.loadFiles(["../css/user.css"])
@@ -347,15 +348,31 @@ async function gallery(user) {
 
         const scroll = $("<div/>").addClass("row scroll")
 
+        let imgs = []
+
         async function refreshImages() {
             scroll.html("")
+            imgs = []
+
             const images = await user.bucket.getAllImages(folder)
-            images.forEach(async (image) => {
+
+            for (let index = 0; index < images.length; index++) {
+                const image = images[index];
 
                 const url = await user.bucket.getImage("gallery/" + folder.name + "/" + image.name)
 
-                scroll.append($("<img/>").addClass("image").attr("src", url).attr("data_path", "gallery/" + folder.name + "/" + image.name))
-            })
+                imgs.push({ url: url, name: image.name })
+                const i = $("<img/>")
+                    .addClass("image")
+                    .attr("src", url)
+                    .attr("data_path", "gallery/" + folder.name + "/" + image.name)
+
+                i[0].onclick = () => {
+                    new ImageViewer(imgs, index)
+                }
+
+                scroll.append(i)
+            }
         }
 
         more.add("Upload Images", async () => {
@@ -367,15 +384,14 @@ async function gallery(user) {
             $(document.body).append(inp)
 
             inp.on("change", async () => {
-                console.log(inp[0].files)
                 for (let index = 0; index < inp[0].files.length; index++) {
                     const file = inp[0].files[index];
 
-                    await user.bucket.uploadImage(new File([file], crypto.randomUUID(), { type: file.type }), `gallery/${folder.name}/${crypto.randomUUID()}`);
+                    await user.bucket.uploadImage(file, `gallery/${folder.name}/${file.name}`);
 
                 }
-                await refreshImages()
-                inp.remove()
+                window.location.reload()
+
             });
 
             inp.trigger("click")
@@ -408,7 +424,7 @@ async function gallery(user) {
                     const element = $(scroll.children()[index]);
 
                     element[0].onclick = async () => {
-                        // open viewer like normal
+                        new ImageViewer(imgs, index)
                     }
                 }
             }
