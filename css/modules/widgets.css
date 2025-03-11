@@ -16,7 +16,6 @@
     background-color: var(--dark0);
     transition: 0.25s all ease-in-out;
     border: 4px solid transparent;
-    animation: fadeIn 1s;
 }
 
 .event-content {
