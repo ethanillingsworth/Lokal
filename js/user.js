@@ -207,24 +207,23 @@ async function members(user) {
 
             let p = true;
 
-            const promote = $("<img/>")
-                .addClass("action")
-                .attr("src", admin ? "../img/icons/down.png" : "../img/icons/up.png")
-                .on("click", async function () {
-                    if (p) {
-                        if (confirm("Are you sure you want to promote that person?")) {
-                            await user.updateMemberReadOnly(person.id, { admin: true });
-                        }
-                        p = false;
-                        $(this).attr("src", "../img/icons/down.png");
-                    } else {
-                        if (confirm("Are you sure you want to demote that person?")) {
-                            await user.updateMemberReadOnly(person.id, { admin: false });
-                        }
-                        p = true;
-                        $(this).attr("src", "../img/icons/up.png");
+            const moreMenu = new MoreMenu()
+
+            moreMenu.add(admin ? "Demote" : "Promote", async () => {
+                if (p) {
+                    if (confirm("Are you sure you want to promote that person?")) {
+                        await user.updateMemberReadOnly(person.id, { admin: true });
                     }
-                });
+                    p = false;
+
+                } else {
+                    if (confirm("Are you sure you want to demote that person?")) {
+                        await user.updateMemberReadOnly(person.id, { admin: false });
+                    }
+                    p = true;
+
+                }
+            })
 
             const del = $("<img/>")
                 .addClass("action")
@@ -245,7 +244,7 @@ async function members(user) {
                 });
 
             if (auth.currentUser.uid !== personClass.uid) {
-                actions.append(promote).append(del);
+                actions.append(moreMenu.more);
             }
 
             actions.append(open);

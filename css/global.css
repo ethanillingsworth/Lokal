@@ -509,6 +509,8 @@ input:disabled {
     .pfp {
         width: 32px;
         height: 32px;
+        border-radius: 8px;
+        border-width: 3px;
     }
 
     .event,
@@ -526,6 +528,10 @@ input:disabled {
 
     .action {
         padding: 5px;
+    }
+
+    .tabList {
+        place-content: start;
     }
 
     .tab {
@@ -548,8 +554,6 @@ input:disabled {
     }
 
     #pfp {
-        width: 100px;
-        height: 100px;
         margin-bottom: 20px
     }
 
@@ -557,6 +561,17 @@ input:disabled {
         margin: 0;
     }
 
+    img.image {
+        width: 100% !important;
+        height: auto !important;
+    }
 
+    .scroll img.image {
+        height: 100% !important;
+        width: auto !important;
+    }
 
+    .head {
+        font-size: 0.75em;
+    }
 }

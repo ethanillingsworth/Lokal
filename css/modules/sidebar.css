@@ -68,7 +68,6 @@
     text-wrap: nowrap;
     transition: all 0.25s ease-in-out;
     width: auto;
-    animation: fadeIn 1s;
 }
 
 .item img {
