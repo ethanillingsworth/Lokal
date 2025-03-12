@@ -315,6 +315,17 @@ async function requests(user) {
         const actions = dis.find(".actions");
         actions.empty();
 
+        const reject = $("<img/>")
+            .addClass("action")
+            .attr("src", "../img/icons/x.png")
+            .on("click", async function () {
+                await user.updateMember(person.id, { pending: false, joined: false });
+                if (pub.notifs) {
+                    await user.notifyMember(personClass.uid, "has rejected you from their group...", "View their page on Lokal below", `https://lokalevents.com/user/index.html?u=${await user.getUsername()}`)
+                }
+                actions.parent().remove();
+            });
+
         const confirm = $("<img/>")
             .addClass("action")
             .attr("src", "../img/icons/confirm.png")
@@ -327,6 +338,7 @@ async function requests(user) {
                 actions.parent().remove();
             });
 
+        actions.append(reject);
         actions.append(confirm);
     })
 }
