@@ -1250,10 +1250,14 @@ export class MoreMenu {
         const button = $("<div/>")
             .text(label)
             .on("click", () => {
-                onclick()
+                if (onclick) {
+                    onclick()
+                }
             })
 
         this.menu.append(button)
+
+        return button;
     }
 
 

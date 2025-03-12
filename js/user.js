@@ -171,85 +171,96 @@ async function members(user) {
 
     const get = await getDocs(q)
 
-    get.forEach(async (person) => {
-        const personClass = new User(person.id)
+    function refreshUsers() {
+        tab.empty()
 
-        let readOnly = await user.getMemberReadOnly(person.id)
+        get.forEach(async (person) => {
+            const personClass = new User(person.id)
 
-        let currentUserReadOnly = {}
+            let readOnly = await user.getMemberReadOnly(person.id)
 
-        if (auth.currentUser) currentUserReadOnly = await user.getMemberReadOnly(auth.currentUser.uid)
+            let currentUserReadOnly = {}
 
-        if (readOnly.accepted == false) return
+            if (auth.currentUser) currentUserReadOnly = await user.getMemberReadOnly(auth.currentUser.uid)
 
-        const username = await personClass.getUsername()
-        const pub = await personClass.getData("public")
-        const meta = await personClass.getData("hidden")
+            if (readOnly.accepted == false) return
 
-
-        let admin = false
-
-        if (readOnly.admin) { admin = true }
-
-        const dis = await User.display(username, pub, meta, tab, admin)
-
-        let currentUser = new User("notloggedin")
-
-        if (auth.currentUser) currentUser = new User(auth.currentUser.uid)
-
-        const currentUserBadges = await currentUser.getBadges()
+            const username = await personClass.getUsername()
+            const pub = await personClass.getData("public")
+            const meta = await personClass.getData("hidden")
 
 
-        if (currentUserBadges.includes('admin') || currentUserReadOnly.admin) {
+            let admin = false
 
-            const actions = dis.find(".actions");
-            actions.empty();
+            if (readOnly.admin) { admin = true }
 
-            let p = true;
+            const dis = await User.display(username, pub, meta, tab, admin)
 
-            const moreMenu = new MoreMenu()
+            let currentUser = new User("notloggedin")
 
-            moreMenu.add(admin ? "Demote" : "Promote", async () => {
-                if (p) {
-                    if (confirm("Are you sure you want to promote that person?")) {
-                        await user.updateMemberReadOnly(person.id, { admin: true });
+            if (auth.currentUser) currentUser = new User(auth.currentUser.uid)
+
+            const currentUserBadges = await currentUser.getBadges()
+
+
+            if (currentUserBadges.includes('admin') || currentUserReadOnly.admin) {
+
+                const actions = dis.find(".actions");
+                actions.empty();
+
+
+                let p = !admin;
+
+                const moreMenu = new MoreMenu()
+
+                moreMenu.more.addClass("action")
+
+                const prodemote = moreMenu.add(admin ? "Demote" : "Promote")
+
+                prodemote.on("click", async () => {
+                    if (p) {
+                        if (confirm("Are you sure you want to promote that person?")) {
+                            await user.updateMemberReadOnly(person.id, { admin: true });
+                            p = false;
+                            prodemote.text("Demote")
+
+                        }
+
+                    } else {
+                        if (confirm("Are you sure you want to demote that person?")) {
+                            await user.updateMemberReadOnly(person.id, { admin: false });
+                            p = true;
+                            prodemote.text("Promote")
+                        }
                     }
-                    p = false;
+                    refreshUsers()
+                })
 
-                } else {
-                    if (confirm("Are you sure you want to demote that person?")) {
-                        await user.updateMemberReadOnly(person.id, { admin: false });
-                    }
-                    p = true;
-
-                }
-            })
-
-            const del = $("<img/>")
-                .addClass("action")
-                .attr("src", "../img/icons/del.png")
-                .on("click", async function () {
+                moreMenu.add("Remove", async () => {
                     if (confirm("Are you sure you want to remove that person from your group?")) {
                         await user.updateMember(person.id, { pending: false, joined: false });
                         await user.updateMemberReadOnly(person.id, { false: true })
                         actions.parent().remove();
                     }
-                });
+                })
 
-            const open = $("<img/>")
-                .addClass("action")
-                .attr("src", "../img/icons/arrow.png")
-                .on("click", function () {
-                    window.location.href = `../user/index.html?u=${username}`;
-                });
+                const open = $("<img/>")
+                    .addClass("action")
+                    .attr("src", "../img/icons/arrow.png")
+                    .on("click", function () {
+                        window.location.href = `../user/index.html?u=${username}`;
+                    });
 
-            if (auth.currentUser.uid !== personClass.uid) {
-                actions.append(moreMenu.more);
+                if (auth.currentUser.uid !== personClass.uid) {
+                    actions.append(moreMenu.more);
+                }
+
+                actions.append(open);
             }
+        })
+    }
 
-            actions.append(open);
-        }
-    })
+    refreshUsers()
 }
 
 // fetch new names everytime
