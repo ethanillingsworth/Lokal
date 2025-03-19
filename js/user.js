@@ -8,6 +8,8 @@ import {
     ImageViewer
 } from "./funcs.js";
 
+import tinycolor from "https://esm.sh/tinycolor2"
+
 CSS.loadFiles(["../css/user.css"])
 
 
@@ -536,9 +538,6 @@ function updateProfile(data, pfp) {
     document.title = `Lokal - @${pageUser}`;
     displayName.text(data.displayName);
 
-
-
-
     desc.html(data.desc.replaceAll("\n", "<br>"));
 
     $("#pfp").attr("src", pfp);
@@ -567,7 +566,6 @@ bds.forEach((badgeName) => {
 const data = await user.getData("public")
 const profilePicture = await user.getPfp()
 
-updateProfile(data, profilePicture)
 
 async function feed(uid) {
     const feedTab = $("#Feed")
@@ -634,8 +632,6 @@ onAuthStateChanged(auth, async (u) => {
         createTab("Members")
 
         await feed(uid)
-        // await hosting(uid)
-        // await cal(user)
         await members(user)
         await gallery(user)
 
@@ -656,6 +652,8 @@ onAuthStateChanged(auth, async (u) => {
         createTab("Requests")
         await requests(user)
     }
+
+    updateProfile(data, profilePicture)
 
     if ((u.uid == uid || bdsU.includes("admin")) || (bds.includes("group") && readOnly.admin)) {
 

@@ -123,7 +123,7 @@ function addPage(name, prev = null, next = null, current = false) {
                         data.creator = urlParams.get("u");
                         data.face = auth.currentUser.uid;
 
-                        await Update.create(data)
+                        await Update.create(data, "updates")
                         await user.notifyAllMembers(`posted a new update -- ${data.title}`, data.desc, "https://lokalevents.com/user/index.html?u=" + await user.getUsername())
 
 

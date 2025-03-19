@@ -1,10 +1,8 @@
 import { getDoc, doc, setDoc, getDocs, deleteDoc, collection, addDoc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { logEvent } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
-import { deleteUser } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-
-import { ref, getDownloadURL, uploadBytes, getBlob, listAll, deleteObject } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+import { ref, getDownloadURL, uploadBytes, listAll, deleteObject } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
 
 import { auth, db, analytics, imgDB } from "./firebase.js";
 
@@ -241,72 +239,87 @@ export class Badge {
 
 }
 
-export class Update {
-    constructor(id) {
+// Generic Post
+export class Post {
+    constructor(id, path) {
         this.id = id
+        this.path = path
     }
 
     async display(content = $("#content"), pinned = false) {
+        const post = await this.get(this.id)
 
-        const event = await this.get(this.id)
-
-        if (Object.keys(event).length <= 0) {
+        if (Object.keys(post).length <= 0) {
             return
         }
 
-        const u = new User(event.face)
+        const creator = new User(post.creator)
 
-        const user = await u.getData()
+        const user = await creator.getData()
 
-        const meta = await u.getData("hidden")
+        const meta = await creator.getData("hidden")
 
-        const username = await u.getUsername()
+        const username = await creator.getUsername()
 
-        const c = new User(event.creator)
-
-        const readOnly = await new User(event.creator).getMemberReadOnly(event.face)
-
-        // make event
-        const ev = $("<div/>")
+        const postElem = $("<div/>")
             .addClass("event")
             .attr("id", this.id)
             .html(`<img class="pfp border" src="../img/pfp.jpg">
-            <div class="event-content">
-            
-                <div class="user-info row" style="gap: 5px; place-items: center">
-                    <h4 class="display-name">${user.displayName}</h4>
-                    <h4 class="username">(@${username})</h4>
-
+            <div class="col" style="width: 100%">
+                <div class="content-wrapper row">
+                    <div class="event-content">
+                    
+                        <div class="user-info row" style="gap: 5px; place-items: center">
+                            <h4 class="display-name">${user.displayName}</h4>
+                            <h4 class="username">(@${username})</h4>
+                        </div>
+                        <div class="row badges" style="display: none"></div>
+                        
+                        <p>
+                            ${post.desc.replaceAll("\n", "<br>")}
+                        </p>     
+                    </div>
                 </div>
-                <div class="row badges" style="display: none"></div>
-                <h4>${event.title}</h4>
-                <p>
-                    ${event.desc}
-                </p>                
-            </div>
-            <div class="row tools"></div>`)
+                <div class="row tools" style="place-content: end;"></div>
+            </div>`)
 
-        if (pinned) {
 
-            const cData = await new User(event.creator).getData()
-            if (cData.accentColor) {
-                ev.css("borderColor", cData.accentColor)
-            }
-            else {
-                ev.css("borderColor", "var(--accent)")
-            }
-        }
-
-        ev.find(".pfp").on("click", async () => {
+        postElem.find(".pfp").on("click", async () => {
             window.location.href = "../user/index.html?u=" + username
         })
 
-        content.append(ev)
-
-        const badges = ev.find(".badges")
-
         if (user.accentColor) {
-            ev.find(".pfp").css("borderColor", user.accentColor)
+            postElem.find(".pfp").css("borderColor", user.accentColor)
+        }
+
+        const readOnly = await creator.getMemberReadOnly(auth.currentUser.uid)
+
+
+        // add more menu
+        if (readOnly.admin) {
+
+            const more = new MoreMenu()
+
+            if (pinned) {
+                more.add("Unpin", async () => {
+                    await this.unpin(creator)
+                    window.location.reload()
+                })
+            }
+            else {
+                more.add("Pin", async () => {
+                    await this.pin(creator)
+                    window.location.reload()
+                })
+            }
+
+            more.add("Delete", async () => {
+                if (confirm("Are you sure you want to delete this event?")) {
+                    await this.delete()
+                    postElem.css("display", "none")
+                }
+            })
+            postElem.find(".tools").append(more.more)
         }
 
         if (meta.badges) {
@@ -314,86 +327,65 @@ export class Update {
             meta.badges.forEach((badgeName) => {
                 const badge = Badge.getFromName(badgeName, "h5")
 
-                badges.append(badge)
-                badges.css("display", "flex")
+                postElem.find(".badges").append(badge)
+                postElem.find(".badges").css("display", "flex")
             })
         }
 
 
-        ev.find(".pfp").attr("src", await u.getPfp())
-
-
-        if (readOnly.admin) {
-            const badge = new Badge("Admin", "h5")
-            badge.css("backgroundColor", "#144a96")
-
-            badges.append(badge)
-            badges.css("display", "flex")
-
-            const more = new MoreMenu()
-
-            if (pinned) {
-                more.add("Unpin", async () => {
-                    await this.unpin(c)
-                    alert("Update unpinned, refresh your page to see updates")
-                })
+        if (pinned) {
+            if (user.accentColor) {
+                postElem.css("borderColor", user.accentColor)
             }
             else {
-                more.add("Pin", async () => {
-                    await this.pin(c)
-                    alert("Update pinned, refresh your page to see updates")
-                })
+                postElem.css("borderColor", "var(--accent)")
             }
-
-            more.add("Edit", async () => {
-                window.location.href = `../host/index.html?mode=update&u=${c.uid}&update=${this.id}`
-            })
-
-            more.add("Delete", async () => {
-                if (confirm("Are you sure you want to delete this update?")) {
-                    await this.delete()
-                    ev.css("display", "none")
-                }
-            })
-
-
-            ev.find(".tools").append(more.more)
         }
+
+        postElem.find(".pfp").attr("src", await creator.getPfp())
+
+        content.append(postElem)
     }
 
     async get() {
-        let e = await getDoc(doc(db, "updates", this.id))
+        let p = await getDoc(doc(db, this.path, this.id))
 
-        if (!e.exists()) {
-            console.error("Could not load update with id: " + this.id)
+        if (!p.exists()) {
+            console.error(`Could not load post with id: ${this.id} Path: ${this.path}/${this.id}`)
             return {}
         }
 
 
-        let data = e.data()
+        let data = p.data()
 
         return data
     }
 
-    static async create(data) {
-        const up = await addDoc(collection(db, "updates"), data)
-        return up.id;
+    static async create(data, path) {
+        const p = await addDoc(collection(db, path), data)
+        return p.id;
     }
 
     async update(data) {
-        await setDoc(doc(db, "updates", this.id), data, { merge: true })
+        await setDoc(doc(db, this.path, this.id), data, { merge: true })
     }
 
     async delete() {
-        await deleteDoc(doc(db, "updates", this.id))
+        await deleteDoc(doc(db, this.path, this.id))
     }
 
     async pin(group) {
-        await group.updateData({ pinnedUpdate: this.id }, "public")
+        await group.updateData({ pinned: this.id }, "public")
     }
 
     async unpin(group) {
-        await group.updateData({ pinnedUpdate: null }, "public")
+        await group.updateData({ pinned: null }, "public")
+    }
+}
+
+export class Update extends Post {
+    constructor(id) {
+        super(id, "updates")
     }
 }
 
@@ -536,31 +528,6 @@ export class Event {
         }
 
         ev.find(".pfp").attr("src", await u.getPfp())
-
-
-        // actions
-
-        // let attending = 0
-
-        // let selfAttend = false
-
-        // const uData = await this.getUData()
-
-        // uData.forEach((doc) => {
-        //     const data = doc.data()
-
-        //     if (data.attending) {
-        //         attending += 1
-        //     }
-        //     if (auth.currentUser) {
-        //         if (doc.id == auth.currentUser.uid && data.attending) selfAttend = true;
-        //     }
-        // })
-
-        // const actions = ev.find(`.actions`)
-
-
-
 
 
         const open = $("<img/>").attr("src", "../img/icons/arrow.png")
