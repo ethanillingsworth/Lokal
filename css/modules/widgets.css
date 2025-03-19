@@ -85,6 +85,10 @@
     flex-wrap: wrap;
 }
 
+.event {
+    gap: 10px;
+}
+
 .event-details :first-child {
     margin-left: 0;
 }

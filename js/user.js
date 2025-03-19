@@ -8,6 +8,8 @@ import {
     ImageViewer
 } from "./funcs.js";
 
+import tinycolor from "https://esm.sh/tinycolor2"
+
 CSS.loadFiles(["../css/user.css"])
 
 
@@ -315,6 +317,17 @@ async function requests(user) {
         const actions = dis.find(".actions");
         actions.empty();
 
+        const reject = $("<img/>")
+            .addClass("action")
+            .attr("src", "../img/icons/x.png")
+            .on("click", async function () {
+                await user.updateMember(person.id, { pending: false, joined: false });
+                if (pub.notifs) {
+                    await user.notifyMember(personClass.uid, "has rejected you from their group...", "View their page on Lokal below", `https://lokalevents.com/user/index.html?u=${await user.getUsername()}`)
+                }
+                actions.parent().remove();
+            });
+
         const confirm = $("<img/>")
             .addClass("action")
             .attr("src", "../img/icons/confirm.png")
@@ -327,6 +340,7 @@ async function requests(user) {
                 actions.parent().remove();
             });
 
+        actions.append(reject);
         actions.append(confirm);
     })
 }
@@ -524,9 +538,6 @@ function updateProfile(data, pfp) {
     document.title = `Lokal - @${pageUser}`;
     displayName.text(data.displayName);
 
-
-
-
     desc.html(data.desc.replaceAll("\n", "<br>"));
 
     $("#pfp").attr("src", pfp);
@@ -555,7 +566,6 @@ bds.forEach((badgeName) => {
 const data = await user.getData("public")
 const profilePicture = await user.getPfp()
 
-updateProfile(data, profilePicture)
 
 async function feed(uid) {
     const feedTab = $("#Feed")
@@ -622,8 +632,6 @@ onAuthStateChanged(auth, async (u) => {
         createTab("Members")
 
         await feed(uid)
-        // await hosting(uid)
-        // await cal(user)
         await members(user)
         await gallery(user)
 
@@ -644,6 +652,8 @@ onAuthStateChanged(auth, async (u) => {
         createTab("Requests")
         await requests(user)
     }
+
+    updateProfile(data, profilePicture)
 
     if ((u.uid == uid || bdsU.includes("admin")) || (bds.includes("group") && readOnly.admin)) {
 
