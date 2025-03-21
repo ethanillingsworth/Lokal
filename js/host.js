@@ -78,7 +78,7 @@ function addPage(name, prev = null, next = null, current = false) {
                     };
 
 
-                    // upload
+                    // update
                     if (urlParams.get("e")) {
                         const e = new Event(urlParams.get("e"));
                         await e.update(data);
@@ -88,6 +88,7 @@ function addPage(name, prev = null, next = null, current = false) {
 
                         window.location.href = "../event/index.html?e=" + urlParams.get("e");
                     } else {
+                        // create
                         data.timestamp = Timestamp.fromDate(new Date());
                         data.creator = urlParams.get("u");
 
@@ -279,7 +280,7 @@ if (mode == "event") {
 
         inp.on("change", function () {
             if (inp.val() < 0) inp.val(0);
-            if (inp.val() > 1000) inp.val(1000);
+            if (inp.val() > 10000) inp.val(10000);
         });
 
         row.append(inp);
