@@ -648,7 +648,7 @@ onAuthStateChanged(auth, async (u) => {
 
     }
 
-    if (readOnly.admin || bdsU.includes("admin")) {
+    if (readOnly.admin || bds.includes("group") && bdsU.includes("admin")) {
         createTab("Requests")
         await requests(user)
     }
