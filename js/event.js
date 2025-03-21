@@ -358,11 +358,15 @@ addPage("Public View", async (page) => {
 
 addPage("RSVPs", async (page) => {
     const col = $("<div></div>").addClass("col");
+    const none = $("<h3/>").text("No one has joined your event yet! Send out a link to them to get started")
+    col.append(none)
     const userStats = $("<div></div>").addClass("col").css("display", "none");
 
     const uData = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData"), where("attending", "==", true)));
 
     uData.forEach(async (d) => {
+        none.css("display", "none")
+
         const aUser = new User(d.id)
         const username = await aUser.getUsername()
         const pub = await aUser.getData("public")
@@ -475,11 +479,15 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
     addPage("Stats", async (page) => {
         const col = $("<div></div>").addClass("col");
 
+        const none = $("<h3/>").text("No one has joined your event yet! Send out a link to them to get started")
+        col.append(none)
+
         const uData = await e.getUData()
 
         if (data.actions) {
 
             data.actions.forEach(async (a) => {
+                none.css("display", "none")
                 const key = a.label
 
                 const canvas = document.createElement("canvas")
