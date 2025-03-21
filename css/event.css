@@ -13,7 +13,8 @@
 }
 
 canvas {
-    max-height: 50vh;
+    transition: none;
+    height: 50vh !important;
 }
 
 

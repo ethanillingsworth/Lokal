@@ -158,7 +158,7 @@ addField("Border Color:", (row) => {
     const inp = $("<input></input>")
         .attr("type", "color")
         .attr("id", "borderColor")
-        .attr("value", "#a353b9")
+        .attr("value", "#f9c431")
 
     inp.on("change", () => {
         preview.css("borderColor", inp.val())

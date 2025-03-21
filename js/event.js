@@ -99,7 +99,7 @@ addPage("Public View", async (page) => {
     }
 
     if (data.cost > 0) {
-        cost.text(`Cost: ${data.cost}`);
+        cost.text(`Cost: $${data.cost}`);
         page.append(cost);
     }
 
@@ -476,22 +476,67 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
 
     tools.append(more.more);
 
-    addPage("Stats", async (page) => {
-        const col = $("<div></div>").addClass("col");
+    addPage("Charts / Stats", async (page) => {
+        const col = $("<div></div>").addClass("row").css("place-content", "start").css("gap", "20px");
 
         const none = $("<h3/>").text("No one has joined your event yet! Send out a link to them to get started")
         col.append(none)
 
         const uData = await e.getUData()
 
-        if (data.actions) {
+        function hereGraph() {
+            none.css("display", "none")
+            const canvas = document.createElement("canvas")
 
+            const dat = {
+                labels: [
+                    "Here",
+                    "Not here"
+                ],
+                datasets: [{
+                    label: "here",
+                    data: [0, 0],
+                    backgroundColor: [graphColors[0], graphColors[1]],
+                    hoverOffset: 4
+                }]
+            };
+
+            const config = {
+                type: 'pie',
+                data: dat,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Here:",
+                            font: {
+                                size: 32,
+                                weight: 'bold',
+                            },
+                            color: '#fff'
+                        }
+                    }
+                }
+            };
+
+            uData.forEach((d) => {
+                const da = d.data()
+                dat.datasets[0].data[da.here ? 0 : 1] += 1;
+            })
+
+            new Chart(canvas.getContext("2d"), config)
+            col.append(canvas)
+        }
+
+        hereGraph()
+
+
+        if (data.actions) {
             data.actions.forEach(async (a) => {
                 none.css("display", "none")
                 const key = a.label
 
                 const canvas = document.createElement("canvas")
-
 
                 const dat = {
                     labels: [
@@ -515,7 +560,8 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
                                 font: {
                                     size: 32,
                                     weight: 'bold',
-                                }
+                                },
+                                color: '#fff'
                             }
                         }
                     }
@@ -540,11 +586,9 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
 
                 new Chart(canvas, config)
 
-                col.append(canvas)
+                col.append($(canvas))
             })
         }
-
-
         page.append(col)
     })
 
