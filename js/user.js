@@ -570,21 +570,19 @@ const profilePicture = await user.getPfp()
 async function feed(uid) {
     const feedTab = $("#Feed")
 
-    if (data.pinnedEvent) {
-        const up = new Event(data.pinnedEvent)
+    if (data.pinned) {
+        let up = null
+        if (data.pinned.path == "posts") {
+            up = new Event(data.pinned.id)
+        }
+        if (data.pinned.path == "updates") {
+            up = new Update(data.pinned.id)
+        }
 
         await up.display(feedTab, true)
 
     }
 
-    if (data.pinnedUpdate) {
-        const up = new Update(data.pinnedUpdate)
-
-        await up.display(feedTab, true)
-
-    }
-
-    console.log(uid)
 
     const updates = await getDocs(query(collection(db, "updates"), where("creator", "==", uid), orderBy("timestamp", "desc")))
 
@@ -593,14 +591,14 @@ async function feed(uid) {
     const feed = []
 
     updates.forEach(async (update) => {
-        if (update.id != data.pinnedUpdate) {
+        if (update.id != data.pinned.id) {
             const u = new Update(update.id)
             feed.push({ "value": u, "timestamp": update.data().timestamp })
         }
     })
 
     events.forEach(async (event) => {
-        if (event.id != data.pinnedEvent) {
+        if (event.id != data.pinned.id) {
             const u = new Event(event.id)
             feed.push({ "value": u, "timestamp": event.data().timestamp })
         }
