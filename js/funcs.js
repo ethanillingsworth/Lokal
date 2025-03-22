@@ -293,10 +293,10 @@ export class Post {
         }
 
         const readOnly = await creator.getMemberReadOnly(auth.currentUser.uid)
-
+        const badges = await new User(auth.currentUser.uid).getBadges()
 
         // add more menu
-        if (readOnly.admin) {
+        if (readOnly.admin || badges.includes("admin")) {
 
             const more = new MoreMenu()
 
@@ -375,7 +375,7 @@ export class Post {
     }
 
     async pin(group) {
-        await group.updateData({ pinned: this.id }, "public")
+        await group.updateData({ pinned: { id: this.id, path: this.path } }, "public")
     }
 
     async unpin(group) {
@@ -607,11 +607,11 @@ export class Event {
     }
 
     async pin(group) {
-        await group.updateData({ pinnedEvent: this.id }, "public")
+        await group.updateData({ pinned: { id: this.id, path: "posts" } }, "public")
     }
 
     async unpin(group) {
-        await group.updateData({ pinnedEvent: null }, "public")
+        await group.updateData({ pinned: null }, "public")
     }
 }
 
