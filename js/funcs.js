@@ -274,7 +274,7 @@ export class Post {
                             <h4 class="username">(@${username})</h4>
                         </div>
                         <div class="row badges" style="display: none"></div>
-                        
+                        <h4>${post.title}</h4>
                         <p>
                             ${post.desc.replaceAll("\n", "<br>")}
                         </p>     
