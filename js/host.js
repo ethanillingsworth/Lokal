@@ -92,7 +92,7 @@ function addPage(name, prev = null, next = null, current = false) {
                         data.timestamp = Timestamp.fromDate(new Date());
                         data.creator = urlParams.get("u");
 
-                        const id = await Event.create(data);
+                        const id = await Event.create(data, "posts");
 
                         if (!isPlaceholder && file != null) {
                             await new Event(id).bucket.uploadImage(file, "preview.jpg")
@@ -463,13 +463,13 @@ if (mode == "event") {
             src: "../img/icons/search.png",
             css: {
                 width: "auto",
-                height: "calc(100% - 10px)",
+                height: "calc(100% + 4px)",
                 padding: "10px",
                 paddingTop: "5px",
                 paddingBottom: "5px",
-                border: "2px solid var(--dark0)",
+                border: "2px solid var(--dark1)",
                 borderTopRightRadius: "15px",
-                borderBottomRightRadius: "15px",
+                borderBottomRightRadius: "15px"
             },
             id: "searchButton",
             on: {

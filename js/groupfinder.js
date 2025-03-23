@@ -8,17 +8,17 @@ const groups = await getDocs(query(collection(db, "users"), where("badges", "arr
 
 let index = 0;
 
-groups.forEach(async g => {
-    const u = new User(g.id)
-    const username = await u.getUsername()
-    const pub = await u.getData("public")
-    const hidden = await u.getData("hidden")
+for (const g of groups.docs) {  // Use for...of instead of forEach
+    const u = new User(g.id);
 
-    if (index != 0) {
-        $("#content").append($("<hr/>"))
+    const username = await u.getUsername();
+    const pub = await u.getData("public");
+    const hidden = await u.getData("hidden");
+
+    if (index !== 0) {
+        $("#content").append($("<hr/>"));
     }
 
-    await User.display(username, pub, hidden)
-    index++
-
-});
+    await User.display(username, pub, hidden);
+    index++;
+}

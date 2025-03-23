@@ -14,25 +14,39 @@ onAuthStateChanged(auth, async (u) => {
 
     const events = await getDocs(query(collection(db, "posts"), orderBy("timestamp", "desc"), limit(100)))
 
-    let index = 0;
-    events.forEach(async ev => {
-        const data = ev.data()
+    let eventsArray = [];
 
-        const creator = new User(data.creator)
+    // Collect events into an array
+    for (const ev of events.docs) {
+        const data = ev.data();
+        const creator = new User(data.creator);
 
-        console.log(Object.keys(await creator.getMember(u.uid)))
+        // Ensure creator.getMember() resolves before checking keys
+        const memberData = await creator.getMember(u.uid);
+        console.log(Object.keys(memberData));
 
-        if ((new Date(data.date).getMonth() >= new Date().getMonth()
-            || new Date(data.date).getDay() >= new Date().getDay())
-            && Object.keys(await creator.getMember(u.uid)).length > 0) {
-            const e = new Event(ev.id)
-            if (index != 0) {
-                $("#content").append($("<hr/>"))
-            }
+        const eventDate = new Date(data.date);
+        const currentDate = new Date();
 
-            await e.display()
-            index++;
+        if ((eventDate.getMonth() >= currentDate.getMonth() &&
+            eventDate.getDate() >= currentDate.getDate()) &&
+            Object.keys(memberData).length > 0) {
+
+            eventsArray.push({ event: new Event(ev.id), date: eventDate });
         }
-    });
+    }
+
+    // Sort events by date (earliest first)
+    eventsArray.sort((a, b) => a.date - b.date);
+
+    let index = 0;
+    for (const item of eventsArray) {
+        if (index !== 0) {
+            $("#content").append($("<hr/>"));
+        }
+
+        await item.event.display(); // Display in sorted order
+        index++;
+    }
 
 })
