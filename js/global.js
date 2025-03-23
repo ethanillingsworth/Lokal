@@ -5,9 +5,9 @@ import { query, where, getDocs, collection, setDoc, doc } from "https://www.gsta
 
 import { auth, db } from "./firebase.js";
 
-if (localStorage.getItem("mode") == "light") {
-    $(document.body).addClass("lightmode")
-}
+// if (localStorage.getItem("mode") == "light") {
+//     $(document.body).addClass("lightmode")
+// }
 
 // debug only version
 // const ver = document.createElement("span")
@@ -54,36 +54,6 @@ $(document.body).append(content)
 //addItem("Home", "../img/icons/home.png", "../")
 
 onAuthStateChanged(auth, async (user) => {
-
-
-    // const searchMenu = new Menu(expand)
-
-    // const searchBar = new CustomItem(`
-    //     <div class= "row" style = "gap: 0px; flex-wrap: nowrap; place-items: center; width: 100%;" >
-    //         <input placeholder="Search" id="search"></input>
-    //         <div id="search-icon">
-    //             <img src="../img/icons/search.png" style="margin: 0;">
-    //         </div>
-    //     </div>`,
-    //     () => {
-
-    //         document.getElementById("search-icon").onclick = async function () {
-    //             if (document.getElementById('search').value) {
-    //                 const s = document.getElementById('search').value.replaceAll('-', '\-').replaceAll(' ', '-')
-    //                 // if (user) {
-    //                 //     await updateDoc(doc(db, "users", uid, "data", "private"), {
-    //                 //         "prevRes": arrayUnion(s)
-    //                 //     });
-    //                 // }
-    //                 window.location.href = '../search/index.html?q=' + s
-
-    //             }
-    //         }
-    //     })
-
-    // searchBar.noHover = true
-
-    // searchMenu.addItem(searchBar)
 
     if (!user) {
         window.location.href = "../login"
@@ -203,16 +173,16 @@ onAuthStateChanged(auth, async (user) => {
             });
         }), true)
 
-        moreMenu.addItem(new Item("Change Mode", "../img/icons/switchmode.png", () => {
-            if (localStorage.getItem("mode") != "light") {
-                $(document.body).addClass("lightmode")
-                localStorage.setItem("mode", "light")
-            }
-            else {
-                $(document.body).removeClass("lightmode")
-                localStorage.setItem("mode", "dark")
-            }
-        }), true)
+        // moreMenu.addItem(new Item("Change Mode", "../img/icons/switchmode.png", () => {
+        //     if (localStorage.getItem("mode") != "light") {
+        //         $(document.body).addClass("lightmode")
+        //         localStorage.setItem("mode", "light")
+        //     }
+        //     else {
+        //         $(document.body).removeClass("lightmode")
+        //         localStorage.setItem("mode", "dark")
+        //     }
+        // }), true)
 
         if (badges.includes("premium") || badges.includes("admin")) {
             moreMenu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"), true)
