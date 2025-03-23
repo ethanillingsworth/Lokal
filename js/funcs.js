@@ -255,9 +255,9 @@ export class Post {
 
         const creator = new User(post.creator)
 
-        const user = await creator.getData()
+        const creatorData = await creator.getData()
 
-        const meta = await creator.getData("hidden")
+        const badges = await creator.getBadges()
 
         const username = await creator.getUsername()
 
@@ -270,7 +270,7 @@ export class Post {
                     <div class="event-content">
                     
                         <div class="user-info row" style="gap: 5px; place-items: center">
-                            <h4 class="display-name">${user.displayName}</h4>
+                            <h4 class="display-name">${creatorData.displayName}</h4>
                             <h4 class="username">(@${username})</h4>
                         </div>
                         <div class="row badges" style="display: none"></div>
@@ -284,19 +284,21 @@ export class Post {
             </div>`)
 
 
+
         postElem.find(".pfp").on("click", async () => {
             window.location.href = "../user/index.html?u=" + username
         })
 
-        if (user.accentColor) {
-            postElem.find(".pfp").css("borderColor", user.accentColor)
+        if (creatorData.accentColor) {
+            postElem.find(".pfp").css("borderColor", creatorData.accentColor)
         }
+        const user = new User(auth.currentUser.uid)
 
-        const readOnly = await creator.getMemberReadOnly(auth.currentUser.uid)
-        const badges = await new User(auth.currentUser.uid).getBadges()
+        const userReadOnly = await creator.getMemberReadOnly(auth.currentUser.uid)
+        const userBadges = await user.getBadges()
 
         // add more menu
-        if (readOnly.admin || badges.includes("admin")) {
+        if (userReadOnly.admin || userBadges.includes("admin")) {
 
             const more = new MoreMenu()
 
@@ -322,9 +324,9 @@ export class Post {
             postElem.find(".tools").append(more.more)
         }
 
-        if (meta.badges) {
+        if (badges) {
 
-            meta.badges.forEach((badgeName) => {
+            badges.forEach((badgeName) => {
                 const badge = Badge.getFromName(badgeName, "h5")
 
                 postElem.find(".badges").append(badge)
@@ -334,8 +336,8 @@ export class Post {
 
 
         if (pinned) {
-            if (user.accentColor) {
-                postElem.css("borderColor", user.accentColor)
+            if (creatorData.accentColor) {
+                postElem.css("borderColor", creatorData.accentColor)
             }
             else {
                 postElem.css("borderColor", "var(--accent)")
@@ -344,7 +346,26 @@ export class Post {
 
         postElem.find(".pfp").attr("src", await creator.getPfp())
 
-        content.append(postElem)
+        if (content != null) {
+            content.append(postElem)
+        }
+        return {
+            "creator": {
+                "object": creator,
+                "data": creatorData,
+                "meta": badges,
+                "username": username
+            },
+            "currentUser": {
+                "object": user,
+                "readOnly": userReadOnly,
+                "badges": userBadges
+            },
+            "post": {
+                "data": post,
+                "element": postElem
+            }
+        }
     }
 
     async get() {
@@ -389,146 +410,38 @@ export class Update extends Post {
     }
 }
 
-export class Event {
+export class Event extends Post {
     constructor(id) {
-        this.id = id
+        super(id, "posts")
         this.bucket = new ImageBucket(id, "EVENT")
     }
 
     async display(content = $("#content"), pinned = false) {
-        const event = await this.get(this.id)
+        const data = await super.display(null, pinned)
 
-        if (Object.keys(event).length <= 0) {
-            return
+        const ev = data.post.element
+        const postData = data.post.data
+
+        const eventImage = $("<img/>").addClass("event-image")
+
+        let cost = "Free Admission"
+
+        if (postData.cost > 0) {
+            cost = `$${postData.cost} per person`
         }
 
-        const u = new User(event.creator)
+        const info = $("<div/>").addClass("event-details row").html(`<b>${postData.date}</b> | <b>${postData.location}</b> | <b>${cost}</b>`)
 
-        const user = await u.getData()
-
-        const meta = await u.getData("hidden")
-
-        const username = await u.getUsername()
-
-        let cost = "Free admission";
-
-        if (event.cost > 0) {
-            cost = `$${event.cost} per person`
-        }
-
-        // make event
-        const ev = $("<div/>")
-            .addClass("event")
-            .attr("id", this.id)
-            .html(`<img class="pfp border" src="../img/pfp.jpg">
-            <div class="col" style="width: 100%">
-                <div class="content-wrapper row">
-                    <div class="event-content">
-                    
-                        <div class="user-info row" style="gap: 5px; place-items: center">
-                            <h4 class="display-name">${user.displayName}</h4>
-                            <h4 class="username">(@${username})</h4>
-                                
-                            
-                            <span class="bullet hide">•</span>
-                            <h4 class="category">${event.category}</h4>
-                                
-
-                        </div>
-                        <div class="row badges" style="display: none"></div>
-                        <div class="event-details row">
-                            <span><b>${event.date}</b></span>
-                            <span class="hide">|</span>
-                            <span><b>${event.location}</b></span>
-                            <span class="hide">|</span>
-                            <span><b>${cost}</b></span>
-                        </div>
-                        <p>
-                            ${event.desc.replaceAll("\n", "<br>")}
-                        </p>     
-                    </div>
-                    <img class="event-image" src="../img/sample.jpg">
-                </div>
-                <div class="row tools" style="place-content: end;"></div>
-            </div>`)
-
-
-        const badges = ev.find(".badges")
-
-        ev.find(".pfp").on("click", async () => {
-            window.location.href = "../user/index.html?u=" + username
-        })
-
-        if (user.accentColor) {
-            ev.find(".pfp").css("borderColor", user.accentColor)
-        }
-
-        const readOnly = await u.getMemberReadOnly(auth.currentUser.uid)
-
-
-
-        if (readOnly.admin) {
-
-            const more = new MoreMenu()
-
-            if (pinned) {
-                more.add("Unpin", async () => {
-                    await this.unpin(u)
-                    alert("Event unpinned, refresh your page to see updates")
-                })
-            }
-            else {
-                more.add("Pin", async () => {
-                    await this.pin(u)
-                    alert("Event pinned, refresh your page to see updates")
-                })
-            }
-
-            more.add("Delete", async () => {
-                if (confirm("Are you sure you want to delete this event?")) {
-                    await this.delete()
-                    ev.css("display", "none")
-                }
-            })
-            ev.find(".tools").append(more.more)
-        }
-
-        if (meta.badges) {
-
-            meta.badges.forEach((badgeName) => {
-                const badge = Badge.getFromName(badgeName, "h5")
-
-                badges.append(badge)
-                badges.css("display", "flex")
-            })
-        }
-
-        // ev.querySelector(".pfp").onclick = function () {
-        //     window.location.href = `../user/index.html?u=${username}`
-        // }
-
-        // ev.querySelector(".display-name").onclick = function () {
-        //     window.location.href = `../user/index.html?u=${username}`
-        // }
-
-        if (pinned) {
-            if (user.accentColor) {
-                ev.css("borderColor", user.accentColor)
-            }
-            else {
-                ev.css("borderColor", "var(--accent)")
-            }
-        }
+        ev.find(".badges").after(info)
 
         try {
-            ev.find(".event-image").attr("src", await this.bucket.getImage("preview.jpg"))
+            eventImage.attr("src", await this.bucket.getImage("preview.jpg"))
         }
         catch {
-            ev.find(".event-image").css("display", "none")
+            eventImage.css("display", "none")
         }
 
-        ev.find(".pfp").attr("src", await u.getPfp())
-
+        ev.find(".content-wrapper").append(eventImage)
 
         const open = $("<img/>").attr("src", "../img/icons/arrow.png")
 
@@ -538,12 +451,21 @@ export class Event {
 
         ev.find(".tools").append(open)
 
-        content.append(ev)
+        if (content != null) {
+            content.append(ev)
+        }
+        else {
+            return data
+        }
 
     }
 
     async getUData() {
         return await getDocs(query(collection(db, "posts", this.id, "uData")))
+    }
+
+    async updateUData(memberId, data) {
+        await setDoc(doc(db, "posts", this.id, "uData", memberId), data, { merge: true })
     }
 
     async getUDataMember(uid) {
@@ -566,52 +488,6 @@ export class Event {
 
     async setImage(file, name) {
         await this.bucket.uploadImage(file, name)
-    }
-
-    async update(data) {
-        await setDoc(doc(db, "posts", this.id), data, { merge: true })
-    }
-
-    async updateUData(memberId, data) {
-        await setDoc(doc(db, "posts", this.id, "uData", memberId), data, { merge: true })
-
-    }
-
-    async get() {
-        let e = await getDoc(doc(db, "posts", this.id))
-
-        if (!e.exists()) {
-            console.error("Could not load event with id: " + this.id)
-            return {}
-        }
-
-
-        let eventData = e.data()
-
-        return eventData
-    }
-
-    static async create(data) {
-        const event = await addDoc(collection(db, "posts"), data)
-        return event.id;
-    }
-
-    async delete() {
-        const q = await getDocs(query(collection(db, "posts", this.id, "uData")));
-
-        q.forEach(async (d) => {
-            await deleteDoc(doc(db, "posts", this.id, "uData", d.id));
-        });
-
-        await deleteDoc(doc(db, "posts", this.id));
-    }
-
-    async pin(group) {
-        await group.updateData({ pinned: { id: this.id, path: "posts" } }, "public")
-    }
-
-    async unpin(group) {
-        await group.updateData({ pinned: null }, "public")
     }
 }
 
