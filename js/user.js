@@ -570,6 +570,9 @@ const profilePicture = await user.getPfp()
 async function feed(uid) {
     const feedTab = $("#Feed")
 
+    const none = $("<h2/>").text("There seems to be no posts...").css("font-size", "1.5em")
+    feedTab.append(none)
+
     if (data.pinned) {
         let up = null
         if (data.pinned.path == "posts") {
@@ -590,23 +593,31 @@ async function feed(uid) {
 
     const feed = []
 
+    let pinned = {}
+
+    if (data.pinned) {
+        pinned = data.pinned
+    }
+
     updates.forEach(async (update) => {
-        if (update.id != data.pinned.id) {
+        if (update.id != pinned.id) {
             const u = new Update(update.id)
             feed.push({ "value": u, "timestamp": update.data().timestamp })
         }
     })
 
     events.forEach(async (event) => {
-        if (event.id != data.pinned.id) {
+        if (event.id != pinned.id) {
             const u = new Event(event.id)
             feed.push({ "value": u, "timestamp": event.data().timestamp })
         }
     })
 
     feed.sort((a, b) => { return b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime() }).forEach(async (v) => {
+        none.remove()
         await v.value.display(feedTab)
     })
+
 }
 
 onAuthStateChanged(auth, async (u) => {
