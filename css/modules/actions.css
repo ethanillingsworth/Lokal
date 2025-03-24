@@ -6,11 +6,6 @@
     margin-top: 5px;
 }
 
-.actionsWrapper img {
-    width: 30px !important;
-    height: 30px !important;
-}
-
 .actions button,
 .actions select {
     width: fit-content;

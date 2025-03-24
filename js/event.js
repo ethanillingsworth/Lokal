@@ -176,10 +176,10 @@ addPage("Public View", async (page) => {
         row.append(label)
 
         const dropdown = new Dropdown(data.label.replaceAll(" ", ""))
-
-        data.options.forEach((opt) => {
+        for (const opt of data.options) {
             dropdown.addOption(opt)
-        })
+        }
+
 
         if (currentUData[data.label]) {
 
@@ -226,10 +226,10 @@ addPage("Public View", async (page) => {
 
             menu.add("Remove Selected Option", async () => {
                 dropdown.removeOption(dropdown.menu.val())
-                const i = data.options.indexOf(dropdown.menu.val()) + 1
+                const i = data.options.indexOf(dropdown.menu.val()) - 1
                 data.options.splice(i, 1)
                 if (i > 0) {
-                    dropdown.menu.val(data.options[i - 1])
+                    dropdown.menu.val(data.options[i])
                 }
                 await e.update({
                     "actions": act
