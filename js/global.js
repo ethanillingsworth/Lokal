@@ -186,6 +186,7 @@ onAuthStateChanged(auth, async (user) => {
 
         if (badges.includes("premium") || badges.includes("admin")) {
             moreMenu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"), true)
+            moreMenu.addItem(new Item("Organizer Guide", "../img/icons/doc.png", "../links/org-guide"), true)
         }
 
         let backAdded = false
@@ -244,7 +245,7 @@ onAuthStateChanged(auth, async (user) => {
 
         const groups = await getDocs(q)
 
-        groups.forEach(async g => {
+        for (const g of groups.docs) {
             const group = new User(g.id)
 
             const mem = await group.getMember(uid)
@@ -264,8 +265,7 @@ onAuthStateChanged(auth, async (user) => {
 
                 groupMenu.addItem(item)
             }
-
-        });
+        }
 
     }
 

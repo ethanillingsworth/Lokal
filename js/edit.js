@@ -39,7 +39,7 @@ function addButton(label, onclick) {
     })
 }
 
-let pageUser = undefined
+let pageUser = null
 
 if (urlParams.get("u")) {
 
@@ -90,8 +90,12 @@ addField("Display Name:", (row) => {
     row.append(inp)
 })
 let bdgs = undefined
-if (pageUser) {
-    bdgs = await pageUser.getBadges()
+
+if (pageUser || urlParams.get("createGroup")) {
+    bdgs = ["group"]
+    if (pageUser) {
+        bdgs = await pageUser.getBadges()
+    }
 
     if (bdgs.includes("group")) {
 
@@ -241,7 +245,7 @@ addButton("Done", async () => {
         data["contactEmail"] = null
     }
 
-    if (bdgs != null && bdgs.includes("group")) {
+    if (bdgs != null && bdgs.includes("group") || urlParams.get("createGroup")) {
         if (data["contactEmail"] == null) {
             alert("As a group you are required to have a contact email!")
             return
