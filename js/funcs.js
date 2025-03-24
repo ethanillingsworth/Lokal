@@ -241,9 +241,10 @@ export class Badge {
 
 // Generic Post
 export class Post {
-    constructor(id, path) {
+    constructor(id, type) {
         this.id = id
-        this.path = path
+        this.path = "posts"
+        this.type = type
     }
 
     async display(content = $("#content"), pinned = false) {
@@ -382,8 +383,8 @@ export class Post {
         return data
     }
 
-    static async create(data, path) {
-        const p = await addDoc(collection(db, path), data)
+    static async create(data) {
+        const p = await addDoc(collection(db, "posts"), data)
         return p.id;
     }
 
@@ -406,13 +407,13 @@ export class Post {
 
 export class Update extends Post {
     constructor(id) {
-        super(id, "updates")
+        super(id, "UPDATE")
     }
 }
 
 export class Event extends Post {
     constructor(id) {
-        super(id, "posts")
+        super(id, "EVENT")
         this.bucket = new ImageBucket(id, "EVENT")
     }
 
@@ -464,11 +465,11 @@ export class Event extends Post {
         return await getDocs(query(collection(db, "posts", this.id, "uData")))
     }
 
-    async updateUData(memberId, data) {
+    async updateMemberUData(memberId, data) {
         await setDoc(doc(db, "posts", this.id, "uData", memberId), data, { merge: true })
     }
 
-    async getUDataMember(uid) {
+    async getMemberUData(uid) {
         let e = await getDoc(doc(db, "posts", this.id, "uData", uid))
 
         if (!e.exists()) {
@@ -488,6 +489,12 @@ export class Event extends Post {
 
     async setImage(file, name) {
         await this.bucket.uploadImage(file, name)
+    }
+}
+
+export class Gallery extends Post {
+    constructor(id) {
+        super(id, "GALLERY")
     }
 }
 
