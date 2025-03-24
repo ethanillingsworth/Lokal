@@ -75,6 +75,7 @@ function addPage(name, prev = null, next = null, current = false) {
                         location: Utils.toTitleCase(loc.val()),
                         cost: cost.val(),
                         agenda: agenda.val().replaceAll("\n", "<br>"),
+                        type: "EVENT"
                     };
 
 
@@ -92,7 +93,7 @@ function addPage(name, prev = null, next = null, current = false) {
                         data.timestamp = Timestamp.fromDate(new Date());
                         data.creator = urlParams.get("u");
 
-                        const id = await Event.create(data, "posts");
+                        const id = await Event.create(data);
 
                         if (!isPlaceholder && file != null) {
                             await new Event(id).bucket.uploadImage(file, "preview.jpg")
@@ -111,6 +112,7 @@ function addPage(name, prev = null, next = null, current = false) {
                     const data = {
                         title: title.val(),
                         desc: desc.val().replaceAll("\n", "<br>"),
+                        type: "UPDATE"
                     }
 
                     if (urlParams.get("update")) {
@@ -122,9 +124,8 @@ function addPage(name, prev = null, next = null, current = false) {
 
                         data.timestamp = Timestamp.fromDate(new Date());
                         data.creator = urlParams.get("u");
-                        data.face = auth.currentUser.uid;
 
-                        await Update.create(data, "updates")
+                        await Update.create(data)
                         await user.notifyAllMembers(`posted a new update -- ${data.title}`, data.desc, "https://lokalevents.com/user/index.html?u=" + await user.getUsername())
 
 

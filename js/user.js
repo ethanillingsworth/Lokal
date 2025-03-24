@@ -575,10 +575,10 @@ async function feed(uid) {
 
     if (data.pinned) {
         let up = null
-        if (data.pinned.path == "posts") {
+        if (data.pinned.type == "EVENT") {
             up = new Event(data.pinned.id)
         }
-        if (data.pinned.path == "updates") {
+        if (data.pinned.type == "UPDATE") {
             up = new Update(data.pinned.id)
         }
 
@@ -586,10 +586,7 @@ async function feed(uid) {
 
     }
 
-
-    const updates = await getDocs(query(collection(db, "updates"), where("creator", "==", uid), orderBy("timestamp", "desc")))
-
-    const events = await getDocs(query(collection(db, "posts"), where("creator", "==", uid), orderBy("timestamp", "desc")))
+    const posts = await getDocs(query(collection(db, "posts"), where("creator", "==", uid), orderBy("timestamp", "desc")))
 
     const feed = []
 
@@ -598,20 +595,20 @@ async function feed(uid) {
     if (data.pinned) {
         pinned = data.pinned
     }
-
-    // Process updates
-    updates.forEach((update) => {
-        if (update.id !== pinned.id) {
-            const u = new Update(update.id);
-            feed.push({ "value": u, "timestamp": update.data().timestamp });
-        }
-    });
-
     // Process events
-    events.forEach((event) => {
-        if (event.id !== pinned.id) {
-            const u = new Event(event.id);
-            feed.push({ "value": u, "timestamp": event.data().timestamp });
+    posts.forEach((post) => {
+        if (post.id !== pinned.id) {
+            let u = null;
+            const data = post.data()
+
+            if (data.type == "EVENT") {
+                u = new Event(post.id)
+            }
+
+            if (data.type == "UPDATE") {
+                u = new Update(post.id)
+            }
+            feed.push({ "value": u, "timestamp": post.data().timestamp });
         }
     });
 
@@ -632,6 +629,8 @@ onAuthStateChanged(auth, async (u) => {
         return
     }
 
+    updateProfile(data, profilePicture)
+
     const currentUser = new User(u.uid)
 
     let bdsU = await currentUser.getBadges()
@@ -642,12 +641,12 @@ onAuthStateChanged(auth, async (u) => {
         createTab("Feed", true)
         // createTab("Events")
         // createTab("Calendar")
-        createTab("Gallery")
+        // createTab("Gallery")
         createTab("Members")
 
         await feed(uid)
         await members(user)
-        await gallery(user)
+        // await gallery(user)
 
     }
 
@@ -667,7 +666,6 @@ onAuthStateChanged(auth, async (u) => {
         await requests(user)
     }
 
-    updateProfile(data, profilePicture)
 
     if ((u.uid == uid || bdsU.includes("admin")) || (bds.includes("group") && readOnly.admin)) {
 
