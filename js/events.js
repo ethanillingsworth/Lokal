@@ -19,18 +19,13 @@ onAuthStateChanged(auth, async (u) => {
     // Collect events into an array
     for (const ev of events.docs) {
         const data = ev.data();
-        const creator = new User(data.creator);
 
-        // Ensure creator.getMember() resolves before checking keys
-        const memberData = await creator.getMember(u.uid);
-        console.log(Object.keys(memberData));
 
         const eventDate = new Date(data.date);
+        eventDate.setHours(23)
         const currentDate = new Date();
 
-        if ((eventDate.getMonth() >= currentDate.getMonth() &&
-            eventDate.getDate() >= currentDate.getDate()) &&
-            Object.keys(memberData).length > 0) {
+        if ((eventDate.getTime() >= currentDate.getTime())) {
 
             eventsArray.push({ event: new Event(ev.id), date: eventDate });
         }

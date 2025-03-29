@@ -83,7 +83,7 @@ function addPage(name, prev = null, next = null, current = false) {
                     if (urlParams.get("e")) {
                         const e = new Event(urlParams.get("e"));
                         await e.update(data);
-                        if (!isPlaceholder && file != null) {
+                        if (file != null) {
                             await e.bucket.uploadImage(file, "preview.jpg")
                         }
 
@@ -343,7 +343,7 @@ if (mode == "event") {
             id: "agenda",
             placeholder: `This is where you put a detailed run down of your plans for the event!`,
             maxLength: "1000",
-        }).css({ width: "500px", height: "400px" });
+        })
 
         const txtP = $("<p/>", {
             class: "inp",
@@ -439,8 +439,6 @@ if (mode == "event") {
         src: "https://www.google.com/maps/embed/v1/place?q=''&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8",
         style: "border: 0px solid black",
     })
-        .css("width", "600px")
-        .css("height", "350px")
 
 
     loc.find(".cont").append(map);

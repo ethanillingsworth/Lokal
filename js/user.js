@@ -5,7 +5,10 @@ import { listAll, deleteObject, ref } from "https://www.gstatic.com/firebasejs/1
 import { db, auth, imgDB } from "./firebase.js";
 import {
     User, Badge, Event, MoreMenu, Update, Calendar, CSS,
-    ImageViewer
+    ImageViewer,
+    Popup,
+    Dropdown,
+    PostPopup
 } from "./funcs.js";
 
 import tinycolor from "https://esm.sh/tinycolor2"
@@ -639,33 +642,15 @@ onAuthStateChanged(auth, async (u) => {
 
     if (bds.includes("group")) {
         createTab("Feed", true)
-        // createTab("Events")
-        // createTab("Calendar")
-        // createTab("Gallery")
         createTab("Members")
-
-        await feed(uid)
-        await members(user)
-        // await gallery(user)
 
     }
 
     else {
-
         createTab("Attending", true)
-        await attending(uid)
-
         createTab("Groups")
 
-        await groups(user)
-
     }
-
-    if (readOnly.admin || bds.includes("group") && bdsU.includes("admin")) {
-        createTab("Requests")
-        await requests(user)
-    }
-
 
     if ((u.uid == uid || bdsU.includes("admin")) || (bds.includes("group") && readOnly.admin)) {
 
@@ -673,41 +658,10 @@ onAuthStateChanged(auth, async (u) => {
         const moreMenu = new MoreMenu()
 
         if (bds.includes("group")) {
-            moreMenu.add("Add Event", () => {
-                window.location.href = "../host/index.html?u=" + user.uid
+            moreMenu.add("Add Post", () => {
+                const popup = new PostPopup(uid)
 
-            })
-
-            moreMenu.add("Add Update", () => {
-                window.location.href = "../host/index.html?mode=update&u=" + user.uid
-
-            })
-
-            moreMenu.add("Add Gallery Folder", async () => {
-                const label = prompt("Enter new folder name:")
-
-                if (label.length < 1 || label.length > 30) {
-                    alert("Name cannot be blank, and cannot be over 30 chars.")
-                    return
-                }
-                else if (await nameExists(label)) {
-                    alert("You already have a folder with this name.")
-                    return
-                }
-
-                const response = await fetch("../img/placeholder.png");
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const blob = await response.blob();
-
-                // add folder
-                await user.bucket.uploadImage(new File([blob], "placeholder.png", { "type": "image/png" }), `/gallery/${label}/placeholder.png`)
-                // refresh gallery
-                await gallery(user)
-
+                popup.show()
             })
 
         }
@@ -732,23 +686,45 @@ onAuthStateChanged(auth, async (u) => {
             window.location.href = "../edit/index.html?u=" + urlParams.get("u")
         })
 
-        moreMenu.add("Delete Profile", async () => {
-            await user.delete()
+        if (bds.includes("group")) {
+            moreMenu.add("Delete Profile", async () => {
+                await user.delete()
 
-            const priv = await currentUser.getData("private")
-            await currentUser.updateData({
-                groupsCreated: priv.groupsCreated - 1
-            }, "private")
+                const priv = await currentUser.getData("private")
+                await currentUser.updateData({
+                    groupsCreated: priv.groupsCreated - 1
+                }, "private")
 
-            window.location.href = "../"
+                window.location.href = "../"
 
-        })
+            })
+        }
 
 
 
 
         tools.append(moreMenu.more)
     }
+
+    if (bds.includes("group")) {
+        await feed(uid)
+        await members(user)
+        // await gallery(user)
+
+    }
+
+    else {
+        await attending(uid)
+
+        await groups(user)
+
+    }
+
+    if (readOnly.admin || bds.includes("group") && bdsU.includes("admin")) {
+        createTab("Requests")
+        await requests(user)
+    }
+
 
     if (bds.includes("group")) {
         const memberData = await user.getMember(currentUser.uid)

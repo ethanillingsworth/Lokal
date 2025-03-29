@@ -302,7 +302,10 @@ export class Post {
         if (userReadOnly.admin || userBadges.includes("admin")) {
 
             const more = new MoreMenu()
+            more.add("Edit", () => {
+                new PostPopup(creator.uid, Utils.toTitleCase(this.type.toLowerCase()), this.id).show()
 
+            })
             if (pinned) {
                 more.add("Unpin", async () => {
                     await this.unpin(creator)
@@ -492,9 +495,9 @@ export class Event extends Post {
     }
 }
 
-export class Gallery extends Post {
+export class Media extends Post {
     constructor(id) {
-        super(id, "GALLERY")
+        super(id, "Media")
     }
 }
 
@@ -502,16 +505,11 @@ export class User {
     constructor(uid) {
         this.uid = uid
         this.bucket = new ImageBucket(uid);
+
     }
 
-
-    async getEvents() {
+    async getPosts() {
         return await getDocs(query(collection(db, "posts"), where("creator", "==", this.uid)))
-    }
-
-    async getUpdates() {
-        return await getDocs(query(collection(db, "updates"), where("creator", "==", this.uid)))
-
     }
 
     async deleteMembers() {
@@ -527,23 +525,13 @@ export class User {
         })
     }
 
-    async deleteEvents() {
-        const e = await this.getEvents()
+    async deletePosts() {
+        const e = await this.getPosts()
 
         e.forEach(async (event) => {
             const id = event.id
 
             await deleteDoc(doc(db, "posts", id))
-        })
-    }
-
-    async deleteUpdates() {
-        const e = await this.getUpdates()
-
-        e.forEach(async (update) => {
-            const id = update.id
-
-            await deleteDoc(doc(db, "updates", id))
         })
     }
 
@@ -685,9 +673,7 @@ export class User {
         const user = $("<div/>")
             .addClass("user")
             .addClass("row")
-            .css("gap", 0)
             .css("flex-wrap", "nowrap")
-            .css("width", "calc(100% - 40px)")
             .css("place-content", "start")
             .css("place-items", "start")
 
@@ -1057,8 +1043,19 @@ export class Dropdown {
         this.menu.append($("<option/>").text(text).attr("id", text))
     }
 
+    addOptions(arr) {
+        for (let index = 0; index < arr.length; index++) {
+            const element = arr[index];
+            this.addOption(element)
+        }
+    }
+
+    setDefault(text) {
+        this.menu.find(`[id='${text}']`).attr("selected", true)
+    }
+
     removeOption(text) {
-        this.menu.find(`#${text}`).remove()
+        this.menu.find(`[id='${text}']`).remove()
     }
 }
 
@@ -1305,7 +1302,6 @@ export class Calendar {
     }
 }
 
-
 export class ImageBucket {
     constructor(id, type) {
         this.id = id
@@ -1434,7 +1430,6 @@ export class ImageBucket {
     }
 }
 
-
 export class ImageViewer {
     constructor(photos, startIndex = 0) {
         this.content = $("<div/>").attr("id", "imageViewer")
@@ -1537,8 +1532,380 @@ export class ImageViewer {
     }
 }
 
-// export class CSV {
-//     static async import(csv) {
-//         return $.csv.toObjects(csv);
-//     }
-// }
+export class Popup {
+    constructor() {
+        this.bg = $("<div/>").attr("id", "bg")
+
+        this.wrapper = $("<div/>").addClass("col popupWrapper")
+
+        this.modal = $("<div/>").addClass("modal popup")
+        this.content = $("<div/>").addClass("col content")
+        this.buttons = $("<div/>").addClass("row")
+
+        this.modal.append(this.content).append(this.buttons)
+
+        this.wrapper.append(this.modal)
+
+        this.addButton("Cancel", () => {
+            this.hide()
+        })
+    }
+
+    addButton(text, func) {
+        const button = $("<button/>").text(text)
+        this.buttons.append(button)
+
+        button.on("click", func)
+
+
+    }
+
+    show() {
+        $(document.body).append(this.wrapper).append(this.bg)
+    }
+
+    hide() {
+        this.bg.remove()
+        this.wrapper.remove()
+    }
+
+    clear() {
+        this.content.empty()
+    }
+
+    addElement(label, e) {
+        const row = $("<div/>").addClass("row")
+        row.append($("<h3/>").text(label))
+        row.append(e)
+        this.content.append(row)
+
+        return row
+    }
+
+    addRule() {
+        this.content.append($("<hr/>"))
+    }
+
+}
+
+export class PostPopup extends Popup {
+
+    constructor(creatorId, type, postId) {
+        super()
+        this.type = type
+        this.postId = postId
+
+        this.user = new User(creatorId)
+
+        this.postTypes = new Dropdown("postTypes")
+
+        this.postTypes.addOption("Event")
+        this.postTypes.addOption("Update")
+        this.v = "Event"
+
+        this.refreshContent()
+
+        if (type) {
+            this.postTypes.menu.val(type)
+            this.v = type
+
+            console.log(this.v)
+
+            this.postTypes.menu.attr("disabled", true)
+
+            if (type == "Event") {
+                const e = new Event(postId)
+
+                e.get().then((data) => {
+                    $("#title").val(data.title)
+                    $("#desc").val(data.desc.replaceAll("<br>", "\n"))
+                    $("#cost").val(data.cost)
+                    $("#agenda").val(data.agenda.replaceAll("<br>", "\n"))
+                    $("#location").val(data.location)
+                    $("#date").val(data.date)
+                    try {
+                        e.getImage("preview.jpg").then((img) => {
+                            $("#preview").attr("src", img);
+                        })
+                    }
+                    catch { }
+
+                })
+            }
+
+            if (type == "Update") {
+                const e = new Update(postId)
+
+                e.get().then((data) => {
+                    $("#title").val(data.title)
+                    $("#desc").val(data.desc.replaceAll("<br>", "\n"))
+
+                })
+            }
+
+        }
+
+        this.refreshContent()
+
+        this.addButton("Done", async () => {
+            let data = {
+                title: $("#title").val(),
+                desc: $("#desc").val().replaceAll("\n", "<br>")
+            }
+            if (this.v == "Event") {
+
+                if ($("location").val() == "" || $("location").val() == null) {
+                    $("#location").val("None")
+                }
+                data = {
+                    ...data,
+                    category: $("#cate").val(),
+                    date: $("#date").val(),
+                    cost: $("#cost").val(),
+                    agenda: $("#agenda").val().replaceAll("\n", "<br>"),
+                    location: Utils.toTitleCase($("#location").val()),
+                    type: "EVENT"
+                }
+
+                if (postId) {
+                    const e = new Event(postId);
+                    await e.update(data);
+                    if (this.file != null) {
+                        await e.bucket.uploadImage(this.file, "preview.jpg")
+                    }
+
+                    window.location.href = "../event/index.html?e=" + postId;
+                } else {
+                    // create
+                    data.timestamp = Timestamp.fromDate(new Date());
+                    data.creator = this.user.uid;
+
+                    const id = await Event.create(data);
+
+                    if (this.file != null) {
+                        await new Event(id).bucket.uploadImage(this.file, "preview.jpg")
+                    }
+
+                    await this.user.notifyAllMembers(`posted a new event -- ${data.title}`, data.desc, "https://lokalevents.com/event/index.html?e=" + id)
+
+                    window.location.href = "../event/index.html?e=" + id;
+                }
+            }
+            else if (this.v == "Update") {
+                data = {
+                    ...data,
+                    type: "UPDATE"
+                }
+
+                if (postId) {
+                    const up = new Update(postId)
+
+                    await up.update(data)
+                }
+                else {
+
+                    data.timestamp = Timestamp.fromDate(new Date());
+                    data.creator = this.user.uid;
+
+                    await Update.create(data)
+                    await this.user.notifyAllMembers(`posted a new update -- ${data.title}`, data.desc, "https://lokalevents.com/user/index.html?u=" + await user.getUsername())
+
+
+                }
+
+                window.location.href = "../user/index.html?u=" + await this.user.getUsername()
+            }
+            else if (this.v == "Media") { }
+        })
+
+        this.file = null
+
+    }
+
+    refreshContent() {
+
+        this.clear()
+        this.addElement("Post Type:", this.postTypes.menu)
+        this.postTypes.menu.on("change", () => {
+            this.v = this.postTypes.menu.val()
+            this.refreshContent()
+        })
+
+        this.addRule()
+
+
+        const title = $("<input/>")
+            .attr("placeholder", "Title for your post")
+            .val("Title for your post")
+            .attr("id", "title")
+
+        this.addElement("Title:", title)
+
+        const desc = $("<textarea/>")
+            .attr("placeholder", "A short summary for your post")
+            .val("A short summary for your post")
+            .attr("rows", "5")
+            .attr("id", "desc")
+
+        this.addElement("Summary:", desc)
+            .addClass("wrap")
+
+        this.addRule()
+
+        // event specific fields
+        if (this.v == "Event") {
+            const eventCategory = new Dropdown("cate")
+            eventCategory.addOptions(["Arts", "Community", "Club Activity", "Food & Drink", "Fitness", "Sports", "Music", "Workshops / Classes", "Family / Kids", "Tech", "Holidays", "Networking", "Activism", "Travel", "Conference", "Charity", "Community Service"])
+            eventCategory.setDefault("Club Activity")
+
+            this.addElement("Category:", eventCategory.menu)
+
+            const date = $("<input/>")
+                .attr("id", "date")
+                .val(new Date().toLocaleDateString("en-US"));
+
+            date.on("change", function () {
+                if (new Date(date.val()) < new Date() || new Date(date.val()) == "Invalid Date") {
+                    date.val(new Date().toLocaleDateString("en-US"));
+                } else {
+                    date.val(new Date(date.val()).toLocaleDateString("en-US"));
+                }
+            });
+
+            this.addElement("Date:", date)
+
+            const cost = $("<input/>")
+                .attr("id", "cost")
+                .attr("placeholder", "0")
+                .val("0")
+                .attr("type", "number");
+
+            cost.on("change", function () {
+                if (cost.val() < 0) cost.val(0);
+                if (cost.val() > 10000) cost.val(10000);
+            });
+
+            this.addElement("Cost:", cost)
+
+            this.addRule()
+
+
+            const txtArea = $("<textarea/>", {
+                id: "agenda",
+                placeholder: `This is where you put a detailed run down of your plans for the event!`,
+                maxLength: "1000",
+            })
+                .attr("rows", 10)
+                .attr("cols", 40)
+
+            this.addElement("Agenda:", txtArea)
+                .addClass("wrap")
+
+            const txtLimit = $("<h5/>").css({ textAlign: "right", color: "gray" });
+
+            txtLimit.html('<span id="count" style="color: gray">0</span>/1000');
+
+            txtArea.on("input", () => {
+                txtLimit.find("span").text(txtArea[0].textLength);
+            });
+
+            txtArea.on("change", () => {
+                if (txtArea[0].textLength < 1) {
+                    txtArea.val("This cannot be left blank!!");
+                }
+                txtLimit.find("span").text(txtArea[0].textLength);
+            });
+
+            this.content.append(txtLimit)
+
+            this.addRule()
+
+
+            const preview = $("<img/>", {
+                id: "preview",
+                src: "../img/placeholder.png",
+            })
+                .css("place-self", "center");
+            ;
+
+            this.content.append(preview)
+
+            const fileInp = $("<input/>", {
+                type: "file",
+                accept: "image/png, image/jpeg",
+                name: "upload",
+                id: "upload",
+            }).on("change", async () => {
+                this.file = fileInp[0].files[0];
+                preview.attr("src", await Utils.getBase64(this.file));
+
+            });
+
+            const label = $("<label/>", {
+                text: "Browse...",
+                for: "upload",
+            }).on("click", function () {
+                fileInp.click();
+            })
+                .css("width", "fit-content")
+                .css("place-self", "center");
+
+            this.content.append(fileInp, label);
+
+            this.addRule()
+
+
+            const map = $("<iframe/>", {
+                id: "map",
+                src: "https://www.google.com/maps/embed/v1/place?q=''&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8",
+                style: "border: 0px solid black",
+            })
+                .css("place-self", "center");
+
+
+            this.content.append(map)
+
+            const newRow = $("<div/>", { class: "row" }).css({
+                flexWrap: "nowrap",
+                height: "37.2px",
+                gap: "0",
+            });
+
+            const searchInput = $("<input/>", {
+                id: "location",
+                placeholder: "Location / Address",
+            }).css({
+                borderTopRightRadius: "0",
+                borderBottomRightRadius: "0",
+            });
+
+            const search = $("<img/>", {
+                src: "../img/icons/search.png",
+                css: {
+                    width: "auto",
+                    height: "calc(100% + 4px)",
+                    padding: "10px",
+                    paddingTop: "5px",
+                    paddingBottom: "5px",
+                    border: "2px solid var(--dark1)",
+                    borderTopRightRadius: "15px",
+                    borderBottomRightRadius: "15px"
+                },
+                id: "searchButton",
+                on: {
+                    click: function () {
+                        map.attr("src", `https://www.google.com/maps/embed/v1/place?q=${searchInput.val().replaceAll(" ", "+")}&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8`);
+                    },
+                },
+            });
+
+            newRow.append(searchInput, search);
+
+            this.addElement("Address:", newRow)
+
+            this.addRule()
+
+
+        }
+    }
+}

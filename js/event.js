@@ -1,7 +1,7 @@
 import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where, deleteField } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
-import { Dropdown, Event, graphColors, MoreMenu, User, CSS } from "./funcs.js";
+import { Dropdown, Event, graphColors, MoreMenu, User, CSS, PostPopup } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search)
 CSS.loadFiles(["../css/event.css"])
@@ -45,7 +45,7 @@ const tools = $("<div/>").addClass("row").addClass("tools")
 
 modal.append(row)
 
-const preview = $("<img/>").addClass("event-image")
+const preview = $("<img/>").addClass("event-image").css("place-self", "center")
 
 try {
     preview.attr("src", await e.bucket.getImage("preview.jpg"))
@@ -78,7 +78,7 @@ modal.append(hr)
 
 const creator = new User(data.creator)
 
-const currentUData = await e.getUDataMember(currentUser.uid)
+const currentUData = await e.getMemberUData(currentUser.uid)
 
 const readOnly = await creator.getMemberReadOnly(currentUser.uid)
 
@@ -189,13 +189,14 @@ addPage("Public View", async (page) => {
             dropdown.menu.val(currentUData[data.label])
         }
         else {
-            await e.updateUData(currentUser.uid, {
+            await e.updateMemberUData(currentUser.uid, {
                 [data.label]: data.defaultOption
             })
         }
 
         dropdown.menu.on("change", async () => {
-            await e.updateUData(currentUser.uid, {
+
+            await e.updateMemberUData(currentUser.uid, {
                 [data.label]: dropdown.menu.val()
             })
             console.log("updated")
@@ -267,7 +268,7 @@ addPage("Public View", async (page) => {
                     const allUData = await e.getUData()
 
                     allUData.forEach(async (d) => {
-                        await e.updateUData(d.id, {
+                        await e.updateMemberUData(d.id, {
                             [data.label]: deleteField()
                         })
                     })
@@ -372,7 +373,7 @@ addPage("RSVPs", async (page) => {
         const pub = await aUser.getData("public")
         const meta = await aUser.getData("hidden")
 
-        const userUData = await e.getUDataMember(d.id)
+        const userUData = await e.getMemberUData(d.id)
 
 
         const display = await User.display(username, pub, meta, col)
@@ -418,7 +419,7 @@ addPage("RSVPs", async (page) => {
                         box.on("change", async () => {
                             console.log(box[0].checked)
 
-                            await e.updateUData(d.id, { [key]: box[0].checked })
+                            await e.updateMemberUData(d.id, { [key]: box[0].checked })
 
                         })
                         grid.append($("<div/>").append(box))
@@ -456,7 +457,7 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
     const more = new MoreMenu()
 
     more.add("Edit", function () {
-        window.location.href = "../host/index.html?e=" + urlParams.get("e");
+        new PostPopup(creator.uid, "Event", urlParams.get("e")).show()
     })
 
     more.add("Delete", async function () {
