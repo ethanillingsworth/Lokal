@@ -21,43 +21,6 @@
     color: gray
 }
 
-#Gallery {
-    gap: 10px
-}
-
-.scroll {
-    overflow-x: auto;
-    overflow-y: hidden;
-    height: 270px;
-    place-content: start;
-    padding: 15px;
-    padding-top: 10px;
-    gap: 30px;
-    margin-bottom: 20px
-}
-
-.scroll .image {
-    object-fit: cover;
-    height: 100%;
-    width: auto;
-}
-
-.scroll.remove .image {
-    transition: scale 0.25s ease-in-out;
-}
-
-
-.scroll.remove .image:hover {
-
-    filter: sepia(100%) saturate(300%) brightness(70%) hue-rotate(290deg);
-}
-
-.scroll .image:hover {
-    scale: 1.05;
-    cursor: pointer;
-}
-
-
 
 hr {
     position: relative;
@@ -65,7 +28,6 @@ hr {
     margin: 0 !important;
 
 }
-
 
 #edit:hover {
     cursor: pointer;

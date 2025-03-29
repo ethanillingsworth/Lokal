@@ -28,6 +28,29 @@
     height: 100%;
 }
 
+.popup label {
+    width: fit-content;
+    place-self: center;
+}
+
+.popup .grid {
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-auto-rows: auto;
+    gap: 20px;
+    width: fit-content;
+    place-self: center;
+}
+
+.popup .grid>img {
+    object-fit: cover;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    border-radius: 15px;
+    max-width: 200px;
+    height: auto;
+
+}
+
 .popupWrapper {
     position: absolute;
     overflow-y: auto;
@@ -70,4 +93,20 @@
 .popup .content #map {
     width: 500px;
     height: 350px;
+}
+
+@media (max-width: 600px) {
+    .popup .content #preview {
+        width: 250px;
+    }
+
+    .popup .grid {
+        grid-template-columns: 1fr;
+        width: 250px;
+    }
+
+    .popup .content #map {
+        width: 250px;
+        height: calc(350px / 2);
+    }
 }

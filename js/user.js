@@ -8,7 +8,8 @@ import {
     ImageViewer,
     Popup,
     Dropdown,
-    PostPopup
+    PostPopup,
+    Media
 } from "./funcs.js";
 
 import tinycolor from "https://esm.sh/tinycolor2"
@@ -585,6 +586,10 @@ async function feed(uid) {
             up = new Update(data.pinned.id)
         }
 
+        if (data.pinned.type == "Media") {
+            up = new Media(data.pinned.id)
+        }
+
         await up.display(feedTab, true)
 
     }
@@ -610,6 +615,10 @@ async function feed(uid) {
 
             if (data.type == "UPDATE") {
                 u = new Update(post.id)
+            }
+
+            if (data.type == "MEDIA") {
+                u = new Media(post.id)
             }
             feed.push({ "value": u, "timestamp": post.data().timestamp });
         }
