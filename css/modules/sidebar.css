@@ -1,6 +1,12 @@
+/* fonts */
+
+@import url(https://fonts.googleapis.com/css?family=EB+Garamond);
+
 #heading {
     margin: 20px;
     text-align: left;
+    font-size: 3em !important;
+    font-family: "EB Garamond";
 }
 
 
