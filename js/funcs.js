@@ -498,6 +498,39 @@ export class Event extends Post {
 export class Media extends Post {
     constructor(id) {
         super(id, "Media")
+        this.bucket = new ImageBucket(id, "EVENT")
+    }
+
+    async display(content = $("#content"), pinned = false) {
+        const data = await super.display(content, pinned)
+
+        const ev = data.post.element
+        const postData = data.post.data
+
+        const grid = $("<div/>", {
+            css: {
+                placeSelf: "start"
+            }
+        })
+            .addClass("grid three")
+
+        const files = []
+
+        for (const v of postData.images) {
+            const url = await this.bucket.getImage(v)
+
+            files.push({ name: v, url: url })
+        }
+
+
+        for (let index = 0; index < postData.images.length; index++) {
+            const img = postData.images[index];
+
+            grid.append($("<img/>").attr("src", await this.bucket.getImage(img)).on("click", () => {
+                new ImageViewer(files, index)
+            }))
+        }
+        ev.find(".event-content").append(grid)
     }
 }
 
@@ -1446,7 +1479,9 @@ export class ImageViewer {
 
         topBar.append(exit)
 
-        topBar.append($("<h3/>").text(photos[startIndex].name).css("height", "fit-content"))
+        this.name = $("<h3/>").text(photos[startIndex].name).css("height", "fit-content")
+
+        topBar.append(this.name)
 
         exit.on("click", () => {
             this.delete()
@@ -1521,6 +1556,7 @@ export class ImageViewer {
         if (this.index + 1 < this.photos.length) {
             this.index += 1
             this.image.attr("src", this.photos[this.index].url)
+            this.name.text(this.photos[this.index].name)
         }
     }
 
@@ -1528,6 +1564,8 @@ export class ImageViewer {
         if (this.index - 1 >= 0) {
             this.index -= 1
             this.image.attr("src", this.photos[this.index].url)
+            this.name.text(this.photos[this.index].name)
+
         }
     }
 }
@@ -1601,7 +1639,10 @@ export class PostPopup extends Popup {
 
         this.postTypes.addOption("Event")
         this.postTypes.addOption("Update")
+        this.postTypes.addOption("Media")
+
         this.v = "Event"
+        this.images = []
 
         this.refreshContent()
 
@@ -1640,6 +1681,20 @@ export class PostPopup extends Popup {
                     $("#title").val(data.title)
                     $("#desc").val(data.desc.replaceAll("<br>", "\n"))
 
+                })
+            }
+
+            if (type == "Media") {
+                const e = new Media(postId)
+
+                e.get().then((data) => {
+                    $("#title").val(data.title)
+                    $("#desc").val(data.desc.replaceAll("<br>", "\n"))
+                    for (const path of data.images) {
+                        e.bucket.getImage(path).then((img) => {
+                            $("#grid").append($("<img/>").attr("src", img))
+                        })
+                    }
                 })
             }
 
@@ -1713,9 +1768,53 @@ export class PostPopup extends Popup {
 
                 }
 
-                window.location.href = "../user/index.html?u=" + await this.user.getUsername()
+                window.location.reload()
             }
-            else if (this.v == "Media") { }
+            else if (this.v == "Media") {
+
+                const imagePaths = []
+                for (const file of this.images) {
+
+                    imagePaths.push(file.name)
+                }
+
+                data = {
+                    ...data,
+                    images: imagePaths,
+                    type: "MEDIA"
+                }
+
+                if (postId) {
+                    const up = new Media(postId)
+
+                    await up.bucket.removeImages()
+
+                    for (const file of this.images) {
+                        await up.bucket.uploadImage(file, file.name)
+                    }
+
+
+                    await up.update(data)
+
+
+                }
+                else {
+
+                    data.timestamp = Timestamp.fromDate(new Date());
+                    data.creator = this.user.uid;
+
+                    const id = await Media.create(data)
+
+                    for (const file of this.images) {
+                        await new Media(id).bucket.uploadImage(file, file.name)
+                    }
+                    await this.user.notifyAllMembers(`posted a new media post -- ${data.title}`, data.desc, "https://lokalevents.com/user/index.html?u=" + await this.user.getUsername())
+
+
+                }
+                window.location.reload()
+
+            }
         })
 
         this.file = null
@@ -1906,6 +2005,44 @@ export class PostPopup extends Popup {
             this.addRule()
 
 
+        }
+
+        // media specific fields
+        if (this.v == "Media") {
+            const grid = $("<div/>").addClass("grid").attr("id", "grid")
+
+            const label = $("<label/>").text("Upload Images")
+
+            label.on("click", () => {
+
+                const imageUpload = $("<input/>")
+                    .attr("type", "file")
+                    .attr("multiple", true)
+                    .css("z-index", "-10000")
+                    .css("position", "absolute")
+                $(document.body).append(imageUpload)
+
+                imageUpload.on("change", async () => {
+                    this.images = []
+                    for (let index = 0; index < imageUpload[0].files.length; index++) {
+                        const file = imageUpload[0].files[index];
+                        this.images.push(file)
+
+                    }
+                    grid.empty()
+
+                    for (const img of this.images) {
+                        grid.append($("<img/>").attr("src", URL.createObjectURL(img)))
+                    }
+                });
+
+                imageUpload.trigger("click")
+            })
+
+
+            this.content.append(grid, label)
+
+            this.addRule()
         }
     }
 }
