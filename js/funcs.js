@@ -1708,7 +1708,7 @@ export class PostPopup extends Popup {
                     data.creator = this.user.uid;
 
                     await Update.create(data)
-                    await this.user.notifyAllMembers(`posted a new update -- ${data.title}`, data.desc, "https://lokalevents.com/user/index.html?u=" + await user.getUsername())
+                    await this.user.notifyAllMembers(`posted a new update -- ${data.title}`, data.desc, "https://lokalevents.com/user/index.html?u=" + await this.user.getUsername())
 
 
                 }
