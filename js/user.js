@@ -1,4 +1,4 @@
-import { getDoc, doc, query, collection, getDocs, where, limit, orderBy } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDoc, doc, query, collection, getDocs, where, limit, startAfter, orderBy } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { listAll, deleteObject, ref } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
 
@@ -594,42 +594,72 @@ async function feed(uid) {
 
     }
 
-    const posts = await getDocs(query(collection(db, "posts"), where("creator", "==", uid), orderBy("timestamp", "desc")))
-
-    const feed = []
-
     let pinned = {}
 
     if (data.pinned) {
         pinned = data.pinned
     }
-    // Process events
-    posts.forEach((post) => {
-        if (post.id !== pinned.id) {
-            let u = null;
-            const data = post.data()
 
-            if (data.type == "EVENT") {
-                u = new Event(post.id)
-            }
+    let lastDoc = null;
 
-            if (data.type == "UPDATE") {
-                u = new Update(post.id)
-            }
+    async function loadDocs(posts) {
+        lastDoc = posts.empty ? null : posts.docs[posts.docs.length - 1]
+        for (const post of posts.docs) {
+            if (post.id !== pinned.id) {
+                let u = null;
+                const data = post.data()
 
-            if (data.type == "MEDIA") {
-                u = new Media(post.id)
+                if (data.type == "EVENT") {
+                    u = new Event(post.id)
+                }
+
+                if (data.type == "UPDATE") {
+                    u = new Update(post.id)
+                }
+
+                if (data.type == "MEDIA") {
+                    u = new Media(post.id)
+                }
+                none.remove();
+                await u.display(feedTab);
             }
-            feed.push({ "value": u, "timestamp": post.data().timestamp });
         }
-    });
+    }
 
-    // Sort posts by timestamp (newest first)
-    feed.sort((a, b) => b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime());
+    const posts = await getDocs(query(
+        collection(db, "posts"),
+        where("creator", "==", uid),
+        orderBy("timestamp", "desc"),
+        limit(25)
+    ))
 
-    for (const v of feed) {
-        none.remove();
-        await v.value.display(feedTab);
+    await loadDocs(posts)
+
+    const loadMore = $("<h3/>")
+        .text("Load More...")
+        .addClass("loadMore")
+        .on("click", async () => {
+            loadMore.remove()
+            if (!lastDoc) return; // Prevent querying if no more documents
+
+            const q = await getDocs(query(
+                collection(db, "posts"),
+                where("creator", "==", uid),
+                orderBy("timestamp", "desc"),
+                startAfter(lastDoc), // Start from the last loaded document
+                limit(25)
+            ));
+
+            await loadDocs(q)
+            if (q.docs.length == 25) {
+                feedTab.append(loadMore)
+            }
+
+        })
+
+
+    if (posts.docs.length == 25) {
+        feedTab.append(loadMore)
     }
 
 }
