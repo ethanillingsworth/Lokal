@@ -29,6 +29,14 @@ hr {
 
 }
 
+.loadMore {
+    text-align: center;
+}
+
+.loadMore:hover {
+    cursor: pointer;
+}
+
 #edit:hover {
     cursor: pointer;
 }
