@@ -46,7 +46,12 @@ input {
 }
 
 #forgotpass {
+    color: var(--accent)
+}
+
+#forgotpass:hover {
     cursor: pointer;
+    text-decoration: underline;
 }
 
 #inputs {
@@ -56,4 +61,8 @@ input {
 input[type=checkbox] {
     height: 25px;
     width: 25px;
+}
+
+p {
+    font-size: 1em
 }
