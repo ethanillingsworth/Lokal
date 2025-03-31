@@ -122,7 +122,7 @@ onAuthStateChanged(auth, async (user) => {
                 notifMenu.items.splice(i, 1)
             }
 
-            const ev = new CustomItem(`<img class="pfp border" src="../img/pfp.jpg">
+            const ev = new CustomItem(`<img class="pfp border" style="border-radius: 7.5px; margin: 0" src="${await group.getPfp()}">
             <div class="event-content">
             
                 <div class="user-info row" style="gap: 5px; place-items: center">
@@ -135,9 +135,9 @@ onAuthStateChanged(auth, async (user) => {
                 <p>
                     ${data.message.text}
                 </p>
-                <div class="row tools" style="place-content: end; gap:0;">
-                    <img src="../img/icons/x.png" style="width: 25px; height: 25px;" onclick="removeNotif('${n.id}')">
-                    <img src="../img/icons/arrow.png" style="width: 25px; height: 25px;" onclick="window.location.href = '${data.url}'">
+                <div class="row tools" style="place-content: end; gap: 5px;">
+                    <img src="../img/icons/x.png" style="width: 25px; height: 25px; margin: 0" onclick="removeNotif('${n.id}')">
+                    <img src="../img/icons/arrow.png" style="width: 25px; height: 25px; margin: 0" onclick="window.location.href = '${data.url}'">
                 </div>
             </div>`, () => { })
 
@@ -172,17 +172,6 @@ onAuthStateChanged(auth, async (user) => {
                 // An error happened.
             });
         }), true)
-
-        // moreMenu.addItem(new Item("Change Mode", "../img/icons/switchmode.png", () => {
-        //     if (localStorage.getItem("mode") != "light") {
-        //         $(document.body).addClass("lightmode")
-        //         localStorage.setItem("mode", "light")
-        //     }
-        //     else {
-        //         $(document.body).removeClass("lightmode")
-        //         localStorage.setItem("mode", "dark")
-        //     }
-        // }), true)
 
         if (badges.includes("premium") || badges.includes("admin")) {
             moreMenu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"), true)
@@ -249,9 +238,10 @@ onAuthStateChanged(auth, async (user) => {
             const group = new User(g.id)
 
             const mem = await group.getMember(uid)
+            const memReadOnly = await group.getMemberReadOnly(uid)
 
 
-            if (mem.joined) {
+            if (mem.joined && memReadOnly.accepted) {
                 // show item
                 const pub = await group.getData("public")
                 const username = await group.getUsername()
