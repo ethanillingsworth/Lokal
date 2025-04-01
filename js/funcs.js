@@ -486,6 +486,11 @@ export class Event extends Post {
         return eventData
     }
 
+    async delete() {
+        await super.delete()
+        await this.bucket.removeImages()
+    }
+
     async getImage(url) {
         return await this.bucket.getImage(url)
     }
@@ -531,6 +536,11 @@ export class Media extends Post {
             }))
         }
         ev.find(".event-content").append(grid)
+    }
+
+    async delete() {
+        await super.delete()
+        await this.bucket.removeImages()
     }
 }
 
