@@ -150,8 +150,8 @@ onAuthStateChanged(auth, async (user) => {
         })
 
         sidebar.menu.addItem(new Item("Notifications", "../img/icons/notif.png", notifMenu))
-
-        if (!badges.includes("premium")) {
+        const email = await u.getEmail()
+        if (!badges.includes("premium") && email.endsWith("@d214.org")) {
             const upgrade = new Item("Upgrade", "../img/icons/hat.png", "../plans")
 
             upgrade.classList = ['upgrade']
