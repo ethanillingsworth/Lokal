@@ -136,8 +136,8 @@ onAuthStateChanged(auth, async (user) => {
                     ${data.message.text}
                 </p>
                 <div class="row tools" style="place-content: end; gap: 5px;">
-                    <img src="../img/icons/x.png" style="width: 25px; height: 25px; margin: 0" onclick="removeNotif('${n.id}')">
-                    <img src="../img/icons/arrow.png" style="width: 25px; height: 25px; margin: 0" onclick="window.location.href = '${data.url}'">
+                    <img src="../img/icons/x.svg" style="width: 25px; height: 25px; margin: 0" onclick="removeNotif('${n.id}')">
+                    <img src="../img/icons/right.png" style="width: 25px; height: 25px; margin: 0" onclick="window.location.href = '${data.url}'">
                 </div>
             </div>`, () => { })
 
@@ -174,7 +174,7 @@ onAuthStateChanged(auth, async (user) => {
         }), true)
 
         if (badges.includes("premium") || badges.includes("admin")) {
-            moreMenu.addItem(new Item("Create Group", "../img/icons/group.png", "../edit/index.html?createGroup=true"), true)
+            moreMenu.addItem(new Item("Create Group", "../img/icons/addgroup.png", "../edit/index.html?createGroup=true"), true)
             moreMenu.addItem(new Item("Organizer Guide", "../img/icons/doc.png", "../links/org-guide"), true)
         }
 
@@ -188,15 +188,15 @@ onAuthStateChanged(auth, async (user) => {
 
                 if (!backAdded) {
 
-                    moreMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                    moreMenu.addItem(new Item("Back", "../img/icons/left.png", () => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
-                    notifMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                    notifMenu.addItem(new Item("Back", "../img/icons/left.png", () => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
-                    groupMenu.addItem(new Item("Back", "../img/icons/back.png", () => {
+                    groupMenu.addItem(new Item("Back", "../img/icons/left.png", () => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
@@ -228,7 +228,7 @@ onAuthStateChanged(auth, async (user) => {
         sidebar.menu.addItem(dName, true)
 
 
-        sidebar.menu.addItem(new Item("Your Groups", "../img/icons/groupfinder.png", groupMenu), true)
+        sidebar.menu.addItem(new Item("Your Groups", "../img/icons/groups.png", groupMenu), true)
 
         const q = query(collection(db, "users"), where("badges", "array-contains", "group"))
 

@@ -447,7 +447,7 @@ export class Event extends Post {
 
         ev.find(".content-wrapper").append(eventImage)
 
-        const open = $("<img/>").attr("src", "../img/icons/arrow.png")
+        const open = $("<img/>").attr("src", "../img/icons/right.png")
 
         open.on("click", () => {
             window.location.href = "../event/index.html?e=" + this.id
@@ -484,6 +484,11 @@ export class Event extends Post {
         let eventData = e.data()
 
         return eventData
+    }
+
+    async delete() {
+        await super.delete()
+        await this.bucket.removeImages()
     }
 
     async getImage(url) {
@@ -531,6 +536,11 @@ export class Media extends Post {
             }))
         }
         ev.find(".event-content").append(grid)
+    }
+
+    async delete() {
+        await super.delete()
+        await this.bucket.removeImages()
     }
 }
 
@@ -797,7 +807,7 @@ export class User {
 
 
         const open = $("<img/>")
-            .attr("src", "../img/icons/arrow.png")
+            .attr("src", "../img/icons/right.png")
             .addClass("action")
             .attr("id", "open")
             .on("click", function () {

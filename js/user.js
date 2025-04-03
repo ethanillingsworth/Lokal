@@ -252,7 +252,7 @@ async function members(user) {
 
                 const open = $("<img/>")
                     .addClass("action")
-                    .attr("src", "../img/icons/arrow.png")
+                    .attr("src", "../img/icons/right.png")
                     .on("click", function () {
                         window.location.href = `../user/index.html?u=${username}`;
                     });

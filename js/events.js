@@ -19,13 +19,18 @@ onAuthStateChanged(auth, async (u) => {
     // Collect events into an array
     for (const ev of events.docs) {
         const data = ev.data();
+        const group = new User(data.creator)
+
+        const currentUserReadOnly = await group.getMemberReadOnly(u.uid)
+        const currentUserData = await group.getMember(u.uid)
+
 
 
         const eventDate = new Date(data.date);
         eventDate.setHours(23)
         const currentDate = new Date();
 
-        if ((eventDate.getTime() >= currentDate.getTime())) {
+        if ((eventDate.getTime() >= currentDate.getTime()) && currentUserReadOnly.accepted && currentUserData.joined) {
 
             eventsArray.push({ event: new Event(ev.id), date: eventDate });
         }
