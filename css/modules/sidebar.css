@@ -33,8 +33,6 @@
     padding: 0;
     transition: all 0.25s ease-in-out;
     place-content: start;
-    /*position: absolute;
-    left: calc(20% + 14px); */
     background-color: var(--dark0);
     position: absolute;
     left: calc(100vw / 5);
@@ -42,6 +40,8 @@
     border-right: 4px solid var(--accent2);
     height: 100%;
 }
+
+
 
 #expand .event {
     place-items: start;
@@ -57,6 +57,11 @@
 
 .showExpand {
     min-width: 20vw !important;
+    padding: 10px !important;
+}
+
+.showExpand2 {
+    min-width: 40vw !important;
     padding: 10px !important;
 }
 

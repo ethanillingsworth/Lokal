@@ -447,7 +447,7 @@ export class Event extends Post {
 
         ev.find(".content-wrapper").append(eventImage)
 
-        const open = $("<img/>").attr("src", "../img/icons/arrow.png")
+        const open = $("<img/>").attr("src", "../img/icons/right.png")
 
         open.on("click", () => {
             window.location.href = "../event/index.html?e=" + this.id
@@ -807,7 +807,7 @@ export class User {
 
 
         const open = $("<img/>")
-            .attr("src", "../img/icons/arrow.png")
+            .attr("src", "../img/icons/right.png")
             .addClass("action")
             .attr("id", "open")
             .on("click", function () {

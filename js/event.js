@@ -395,7 +395,7 @@ addPage("RSVPs", async (page) => {
 
             const tools = $("<div/>").addClass("row tools").css("place-content", "start")
 
-            const back = $("<img/>").attr("src", "../img/icons/back.png")
+            const back = $("<img/>").attr("src", "../img/icons/left.png")
 
             back.on("click", () => {
                 col.css("display", "flex")
