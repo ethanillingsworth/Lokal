@@ -434,7 +434,7 @@ export class Event extends Post {
             cost = `$${postData.cost} per person`
         }
 
-        const info = $("<div/>").addClass("event-details row").html(`<b>${postData.date}</b> | <b>${postData.location}</b> | <b>${cost}</b>`)
+        const info = $("<div/>").addClass("event-details row").html(`<b>${postData.date}</b> <span class="hide">|</span> <b>${postData.location}</b> <span class="hide">|</span> <b>${cost}</b>`)
 
         ev.find(".badges").after(info)
 
@@ -955,8 +955,8 @@ export class Validation {
 
         const name = "Username"
 
-        if (value.length < 4) {
-            return name + " must be atleast 4 chars long"
+        if (value.length < 3) {
+            return name + " must be atleast 3 chars long"
         }
 
         if (value.length > 20) {
@@ -1001,7 +1001,9 @@ export class Validation {
     }
 
     static email(value) {
-        if (!value.includes("@") || !value.includes(".")) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (!emailRegex.test(value)) {
             return "Email isnt valid"
         }
         return true
@@ -1010,8 +1012,8 @@ export class Validation {
     static displayName(value) {
         const name = "Display Name"
 
-        if (value.length < 4) {
-            return name + " must be atleast 4 chars long"
+        if (value.length < 3) {
+            return name + " must be atleast 3 chars long"
         }
 
         if (value.length > 20) {
