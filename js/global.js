@@ -5,15 +5,6 @@ import { query, where, getDocs, collection, setDoc, doc } from "https://www.gsta
 
 import { auth, db } from "./firebase.js";
 
-// if (localStorage.getItem("mode") == "light") {
-//     $(document.body).addClass("lightmode")
-// }
-
-// debug only version
-// const ver = document.createElement("span")
-// ver.id = "ver"
-// ver.innerText = "BETA v1"
-// document.body.append(ver)
 
 window.getVersion = function () {
     return Utils.getVersion()
@@ -50,9 +41,6 @@ sidebar.menu.addItem(new Item("Group Finder", "../img/icons/groupfind.png", "../
 
 $(document.body).append(content)
 
-
-//addItem("Home", "../img/icons/home.png", "../")
-
 onAuthStateChanged(auth, async (user) => {
 
     if (!user) {
@@ -69,8 +57,6 @@ onAuthStateChanged(auth, async (user) => {
 
         const u = new User(uid)
 
-        // createEvent(uid, "Sports", "Verrat de marde de mosus de doux Jésus de charrue de saint-ciboire de sacristi de crucifix de colon d'étole de maudite marde.", new Date(), "Elk Grove High School", 0, [])
-
         const username = await u.getUsername()
 
 
@@ -80,22 +66,8 @@ onAuthStateChanged(auth, async (user) => {
 
         if (meta.badges) badges = meta.badges
 
-        // prev searches
-        // if (priv.prevRes) {
-        //     let count = 0
-        //     priv.prevRes.reverse().forEach(res => {
-        //         if (count <= 10) {
-
-        //             searchMenu.addItem(new Item(res, "../img/icons/prev.png", `../search/index.html?q=${res.replaceAll("-", "\-").replaceAll(" ", "-")}`))
-
-        //         }
-        //         count++
-        //     })
-        // }
 
         const pub = await u.getData("public")
-
-        // sidebar.menu.addItem(new Item("Search", "../img/icons/search.png", searchMenu))
 
         const notifMenu = new Menu(expand)
 
@@ -261,7 +233,6 @@ onAuthStateChanged(auth, async (user) => {
 
 
 });
-
 
 document.querySelectorAll("label").forEach((e) => {
     document.getElementById(e.htmlFor).click()
