@@ -1,6 +1,3 @@
-[build]
-  command = "rm -rf functions && rm .firebaserc && rm firebase.json && rm README.md"
-
 [[redirects]]
 from = "/org-guide"
 to = "https://docs.google.com/document/d/1NshG1zCRptEe5Mcres3MxNAN-QV2uA5nyyuw4PdcTsE/edit?usp=sharing"
