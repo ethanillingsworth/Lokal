@@ -1,7 +1,7 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { auth, db } from "./firebase.js";
 import { setDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-import { Validation, CSS, User } from "./funcs.js";
+import { Validation, CSS, User, log } from "./funcs.js";
 import "./jquery.js";
 
 CSS.loadFiles(["../css/login.css"])
@@ -89,13 +89,10 @@ async function setUserData(user, email, username) {
     const blob = await response.blob();
 
     await u.setPfp(new File([blob], "default.jpg"))
-    // require manual approval for now
-
-    // if (email.endsWith("@d214.org")) {
-    //     await setDoc(doc(db, "users", user.uid), {
-    //         approved: true
-    //     })
-    // }
+    log("user_signed_up", {
+        uid: user.uid,
+        role: email.endsWith("@d214.org") ? "Organizer" : "User"
+    })
 
 }
 

@@ -387,6 +387,11 @@ export class Post {
     }
 
     static async create(data) {
+        log("post_created", {
+            post_type: data.type,
+            creator: data.creator,
+            created_from: Utils.getDeviceType()
+        })
         const p = await addDoc(collection(db, "posts"), data)
         return p.id;
     }
@@ -463,6 +468,7 @@ export class Event extends Post {
         }
 
     }
+
 
     async getUData() {
         return await getDocs(query(collection(db, "posts", this.id, "uData")))
@@ -934,6 +940,10 @@ export class User {
 
         const d = await addDoc(collection(db, "users"), meta)
 
+        log("group_created", {
+            uid: d.id,
+        })
+
         const user = new User(d.id)
 
         await user.updateUsername(username.toLowerCase())
@@ -944,7 +954,7 @@ export class User {
 
         await user.updateData(priv, "private")
 
-        return new User(d.id)
+        return user
 
     }
 }
@@ -1073,9 +1083,18 @@ export class Utils {
         return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
     }
 
-    static logMetric(name) {
-        logEvent(analytics, name)
+    static getDeviceType() {
+        const ua = navigator.userAgent;
+
+        if (/android/i.test(ua)) return 'mobile';
+        if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return 'mobile';
+
+        return 'web';
     }
+}
+
+export function log(name, details) {
+    logEvent(analytics, name, details)
 }
 
 export class Dropdown {
