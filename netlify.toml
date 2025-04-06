@@ -1,4 +1,14 @@
 [[redirects]]
+from = "/user/*"
+to = "/user/index.html"
+status = 200
+
+[[redirects]]
+from = "/event/*"
+to = "/event/index.html"
+status = 200
+
+[[redirects]]
 from = "/org-guide"
 to = "https://docs.google.com/document/d/1NshG1zCRptEe5Mcres3MxNAN-QV2uA5nyyuw4PdcTsE/edit?usp=sharing"
 status = 301

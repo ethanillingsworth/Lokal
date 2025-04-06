@@ -1,12 +1,24 @@
 import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where, deleteField } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
+
 import { auth, db } from "./firebase.js";
 import { Dropdown, Event, graphColors, MoreMenu, User, CSS, PostPopup, log } from "./funcs.js";
 
-const urlParams = new URLSearchParams(window.location.search)
 CSS.loadFiles(["../css/event.css"])
 
+const params = new URLSearchParams(window.location.search);
 
+if (params.has('e')) {
+    const username = params.get('e');
+    // Redirect to the new format /user/username
+    window.location.replace(`/event/${username}`);
+}
+
+const path = window.location.pathname;
+
+const pageEvent = path.split('/').pop();
 
 const content = $("#content")
 
@@ -14,7 +26,7 @@ const modal = $("<div/>").addClass("modal")
 
 content.append(modal)
 
-const e = new Event(urlParams.get("e"))
+const e = new Event(pageEvent)
 
 const data = await e.get()
 
@@ -342,7 +354,7 @@ addPage("Public View", async (page) => {
                 method: "website"
             })
 
-            await setDoc(doc(db, "posts", urlParams.get("e"), "uData", auth.currentUser.uid), {
+            await setDoc(doc(db, "posts", pageEvent, "uData", auth.currentUser.uid), {
                 attending: selfAttend,
                 here: false
             });
@@ -353,7 +365,7 @@ addPage("Public View", async (page) => {
 
     page.append($("<hr></hr>"));
 
-    if (urlParams.get("autoJoin") && !selfAttend) {
+    if (params.get("autoJoin") && !selfAttend) {
         $("#attend").trigger("click");
     }
 
@@ -371,7 +383,7 @@ addPage("RSVPs", async (page) => {
     col.append(none)
     const userStats = $("<div></div>").addClass("col").css("display", "none");
 
-    const uData = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData"), where("attending", "==", true)));
+    const uData = await getDocs(query(collection(db, "posts", pageEvent, "uData"), where("attending", "==", true)));
 
     uData.forEach(async (d) => {
         none.css("display", "none")
@@ -465,19 +477,19 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
     const more = new MoreMenu()
 
     more.add("Edit", function () {
-        new PostPopup(creator.uid, "Event", urlParams.get("e")).show()
+        new PostPopup(creator.uid, "Event", pageEvent).show()
     })
 
     more.add("Delete", async function () {
         if (confirm("Are you sure? Deleting an event cannot be undone!")) {
 
-            const q = await getDocs(query(collection(db, "posts", urlParams.get("e"), "uData")));
+            const q = await getDocs(query(collection(db, "posts", pageEvent, "uData")));
 
             q.forEach(async (d) => {
-                await deleteDoc(doc(db, "posts", urlParams.get("e"), "uData", d.id));
+                await deleteDoc(doc(db, "posts", pageEvent, "uData", d.id));
             });
 
-            await deleteDoc(doc(db, "posts", urlParams.get("e")));
+            await deleteDoc(doc(db, "posts", pageEvent));
 
             window.location.href = "../";
         }
@@ -644,7 +656,8 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         const userId = user.uid;
 
-
+        // Initialize start time when the user is logged in
+        const startTime = Date.now(); // Record the start time
 
         const readOnly = await creator.getMemberReadOnly(userId)
 
@@ -652,7 +665,7 @@ onAuthStateChanged(auth, async (user) => {
         const logTimeSpent = () => {
             const timeSpentMs = Date.now() - startTime;
 
-            logEvent(analytics, 'event_viewed', {
+            log('event_viewed', {
                 user_id: userId,
                 event_id: '12345', // replace with actual event ID
                 time_spent_ms: timeSpentMs,

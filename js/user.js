@@ -4,23 +4,35 @@ import { listAll, deleteObject, ref } from "https://www.gstatic.com/firebasejs/1
 
 import { db, auth, imgDB } from "./firebase.js";
 import {
-    User, Badge, Event, MoreMenu, Update, Calendar, CSS,
+    User,
+    Badge,
+    Event,
+    MoreMenu,
+    Update,
+    CSS,
     ImageViewer,
-    Popup,
-    Dropdown,
     PostPopup,
     Media
 } from "./funcs.js";
 
-import tinycolor from "https://esm.sh/tinycolor2"
 
 CSS.loadFiles(["../css/user.css"])
 
 
 import "./jquery.js";
 
-const urlParams = new URLSearchParams(window.location.search);
-const pageUser = urlParams.get("u");
+
+const params = new URLSearchParams(window.location.search);
+
+if (params.has('u')) {
+    const username = params.get('u');
+    // Redirect to the new format /user/username
+    window.location.replace(`/user/${username}`);
+}
+
+const path = window.location.pathname;
+
+const pageUser = path.split('/').pop();
 
 const content = $("#content");
 

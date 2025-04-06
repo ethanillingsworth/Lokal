@@ -287,7 +287,7 @@ export class Post {
 
 
         postElem.find(".pfp").on("click", async () => {
-            window.location.href = "../user/index.html?u=" + username
+            window.location.href = "../user/" + username
         })
 
         if (creatorData.accentColor) {
@@ -455,7 +455,7 @@ export class Event extends Post {
         const open = $("<img/>").attr("src", "../img/icons/right.png")
 
         open.on("click", () => {
-            window.location.href = "../event/index.html?e=" + this.id
+            window.location.href = "../event/" + this.id
         })
 
         ev.find(".tools").append(open)
@@ -738,7 +738,7 @@ export class User {
         pfp.attr("src", await uObj.getPfp())
 
         pfp.on("click", async () => {
-            window.location.href = "../user/index.html?u=" + await uObj.getUsername()
+            window.location.href = "../user/" + await uObj.getUsername()
         })
 
 
@@ -817,7 +817,7 @@ export class User {
             .addClass("action")
             .attr("id", "open")
             .on("click", function () {
-                window.location.href = "../user/index.html?u=" + uname;
+                window.location.href = "../user/" + uname;
             });
 
 
@@ -1760,7 +1760,7 @@ export class PostPopup extends Popup {
                         await e.bucket.uploadImage(this.file, "preview.jpg")
                     }
 
-                    window.location.href = "../event/index.html?e=" + postId;
+                    window.location.href = "../event/" + postId;
                 } else {
                     // create
                     data.timestamp = Timestamp.fromDate(new Date());
@@ -1774,7 +1774,7 @@ export class PostPopup extends Popup {
 
                     await this.user.notifyAllMembers(`posted a new event -- ${data.title}`, data.desc, "https://lokalevents.com/event/index.html?e=" + id)
 
-                    window.location.href = "../event/index.html?e=" + id;
+                    window.location.href = "../event/" + id;
                 }
             }
             else if (this.v == "Update") {
