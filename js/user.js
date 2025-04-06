@@ -123,30 +123,6 @@ content.append(modal);
 const uid = await User.getUID(pageUser)
 const user = new User(uid)
 
-
-
-// async function hosting(uid) {
-//     const hostingTab = $("#Events")
-
-//     const q = query(collection(db, "posts"), where("creator", "==", uid), orderBy("timestamp", "desc"))
-
-//     const get = await getDocs(q)
-
-//     if (data.pinnedEvent) {
-//         const up = new Event(data.pinnedEvent)
-
-//         await up.display(hostingTab, true)
-
-//     }
-
-//     get.forEach(async (event) => {
-//         if (event.id != data.pinnedEvent) {
-//             const u = new Event(event.id)
-//             await u.display(hostingTab)
-//         }
-//     })
-// }
-
 async function attending(uid) {
     const attendingTab = $("#Attending")
 

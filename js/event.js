@@ -1,7 +1,7 @@
 import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where, deleteField } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { auth, db } from "./firebase.js";
-import { Dropdown, Event, graphColors, MoreMenu, User, CSS, PostPopup } from "./funcs.js";
+import { Dropdown, Event, graphColors, MoreMenu, User, CSS, PostPopup, log } from "./funcs.js";
 
 const urlParams = new URLSearchParams(window.location.search)
 CSS.loadFiles(["../css/event.css"])
@@ -327,12 +327,20 @@ addPage("Public View", async (page) => {
                 actions.html("")
                 button.find("span").text(`${attending} Attending`)
 
+
             } else {
                 selfAttend = true;
                 button.addClass("active");
                 showActions()
                 button.find("span").text(`${attending} Attending + You`)
             }
+
+            log("rsvp_submitted", {
+                event_id: e.id,
+                user_id: auth.currentUser.uid,
+                response: selfAttend ? "Going" : "Not Going",
+                method: "website"
+            })
 
             await setDoc(doc(db, "posts", urlParams.get("e"), "uData", auth.currentUser.uid), {
                 attending: selfAttend,
@@ -632,4 +640,36 @@ function switchPage(page, tab) {
     tab.addClass("current");
 }
 
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const userId = user.uid;
 
+
+
+        const readOnly = await creator.getMemberReadOnly(userId)
+
+        // Log time spent when tab is hidden or user navigates away
+        const logTimeSpent = () => {
+            const timeSpentMs = Date.now() - startTime;
+
+            logEvent(analytics, 'event_viewed', {
+                user_id: userId,
+                event_id: '12345', // replace with actual event ID
+                time_spent_ms: timeSpentMs,
+                role: readOnly.admin ? "Admin" : "Member"
+            });
+        };
+
+        // Handle visibility change (tab change, close, etc.)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                logTimeSpent();
+            }
+        });
+
+        // Also handle full page unload (just in case)
+        window.addEventListener('beforeunload', () => {
+            logTimeSpent();
+        });
+    }
+});

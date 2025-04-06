@@ -147,7 +147,7 @@ onAuthStateChanged(auth, async (user) => {
 
         if (badges.includes("premium") || badges.includes("admin")) {
             moreMenu.addItem(new Item("Create Group", "../img/icons/addgroup.png", "../edit/index.html?createGroup=true"), true)
-            moreMenu.addItem(new Item("Organizer Guide", "../img/icons/doc.png", "../links/org-guide"), true)
+            moreMenu.addItem(new Item("Organizer Guide", "../img/icons/doc.png", "../org-guide"), true)
         }
 
         let backAdded = false
