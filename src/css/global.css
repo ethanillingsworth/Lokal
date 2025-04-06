@@ -132,7 +132,7 @@ hr {
 }
 
 a {
-    text-decoration: none;
+    text-decoration: none !important;
     transition: all 0.25s ease-in-out;
 }
 
@@ -442,10 +442,6 @@ input:disabled {
     }
 
 
-    #bottom {
-        flex-direction: column-reverse;
-    }
-
     .badge {
         font-size: 0.6em;
         text-wrap: nowrap;
@@ -491,10 +487,6 @@ input:disabled {
 
     #expand {
         left: 0
-    }
-
-    #expand #bottom {
-        flex-direction: column;
     }
 
     #sidebar {
