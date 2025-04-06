@@ -30,9 +30,13 @@ if (params.has('u')) {
     window.location.replace(`/user/${username}`);
 }
 
+
+
 const path = window.location.pathname;
 
 const pageUser = path.split('/').pop();
+
+document.title = `Lokal - @${pageUser}`;
 
 const content = $("#content");
 
@@ -337,197 +341,9 @@ async function requests(user) {
     })
 }
 
-async function gallery(user) {
-    const tab = $("#Gallery")
-    tab.html("")
-
-    const g = await user.getGallery();
-
-    const none = $("<h2/>").text("Nothing to see here...").css("font-size", "1.5em").attr("id", "none")
-
-    tab.append(none)
-
-    if (g.length > 0) {
-        none.css("display", "none")
-    }
-
-    g.forEach(async (folder) => {
-        const head = $("<div/>").addClass("row").css("place-content", "start").css("place-items", "center").addClass("head")
-
-        const l = $("<h2/>").text(folder.name).css("font-size", "1.75em")
-        let removeMode = false
-
-        head.append(l)
-        const tools = $("<div/>").addClass("tools").css("width", "100%")
-
-        const more = new MoreMenu()
-
-        const scroll = $("<div/>").addClass("row scroll")
-
-        let imgs = []
-
-        async function refreshImages() {
-            scroll.html("")
-            imgs = []
-
-            const images = await user.bucket.getAllImages(folder)
-
-            for (let index = 0; index < images.length; index++) {
-                const image = images[index];
-
-                const url = await user.bucket.getImage("gallery/" + folder.name + "/" + image.name)
-
-                imgs.push({ url: url, name: image.name })
-                const i = $("<img/>")
-                    .addClass("image")
-                    .attr("src", url)
-                    .attr("data_path", "gallery/" + folder.name + "/" + image.name)
-
-                i[0].onclick = () => {
-                    new ImageViewer(imgs, index)
-                }
-
-                scroll.append(i)
-            }
-        }
-
-        more.add("Upload Images", async () => {
-            const inp = $("<input/>")
-                .attr("type", "file")
-                .attr("multiple", true)
-                .css("z-index", "-10000")
-                .css("position", "absolute")
-            $(document.body).append(inp)
-
-            inp.on("change", async () => {
-                for (let index = 0; index < inp[0].files.length; index++) {
-                    const file = inp[0].files[index];
-
-                    await user.bucket.uploadImage(file, `gallery/${folder.name}/${file.name}`);
-
-                }
-                window.location.reload()
-
-            });
-
-            inp.trigger("click")
-
-
-
-
-        })
-
-        more.add("Remove Images", async () => {
-            if (!removeMode) {
-                removeMode = true
-                scroll.addClass("remove")
-                for (let index = 0; index < scroll.children().length; index++) {
-                    const element = $(scroll.children()[index]);
-
-                    element[0].onclick = async () => {
-                        await user.bucket.removeImage(element.attr("data_path"))
-                        element.remove()
-                        if (scroll.children().length < 1) {
-                            head.remove()
-                        }
-                    }
-                }
-            }
-            else {
-                removeMode = false
-                scroll.removeClass("remove")
-                for (let index = 0; index < scroll.children().length; index++) {
-                    const element = $(scroll.children()[index]);
-
-                    element[0].onclick = async () => {
-                        new ImageViewer(imgs, index)
-                    }
-                }
-            }
-        })
-
-        more.add("Edit Name", async () => {
-            const name = prompt("Enter new folder name:")
-
-            if (name.length < 1 || name.length > 30) {
-                alert("Name cannot be blank, and cannot be over 30 chars.")
-                return
-            }
-            else if (await nameExists(name)) {
-                alert("You already have a folder with this name.")
-                return
-            }
-            console.log(folder.name)
-            console.log(name)
-
-
-            await user.bucket.moveImages(`gallery/${folder.name}`, `gallery/${name}`)
-            await user.bucket.removeImagesFromPath(`gallery/${folder.name}`)
-
-            l.text(name)
-
-        })
-
-        more.add("Remove Folder", async () => {
-            if (confirm("Are you sure you want to delete this folder?") && confirm("This will delete all of the images in the folder.")) {
-                listAll(folder)
-                    .then((res) => {
-                        res.items.forEach((itemRef) => {
-                            deleteObject(itemRef).then(() => {
-                                // File deleted successfully
-                            }).catch((error) => {
-                                // Uh-oh, an error occurred!
-                            });
-                        });
-                    }).catch((error) => {
-                        // Uh-oh, an error occurred!
-                    })
-
-                head.remove()
-                scroll.remove()
-
-            }
-        })
-
-        tab.append(head)
-        more.more.css("margin-left", "auto")
-        more.more.css("width", "fit-content")
-        tools.append(more.more)
-        head.append(tools)
-        tab.append(scroll)
-
-        // for (let index = 0; index < 100; index++) {
-        //     scroll.append($("<img/>").addClass("image").attr("src", `https://picsum.photos/${Math.floor(Math.random() * (1500 - 500) + 500)}/${Math.floor(Math.random() * (1000 - 500) + 500)}`))
-        // }
-        await refreshImages()
-
-    })
-}
-
-// const calendar = new Calendar()
-
-// async function cal(user) {
-//     const tab = $("#Calendar")
-
-//     const q = query(collection(db, "posts"), where("creator", "==", user.uid))
-
-//     const get = await getDocs(q)
-
-//     get.forEach((post) => {
-//         const d = post.data()
-
-//         const splitDate = d.date.split("/")
-//         calendar.addEvent(splitDate[2], splitDate[0], splitDate[1], post.id)
-//     })
-
-//     calendar.display(tab)
-// }
-
-
 
 function updateProfile(data, pfp) {
     $("#username").text(`(@${pageUser})`);
-    document.title = `Lokal - @${pageUser}`;
     displayName.text(data.displayName);
 
     desc.html(data.desc.replaceAll("\n", "<br>"));
