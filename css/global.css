@@ -374,6 +374,10 @@ input:disabled {
     .showExpand {
         min-width: 25vw !important;
     }
+
+    .showExpand2 {
+        min-width: 50vw !important;
+    }
 }
 
 /* phone */
@@ -473,6 +477,11 @@ input:disabled {
     #attend {
         background-color: var(--accent2);
 
+    }
+
+    #sidebar hr {
+        width: 100% !important;
+        margin: 0;
     }
 
     .actions button {
@@ -592,7 +601,8 @@ input:disabled {
         font-size: 1em
     }
 
-    .showExpand {
+    .showExpand,
+    .showExpand2 {
         min-width: calc(100vw - 10px) !important;
     }
 

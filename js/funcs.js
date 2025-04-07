@@ -92,9 +92,12 @@ export class Sidebar {
 
             })
 
+
         this.setHeading(heading)
 
         this.element.append(this.heading)
+
+        this.element.append($("<hr/>"))
 
         this.itemsElement = $("<div/>").addClass("menu").addClass("col").css("gap", "5px")
 
@@ -121,6 +124,7 @@ export class Menu {
         this.element = parent
         this.items = []
         this.refreshOnItem = false
+        this.expandedSize = ""
     }
 
     refresh() {
@@ -162,12 +166,15 @@ export class Menu {
                     i.on("click", function () {
                         item.click.refresh()
                         if (Menu.clicked == false) {
-                            element.addClass("showExpand")
+                            element.addClass("showExpand" + item.click.expandedSize);
+
 
                             Menu.clicked = true
                         }
                         else {
-                            element.removeClass("showExpand")
+                            element.removeClass("showExpand" + item.click.expandedSize)
+                            element.css("minWidth", null)
+
                             Menu.clicked = false
                         }
                     })
@@ -601,8 +608,7 @@ export class User {
         await deleteDoc(doc(db, "usernames", this.uid))
         await deleteDoc(doc(db, "uids", uname))
 
-        await this.deleteEvents()
-        await this.deleteUpdates()
+        await this.deletePosts()
         await this.deleteMembers()
 
         await this.bucket.removeImages();
@@ -1926,7 +1932,7 @@ export class PostPopup extends Popup {
             const txtArea = $("<textarea/>", {
                 id: "agenda",
                 placeholder: `This is where you put a detailed run down of your plans for the event!`,
-                maxLength: "1000",
+                maxLength: "2500",
             })
                 .attr("rows", 10)
                 .attr("cols", 40)
