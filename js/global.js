@@ -71,6 +71,8 @@ onAuthStateChanged(auth, async (user) => {
 
         const notifMenu = new Menu(expand)
 
+        notifMenu.expandedSize = "2"
+
         const notifs = await u.getNotifs()
 
         const it = new Item("Nothing to see here...", "", "")
@@ -151,8 +153,6 @@ onAuthStateChanged(auth, async (user) => {
             moreMenu.addItem(new Item("Organizer Guide", "../img/icons/doc.png", "../org-guide"), true)
         }
 
-        moreMenu.refresh()
-
         let backAdded = false
 
         const groupMenu = new Menu(expand)
@@ -231,7 +231,6 @@ onAuthStateChanged(auth, async (user) => {
                 groupMenu.addItem(item)
             }
         }
-        groupMenu.refresh()
 
     }
 

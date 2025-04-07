@@ -121,6 +121,7 @@ export class Menu {
         this.element = parent
         this.items = []
         this.refreshOnItem = false
+        this.expandedSize = ""
     }
 
     refresh() {
@@ -162,12 +163,15 @@ export class Menu {
                     i.on("click", function () {
                         item.click.refresh()
                         if (Menu.clicked == false) {
-                            element.addClass("showExpand")
+                            element.addClass("showExpand" + item.click.expandedSize);
+
 
                             Menu.clicked = true
                         }
                         else {
-                            element.removeClass("showExpand")
+                            element.removeClass("showExpand" + item.click.expandedSize)
+                            element.css("minWidth", null)
+
                             Menu.clicked = false
                         }
                     })

@@ -374,6 +374,10 @@ input:disabled {
     .showExpand {
         min-width: 25vw !important;
     }
+
+    .showExpand2 {
+        min-width: 50vw !important;
+    }
 }
 
 /* phone */
@@ -592,7 +596,8 @@ input:disabled {
         font-size: 1em
     }
 
-    .showExpand {
+    .showExpand,
+    .showExpand2 {
         min-width: calc(100vw - 10px) !important;
     }
 

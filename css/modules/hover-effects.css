@@ -4,7 +4,7 @@
 
 .no-hov:hover {
     cursor: default !important;
-    background-color: transparent;
+    background-color: transparent !important;
 
 }
 
