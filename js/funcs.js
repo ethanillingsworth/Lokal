@@ -1932,7 +1932,7 @@ export class PostPopup extends Popup {
             const txtArea = $("<textarea/>", {
                 id: "agenda",
                 placeholder: `This is where you put a detailed run down of your plans for the event!`,
-                maxLength: "1000",
+                maxLength: "2500",
             })
                 .attr("rows", 10)
                 .attr("cols", 40)
