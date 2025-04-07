@@ -102,6 +102,8 @@ export class Sidebar {
         this.element.append(this.itemsElement)
 
         this.menu = new Menu(this.itemsElement)
+
+        this.menu.refreshOnItem = true
     }
 
     setHeading(label) {
@@ -118,6 +120,7 @@ export class Menu {
     constructor(parent) {
         this.element = parent
         this.items = []
+        this.refreshOnItem = false
     }
 
     refresh() {
@@ -207,7 +210,9 @@ export class Menu {
         item.bottom = bottom
         this.items.push(item)
 
-        this.refresh()
+        if (this.refreshOnItem) {
+            this.refresh()
+        }
     }
 }
 
@@ -689,7 +694,6 @@ export class User {
         const ref = await getDoc(doc(db, "users", this.uid, "members", memberId))
 
         if (!ref.exists()) {
-            console.error("Could not fetch data for member ID:" + memberId)
             return {}
         }
 
@@ -700,7 +704,6 @@ export class User {
         const ref = await getDoc(doc(db, "users", this.uid, "members", memberId, "readOnly", "data"))
 
         if (!ref.exists()) {
-            console.error("Could not fetch read only data for member ID:" + memberId)
             return {}
         }
 
@@ -1740,7 +1743,7 @@ export class PostPopup extends Popup {
             }
             if (this.v == "Event") {
 
-                if ($("location").val() == "" || $("location").val() == null) {
+                if ($("#location").val() == "" || $("#location").val() == null) {
                     $("#location").val("None")
                 }
                 data = {

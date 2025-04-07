@@ -1,4 +1,4 @@
-import { getDocs, query, collection, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getDocs, query, collection, orderBy, limit, where, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 import { Event, User, CSS } from "./funcs.js";
@@ -12,32 +12,57 @@ onAuthStateChanged(auth, async (u) => {
         window.location.href = "../login"
     }
 
-    const events = await getDocs(query(collection(db, "posts"), orderBy("timestamp", "desc"), limit(100)))
+    const loading = $("<h3/>").text("Loading...").css("margin-top", "20px")
 
+    $("#content").append(loading)
+
+    const groups = await getDocs(query(collection(db, "users"), where("badges", "array-contains", "group")))
     let eventsArray = [];
 
-    // Collect events into an array
-    for (const ev of events.docs) {
-        const data = ev.data();
-        const group = new User(data.creator)
+    for (const g of groups.docs) {
 
-        const currentUserReadOnly = await group.getMemberReadOnly(u.uid)
-        const currentUserData = await group.getMember(u.uid)
+        const groupId = g.id
 
 
+        const group = new User(groupId)
 
-        const eventDate = new Date(data.date);
-        eventDate.setHours(23)
-        const currentDate = new Date();
+        const readOnly = await group.getMemberReadOnly(u.uid)
+        const dat = await group.getMember(u.uid)
 
-        if ((eventDate.getTime() >= currentDate.getTime()) && currentUserReadOnly.accepted && currentUserData.joined) {
 
-            eventsArray.push({ event: new Event(ev.id), date: eventDate });
+        if (!dat.joined || !readOnly.accepted) {
+            continue
         }
+
+        const events = await getDocs(query(collection(db, "posts"), orderBy("timestamp", "desc"), where("creator", "==", groupId), limit(100)))
+
+        // Collect events into an array
+        for (const ev of events.docs) {
+            const data = ev.data();
+
+
+
+            const eventDate = new Date(data.date);
+            eventDate.setHours(23)
+            const currentDate = new Date();
+
+            if ((eventDate.getTime() >= currentDate.getTime())) {
+
+                eventsArray.push({ event: new Event(ev.id), date: eventDate });
+            }
+        }
+
     }
 
     // Sort events by date (earliest first)
     eventsArray.sort((a, b) => a.date - b.date);
+
+    if (eventsArray.length > 0) {
+        loading.remove()
+    }
+    else {
+        loading.text("You have no upcoming events...")
+    }
 
     let index = 0;
     for (const item of eventsArray) {
@@ -48,5 +73,7 @@ onAuthStateChanged(auth, async (u) => {
         await item.event.display(); // Display in sorted order
         index++;
     }
+
+
 
 })

@@ -108,7 +108,7 @@ onAuthStateChanged(auth, async (user) => {
                     ${data.message.text}
                 </p>
                 <div class="row tools" style="place-content: end; gap: 5px;">
-                    <img src="../img/icons/x.svg" style="width: 25px; height: 25px; margin: 0" onclick="removeNotif('${n.id}')">
+                    <img src="../img/icons/x.png" style="width: 25px; height: 25px; margin: 0" onclick="removeNotif('${n.id}')">
                     <img src="../img/icons/right.png" style="width: 25px; height: 25px; margin: 0" onclick="window.location.href = '${data.url}'">
                 </div>
             </div>`, () => { })
@@ -122,6 +122,7 @@ onAuthStateChanged(auth, async (user) => {
         })
 
         sidebar.menu.addItem(new Item("Notifications", "../img/icons/notif.png", notifMenu))
+        notifMenu.refresh()
         const email = await u.getEmail()
         if (!badges.includes("premium") && email.endsWith("@d214.org")) {
             const upgrade = new Item("Upgrade", "../img/icons/hat.png", "../plans")
@@ -150,12 +151,14 @@ onAuthStateChanged(auth, async (user) => {
             moreMenu.addItem(new Item("Organizer Guide", "../img/icons/doc.png", "../org-guide"), true)
         }
 
+        moreMenu.refresh()
+
         let backAdded = false
 
         const groupMenu = new Menu(expand)
 
         function resizeChecks() {
-            if (window.innerWidth < 600) {
+            if (window.innerWidth <= 600) {
                 sidebar.setHeading("L")
 
                 if (!backAdded) {
@@ -228,6 +231,7 @@ onAuthStateChanged(auth, async (user) => {
                 groupMenu.addItem(item)
             }
         }
+        groupMenu.refresh()
 
     }
 
