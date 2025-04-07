@@ -92,9 +92,12 @@ export class Sidebar {
 
             })
 
+
         this.setHeading(heading)
 
         this.element.append(this.heading)
+
+        this.element.append($("<hr/>"))
 
         this.itemsElement = $("<div/>").addClass("menu").addClass("col").css("gap", "5px")
 
