@@ -608,8 +608,7 @@ export class User {
         await deleteDoc(doc(db, "usernames", this.uid))
         await deleteDoc(doc(db, "uids", uname))
 
-        await this.deleteEvents()
-        await this.deleteUpdates()
+        await this.deletePosts()
         await this.deleteMembers()
 
         await this.bucket.removeImages();
