@@ -11,9 +11,9 @@ CSS.loadFiles(["../css/event.css"])
 const params = new URLSearchParams(window.location.search);
 
 if (params.has('e')) {
-    const username = params.get('e');
-    // Redirect to the new format /user/username
-    window.location.replace(`/event/${username}`);
+    const id = params.get('e');
+    // Redirect to the new format /event/id
+    window.location.replace(`/event/${id}`);
 }
 
 const path = window.location.pathname;
