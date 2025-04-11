@@ -1,3 +1,6 @@
+[build]
+command = "rm -rf functions && rm .firebaserc && rm firebase.json && rm README.md"
+
 [[redirects]]
 from = "/user/*"
 to = "/user/index.html"
