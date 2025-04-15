@@ -481,7 +481,9 @@ input:disabled {
 
     #sidebar hr {
         width: 100% !important;
-        margin: 0;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+
     }
 
     .actions button {

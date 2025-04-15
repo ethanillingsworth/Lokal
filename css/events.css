@@ -4,6 +4,6 @@
     margin-right: 30px;
 }
 
-hr {
+#content hr {
     width: calc(100% - 60px) !important;
 }
