@@ -19,7 +19,11 @@ body {
 }
 
 #tabs a {
-    font-size: 1.25rem;
+    font-size: 1.25em;
+}
+
+#tabs .row {
+    gap: 40px;
 }
 
 #back {
@@ -29,7 +33,7 @@ body {
 
 .home {
     font-family: "EB Garamond";
-    font-size: 2rem !important;
+    font-size: 2em !important;
 }
 
 .imagebg {
@@ -46,7 +50,7 @@ body {
     place-self: start;
     top: 12px;
     width: 100%;
-    filter: blur(12px) brightness(0.5);
+    filter: blur(8px) brightness(0.5);
     height: calc(100% - 12px);
     object-fit: cover;
     z-index: -10;
@@ -58,6 +62,7 @@ h1 {
 
 h2 {
     font-size: 1.5em;
+    padding: 5px
 }
 
 h2.head {
@@ -110,6 +115,10 @@ p {
     object-fit: contain;
 }
 
+.gallery img:hover {
+    scale: 1.1
+}
+
 .gallery>.col {
     place-items: center;
     gap: 40px
@@ -123,9 +132,18 @@ p {
     }
 
     .gallery img,
-    table,
     p {
         width: 70%;
+    }
+
+    table {
+        max-width: 90%;
+    }
+
+    .imagebg .image {
+        height: 100% !important;
+        width: auto !important;
+
     }
 
     h3 {
@@ -141,5 +159,23 @@ p {
         font-size: 1.25em;
         text-align: center;
         text-wrap: wrap !important;
+        max-width: 90%;
+    }
+
+    #tabs {
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 0.8em;
+        place-content: center;
+    }
+
+    .home {
+        width: 100%;
+        text-align: center;
+        font-size: 4em !important;
+    }
+
+    #tabs>.row {
+        gap: 20px;
     }
 }
