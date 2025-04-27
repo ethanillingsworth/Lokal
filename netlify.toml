@@ -1,14 +1,15 @@
 [build]
-command = "rm -rf functions && rm .firebaserc && rm firebase.json && rm README.md && rm -rf public"
+command = "rm -rf functions && rm .firebaserc && rm firebase.json && rm README.md"
+
 
 [[redirects]]
 from = "/user/*"
-to = "/user/index.html"
+to = "/pages/user/index.html"
 status = 200
 
 [[redirects]]
 from = "/event/*"
-to = "/event/index.html"
+to = "/pages/event/index.html"
 status = 200
 
 [[redirects]]
@@ -17,6 +18,13 @@ to = "https://docs.google.com/document/d/1NshG1zCRptEe5Mcres3MxNAN-QV2uA5nyyuw4P
 status = 301
 
 [[redirects]]
-from = "/*"
-to = "/404.html"
-status = 404
+from = "/"
+to = "/pages/"
+status = 200
+
+[[redirects]]
+from = "/:splat"
+to = "/pages/:splat/index.html"
+status = 200
+
+

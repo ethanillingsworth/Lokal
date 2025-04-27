@@ -35,7 +35,7 @@ document.body.onresize = function () {
 
 resizeChecks()
 
-sidebar.menu.addItem(new Item("Events Feed", "../img/icons/party.png", "../"))
+sidebar.menu.addItem(new Item("Events Feed", "../img/icons/party.png", "../events"))
 
 sidebar.menu.addItem(new Item("Group Finder", "../img/icons/groupfind.png", "../groupfinder"))
 
@@ -141,7 +141,7 @@ onAuthStateChanged(auth, async (user) => {
         moreMenu.addItem(new Item("Log Out", "../img/icons/logout.png", () => {
             signOut(auth).then(() => {
                 // Sign-out successful.
-                window.location.href = "../login/index.html?r=" + window.location.href
+                window.location.href = "../login?r=" + window.location.href
 
             }).catch((error) => {
                 // An error happened.
@@ -149,7 +149,7 @@ onAuthStateChanged(auth, async (user) => {
         }), true)
 
         if (badges.includes("premium") || badges.includes("admin")) {
-            moreMenu.addItem(new Item("Create Group", "../img/icons/addgroup.png", "../edit/index.html?createGroup=true"), true)
+            moreMenu.addItem(new Item("Create Group", "../img/icons/addgroup.png", "../edit?createGroup=true"), true)
             moreMenu.addItem(new Item("Organizer Guide", "../img/icons/doc.png", "../org-guide"), true)
         }
 
@@ -194,7 +194,7 @@ onAuthStateChanged(auth, async (user) => {
 
         sidebar.menu.addItem(new Item("More", "../img/icons/more.png", moreMenu), true)
 
-        const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
+        const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/${username}`)
 
         dName.img = await u.getPfp()
 
@@ -221,7 +221,7 @@ onAuthStateChanged(auth, async (user) => {
                 const pub = await group.getData("public")
                 const username = await group.getUsername()
 
-                const item = new Item(pub.displayName, "../img/pfp.jpg", `../user/index.html?u=${username}`)
+                const item = new Item(pub.displayName, "../img/pfp.jpg", `../user/${username}`)
 
 
                 item.img = await group.getPfp()

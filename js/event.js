@@ -96,7 +96,7 @@ const readOnly = await creator.getMemberReadOnly(currentUser.uid)
 
 if (!readOnly.accepted && !badges.includes("admin")) {
     alert("You have to join the group associated with this event before viewing!")
-    window.location.href = `../user/index.html?u=${await creator.getUsername()}`
+    window.location.href = `../user/${await creator.getUsername()}`
 }
 
 

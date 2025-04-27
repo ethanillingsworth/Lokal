@@ -11,10 +11,10 @@
 @import url(./modules/popup.css);
 
 :root {
-    --dark0: #1a1a1a;
-    --dark1: #1f1f1f;
-    --dark2: #2b2b2b;
-    --dark3: #3b3b3b;
+    --dark0: black;
+    --dark1: #1a1a1a;
+    --dark2: #1f1f1f;
+    --dark3: #2b2b2b;
     --accent: #f9c431;
     --accent2: #e8b936;
     --accentpurple: #a353b9;
@@ -27,6 +27,7 @@
 html {
     height: 100%;
     position: relative;
+    overflow: hidden;
 }
 
 body {
@@ -39,6 +40,7 @@ body {
     font-family: sans-serif;
     align-items: center;
     place-content: center;
+    overflow-y: auto;
 }
 
 

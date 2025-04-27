@@ -1,0 +1,145 @@
+body {
+    place-content: start;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+    padding-bottom: 80px;
+}
+
+#tabs {
+    place-content: start;
+    padding: 20px;
+    width: 100%;
+    gap: 40px;
+    border-bottom: 3px solid var(--accent);
+    position: sticky;
+    top: 0;
+    background-color: black;
+    z-index: 10000;
+}
+
+#tabs a {
+    font-size: 1.25rem;
+}
+
+#back {
+    margin-left: auto;
+    width: auto;
+}
+
+.home {
+    font-family: "EB Garamond";
+    font-size: 2rem !important;
+}
+
+.imagebg {
+    min-height: calc(100% - 84px);
+    position: relative;
+    place-self: start;
+    place-content: center;
+    place-items: center;
+    width: 100%;
+}
+
+.imagebg .image {
+    position: absolute;
+    place-self: start;
+    top: 12px;
+    width: 100%;
+    filter: blur(12px) brightness(0.5);
+    height: calc(100% - 12px);
+    object-fit: cover;
+    z-index: -10;
+}
+
+h1 {
+    margin: 0
+}
+
+h2 {
+    font-size: 1.5em;
+}
+
+h2.head {
+    margin-top: 80px;
+    margin-bottom: 80px;
+    font-size: 2em;
+    border-bottom: 3px solid var(--accent);
+}
+
+.borderbottom {
+    border-bottom: 3px solid var(--accent);
+}
+
+.row {
+    width: fit-content
+}
+
+.row>hr {
+    height: 100%;
+    width: 0;
+}
+
+table {
+    max-width: 75%;
+}
+
+th,
+td {
+    padding: 10px
+}
+
+th {
+    text-align: left;
+    border-bottom: 3px solid var(--accent);
+}
+
+p {
+    width: 75%;
+    font-size: 1.1em;
+}
+
+.gallery {
+    width: 75%;
+    text-align: center;
+    gap: 150px;
+}
+
+.gallery img {
+    width: 75%;
+    object-fit: contain;
+}
+
+.gallery>.col {
+    place-items: center;
+    gap: 40px
+}
+
+@media (max-width: 600px) {
+    .gallery {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 50px
+    }
+
+    .gallery img,
+    table,
+    p {
+        width: 70%;
+    }
+
+    h3 {
+        font-size: 1.5em;
+    }
+
+    h1 {
+        text-align: center;
+        font-size: 1.75em;
+    }
+
+    h2 {
+        font-size: 1.25em;
+        text-align: center;
+        text-wrap: wrap !important;
+    }
+}
