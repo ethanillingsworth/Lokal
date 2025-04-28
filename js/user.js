@@ -246,7 +246,7 @@ async function members(user) {
                     .addClass("action")
                     .attr("src", "../img/icons/right.png")
                     .on("click", function () {
-                        window.location.href = `../user/index.html?u=${username}`;
+                        window.location.href = `../user?u=${username}`;
                     });
 
                 if (auth.currentUser.uid !== personClass.uid) {
@@ -319,7 +319,7 @@ async function requests(user) {
             .on("click", async function () {
                 await user.updateMember(person.id, { pending: false, joined: false });
                 if (pub.notifs) {
-                    await user.notifyMember(personClass.uid, "has rejected you from their group...", "View their page on Lokal below", `https://lokalevents.com/user/index.html?u=${await user.getUsername()}`)
+                    await user.notifyMember(personClass.uid, "has rejected you from their group...", "View their page on Lokal below", `https://lokalevents.com/user/${await user.getUsername()}`)
                 }
                 actions.parent().remove();
             });
@@ -331,7 +331,7 @@ async function requests(user) {
                 await user.updateMember(person.id, { pending: false, joined: true });
                 await user.updateMemberReadOnly(person.id, { accepted: true })
                 if (pub.notifs) {
-                    await user.notifyMember(personClass.uid, "has accepted you into their group!", "View their page on Lokal below", `https://lokalevents.com/user/index.html?u=${await user.getUsername()}`)
+                    await user.notifyMember(personClass.uid, "has accepted you into their group!", "View their page on Lokal below", `https://lokalevents.com/user/${await user.getUsername()}`)
                 }
                 actions.parent().remove();
             });
@@ -526,7 +526,7 @@ onAuthStateChanged(auth, async (u) => {
         }
 
         moreMenu.add("Edit Profile", () => {
-            window.location.href = "../edit/index.html?u=" + urlParams.get("u")
+            window.location.href = "../edit?u=" + pageUser
         })
 
         if (bds.includes("group")) {

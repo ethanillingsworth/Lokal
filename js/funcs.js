@@ -1781,7 +1781,7 @@ export class PostPopup extends Popup {
                         await new Event(id).bucket.uploadImage(this.file, "preview.jpg")
                     }
 
-                    await this.user.notifyAllMembers(`posted a new event -- ${data.title}`, data.desc, "https://lokalevents.com/event/index.html?e=" + id)
+                    await this.user.notifyAllMembers(`posted a new event -- ${data.title}`, data.desc, "https://lokalevents.com/event/" + id)
 
                     window.location.href = "../event/" + id;
                 }
@@ -1803,7 +1803,7 @@ export class PostPopup extends Popup {
                     data.creator = this.user.uid;
 
                     await Update.create(data)
-                    await this.user.notifyAllMembers(`posted a new update -- ${data.title}`, data.desc, "https://lokalevents.com/user/index.html?u=" + await this.user.getUsername())
+                    await this.user.notifyAllMembers(`posted a new update -- ${data.title}`, data.desc, "https://lokalevents.com/user/" + await this.user.getUsername())
 
 
                 }
@@ -1848,7 +1848,7 @@ export class PostPopup extends Popup {
                     for (const file of this.images) {
                         await new Media(id).bucket.uploadImage(file, file.name)
                     }
-                    await this.user.notifyAllMembers(`posted a new media post -- ${data.title}`, data.desc, "https://lokalevents.com/user/index.html?u=" + await this.user.getUsername())
+                    await this.user.notifyAllMembers(`posted a new media post -- ${data.title}`, data.desc, "https://lokalevents.com/user/" + await this.user.getUsername())
 
 
                 }

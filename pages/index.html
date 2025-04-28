@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lokal</title>
+    <link rel="apple-touch-icon" href="../img/icon.png">
+    <link rel="shortcut icon" href="./img/icon.png" type="image/png">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/landing.css">
+    <script type="module" src="../js/firebase.js"></script>
+    <script type="module" src="../js/index.js"></script>
+    <meta name="description"
+        content="Lokal Events helps school clubs plan events effortlessly with tools for scheduling, communication, and collaboration, ensuring every meeting or event runs smoothly.">
+</head>
+
+<body>
+    <script>0</script>
+    <div id="tabs" class="row">
+        <a href="../" class="home">Lokal</a>
+        <div class="row" style="width: 100%;">
+            <a href="../#why">Why Lokal?</a>
+            <a href="../#features">Features</a>
+            <a href="../#mission">Mission</a>
+            <a href="../#demo">Demo</a>
+            <div id="back" class="row">
+                <a href="../login">Login</a>
+            </div>
+        </div>
+    </div>
+    <div class="imagebg col">
+        <img class="image" src="../img/home.jpeg">
+        <h1>The Easiest Way to Organize School Events.</h1>
+        <h2>Create, promote, and manage events — all in one place, without the headaches.</h2>
+        <div class="row">
+            <a href="../#demo"><button>Request a Demo</button></a>
+        </div>
+    </div>
+    <h2 class="head" id="why">Why Lokal?</h2>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Icon</th>
+                <th>Feature</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td style="text-align: center;">📅</td>
+                <td>Create Events Easily</td>
+                <td>Build and share event pages in minutes with intuitive tools.</td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">🔔</td>
+                <td>Automated Reminders</td>
+                <td>Keep students and staff updated with smart email notifications.</td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">📈</td>
+                <td>Track Attendance</td>
+                <td>Seemlessly keep track of students for your events.</td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">👥</td>
+                <td>Manage Club Members</td>
+                <td>Centralized management of attendees, members, and communication.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2 class="head" id="features">Feature Preview</h2>
+    <div class="gallery row">
+        <div class="col">
+            <h3 class="borderbottom">Member Management</h3>
+            <img src="../img/phones/members.png">
+        </div>
+        <div class="col">
+            <h3 class="borderbottom">Effortless Event Creation</h3>
+            <img src="../img/phones/event.png">
+        </div>
+        <div class="col">
+            <h3 class="borderbottom">Find Your Perfect Group</h3>
+            <img src="../img/phones/groupfind.png">
+        </div>
+
+    </div>
+
+    <h2 class="head" id="mission">Empowering Schools, One Event at a Time.</h2>
+    <p id="uvp">
+        At Lokal, we believe that events are the heartbeat of a vibrant school community.<br /><br />
+
+        Whether it's a club meeting, a competition, or a schoolwide celebration, every event deserves to be simple,
+        organized, and accessible for everyone.<br /><br />
+
+        That's why we built Lokal — a platform designed to empower school admins, club leaders, and students to create
+        incredible experiences without the stress.
+    </p>
+
+    <h2 class="head" id="demo">Ready to Simplify Your School's Events?</h2>
+
+    <form id="form">
+        <h2 style="padding: 0;">Request a Demo</h2>
+        <p>Get a personalized walkthrough of Lokal — no pressure, no commitment.</p>
+
+        <label for="full-name">Full Name</label>
+        <input type="text" id="full-name" name="fullName" placeholder="Jared Johnson III" required>
+
+        <label for="school-name">School Name</label>
+        <input type="text" id="school-name" name="schoolName" placeholder="Elk Grove High School" required>
+
+        <label for="school-district">School District (numbers)</label>
+        <input type="number" id="school-district" name="schoolName" placeholder="214" required>
+
+        <label for="role-title">Role/Title</label>
+        <input type="text" id="role-title" name="roleTitle" placeholder="Principal" required>
+
+        <label for="school-email">School Email</label>
+        <input type="email" id="school-email" name="schoolEmail" placeholder="jared.johnson@d214.org" required>
+
+        <label for="phone-number">Phone Number (Optional)</label>
+        <input type="tel" id="phone-number" name="phoneNumber" placeholder="630-703-1921">
+
+        <label for="preferred-contact">Preferred Contact Method</label>
+        <select id="preferred-contact" name="preferredContact" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="Email">Email</option>
+            <option value="Phone">Phone</option>
+        </select>
+
+        <label for="usage">What are you looking to use Lokal for?</label>
+        <input type="text" id="usage" name="usageGoals" placeholder="Attendance tracking, organization efforts, etc"
+            required>
+
+        <label for="timeline">How soon are you looking to get started?</label>
+        <select id="timeline" name="timeline" required>
+            <option value="" disabled selected>Select a timeline</option>
+            <option value="ASAP">ASAP</option>
+            <option value="1-2 months">Within 1-2 months</option>
+            <option value="Exploring">Just exploring</option>
+        </select>
+
+        <button type="submit">Request Demo</button>
+    </form>
+
+
+</body>
+
+</html>

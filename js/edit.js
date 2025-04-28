@@ -177,7 +177,7 @@ addButton("Cancel", () => {
         window.location.href = "../"
         return
     }
-    window.location.href = "../user/index.html?u=" + oldUsername
+    window.location.href = "../user/" + oldUsername
 })
 
 
