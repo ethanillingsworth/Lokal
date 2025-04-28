@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { auth, db } from "./firebase.js";
 import { setDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { Validation, CSS, User, log } from "./funcs.js";
@@ -101,7 +101,7 @@ function redirect() {
         window.location.href = urlParams.get("r")
     }
     else {
-        window.location.href = "../"
+        window.location.href = "../events"
     }
 }
 
@@ -141,51 +141,6 @@ password.on("input", () => {
 
     }
 })
-
-
-// google sign in
-// googleButton.onclick = function () {
-
-//     signInWithPopup(auth, google)
-//         .then(async (result) => {
-//             // This gives you a Google Access Token. You can use it to access the Google API.
-//             const credential = GoogleAuthProvider.credentialFromResult(result);
-//             const token = credential.accessToken;
-//             // The signed-in user info.
-//             const u = result.user;
-//             const { isNewUser } = getAdditionalUserInfo(result)
-
-
-//             const email = u.email
-
-
-
-
-//             if (isNewUser) {
-
-
-//                 let tempUsername = generateUsername()
-
-//                 if (Validation.username(email.split("@")[0])) {
-//                     tempUsername = email.split("@")[0]
-//                 }
-
-//                 if (!await Validation.finalUsername(tempUsername)) {
-//                     tempUsername = generateUsername()
-
-//                 }
-
-//                 await setUserData(u, email, tempUsername)
-
-
-//             }
-//             redirect()
-
-
-//             // IdP data available using getAdditionalUserInfo(result)
-//             // ...
-//         })
-// }
 
 // normal sign up
 signUp.on("click", async () => {
@@ -235,4 +190,10 @@ signIn.on("click", () => {
         .catch((error) => {
             alert(error)
         })
+})
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        redirect()
+    }
 })
