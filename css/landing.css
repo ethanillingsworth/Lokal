@@ -66,11 +66,23 @@ h2 {
 }
 
 h2.head {
-    margin-top: 80px;
-    margin-bottom: 80px;
+    margin-top: 60px;
+    margin-bottom: 60px;
     font-size: 2em;
     border-bottom: 3px solid var(--accent);
 }
+
+form {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
+
+form p {
+    width: 100%;
+}
+
 
 .borderbottom {
     border-bottom: 3px solid var(--accent);
@@ -104,6 +116,18 @@ p {
     font-size: 1.1em;
 }
 
+label {
+    background-color: transparent;
+    cursor: default;
+    padding: 0;
+}
+
+label:hover {
+    background-color: transparent !important;
+    cursor: default;
+}
+
+
 .gallery {
     width: 75%;
     text-align: center;
@@ -129,6 +153,10 @@ p {
         width: 100%;
         flex-wrap: wrap;
         gap: 50px
+    }
+
+    form {
+        width: 90%;
     }
 
     .gallery img,
