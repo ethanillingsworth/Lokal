@@ -36,8 +36,8 @@ input {
     margin: 0;
 }
 
-#inputs>* {
-    margin-bottom: 10px;
+#inputs>*:not(span) {
+    margin-bottom: 20px;
 }
 
 

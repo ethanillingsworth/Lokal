@@ -1,4 +1,4 @@
-import { getDoc, doc, getDocs, deleteDoc, setDoc, query, collection, where, deleteField } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { doc, getDocs, deleteDoc, setDoc, query, collection, where, deleteField } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
@@ -96,7 +96,7 @@ const readOnly = await creator.getMemberReadOnly(currentUser.uid)
 
 if (!readOnly.accepted && !badges.includes("admin")) {
     alert("You have to join the group associated with this event before viewing!")
-    window.location.href = `../user/${await creator.getUsername()}`
+    window.location.href = `/${window.getSchool()}/user/${await creator.getUsername()}`
 }
 
 
@@ -383,7 +383,7 @@ addPage("RSVPs", async (page) => {
     col.append(none)
     const userStats = $("<div></div>").addClass("col").css("display", "none");
 
-    const uData = await getDocs(query(collection(db, "posts", pageEvent, "uData"), where("attending", "==", true)));
+    const uData = await getDocs(query(collection(db, "schools", window.getSchool(), "posts", pageEvent, "uData"), where("attending", "==", true)));
 
     uData.forEach(async (d) => {
         none.css("display", "none")
@@ -483,15 +483,15 @@ if (currentUser.uid == data.creator || readOnly.admin || badges.includes("admin"
     more.add("Delete", async function () {
         if (confirm("Are you sure? Deleting an event cannot be undone!")) {
 
-            const q = await getDocs(query(collection(db, "posts", pageEvent, "uData")));
+            const q = await getDocs(query(collection(db, "schools", window.getSchool(), "posts", pageEvent, "uData")));
 
             q.forEach(async (d) => {
-                await deleteDoc(doc(db, "posts", pageEvent, "uData", d.id));
+                await deleteDoc(doc(db, "schools", window.getSchool(), "posts", pageEvent, "uData", d.id));
             });
 
-            await deleteDoc(doc(db, "posts", pageEvent));
+            await deleteDoc(doc(db, "schools", window.getSchool(), "posts", pageEvent));
 
-            window.location.href = "../";
+            window.location.href = `/${window.getSchool()}/events`;
         }
     })
 

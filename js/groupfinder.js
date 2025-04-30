@@ -4,7 +4,7 @@ import { db } from "./firebase.js";
 CSS.loadFiles(["../css/groupfinder.css"])
 
 
-const groups = await getDocs(query(collection(db, "users"), where("badges", "array-contains", "group"), limit(100)))
+const groups = await getDocs(query(collection(db, "schools", window.getSchool(), "users"), where("badges", "array-contains", "group"), limit(100)))
 
 let index = 0;
 

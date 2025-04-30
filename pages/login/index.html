@@ -4,18 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="apple-touch-icon" href="../img/icon.png">
-    <link rel="shortcut icon" href="../img/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/img/icon.png">
+    <link rel="shortcut icon" href="/img/icon.png" type="image/png">
     <title>Lokal - Login</title>
-    <script type="module" src="../js/firebase.js"></script>
-    <script type="module" src="../js/login.js"></script>
-    <link rel="stylesheet" href="../css/global.css">
+    <script type="module" src="/js/firebase.js"></script>
+    <script type="module" src="/js/login.js"></script>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/login.css">
+
     <meta name="description"
         content="Lokal Events helps school clubs plan events effortlessly with tools for scheduling, communication, and collaboration, ensuring every meeting or event runs smoothly.">
 
 </head>
 
 <body>
+    <script>0</script>
     <div class="modal">
         <h1 style="margin: 0;">Welcome to Lokal!</h1>
         <hr>
@@ -27,6 +30,11 @@
                 <input type="text" placeholder="username" id="username">
             </div>
             <span id="usernameError" style="color: var(--red)"></span> -->
+            <!-- <select id="school">
+                <option value="" selected disabled>Select a School</option>
+                <option value="eghs">Elk Grove High School</option>
+            </select> -->
+
             <input type="email" placeholder="email" id="email" style="width: auto">
             <span id="emailError" style="color: var(--red)"></span>
             <input type="password" placeholder="password" id="password" style="width: auto">
@@ -34,15 +42,15 @@
 
         </div>
 
-        <div class="row">
+        <!-- <div class="row">
             <input type="checkbox" checked id="notifs">
             <h4 style="text-wrap: wrap;">I'd like to recieve <b>notifications</b> from Lokal Groups</h4>
 
-        </div>
+        </div> -->
 
         <div class="row">
             <button id="signin">Login</button>
-            <button id="signup">Sign Up</button>
+            <!-- <button id="signup" disabled>Sign Up</button> -->
         </div>
         <hr>
         <p id="forgotpass">Forgot your password?</p>
