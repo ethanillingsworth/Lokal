@@ -10,6 +10,19 @@ window.getVersion = function () {
     return Utils.getVersion()
 }
 
+window.getSchool = function () {
+    // Get the full path like "/eghs/events"
+    const path = window.location.pathname;
+
+    // Split it into parts: ["", "eghs", "events"]
+    const parts = path.split('/');
+
+    // Get the second part (index 1), which is the school code
+    const school = parts[1];
+
+    return school
+}
+
 const expand = $("<div/>").attr("id", "expand")
 
 $(document.body).append(expand)
@@ -35,16 +48,16 @@ document.body.onresize = function () {
 
 resizeChecks()
 
-sidebar.menu.addItem(new Item("Events Feed", "../img/icons/party.png", "../events"))
+sidebar.menu.addItem(new Item("Events Feed", "/img/icons/party.png", `/${window.getSchool()}/events`))
 
-sidebar.menu.addItem(new Item("Group Finder", "../img/icons/groupfind.png", "../groupfinder"))
+sidebar.menu.addItem(new Item("Group Finder", "/img/icons/groupfind.png", `/${window.getSchool()}/groupfinder`))
 
 $(document.body).append(content)
 
 onAuthStateChanged(auth, async (user) => {
 
     if (!user) {
-        window.location.href = "../login"
+        window.location.href = "/login"
         return
     }
     else {
@@ -53,7 +66,7 @@ onAuthStateChanged(auth, async (user) => {
 
         await setDoc(doc(db, "emails", uid), {
             email: user.email
-        });
+        }, { merge: true });
 
         const u = new User(uid)
 
@@ -110,8 +123,8 @@ onAuthStateChanged(auth, async (user) => {
                     ${data.message.text}
                 </p>
                 <div class="row tools" style="place-content: end; gap: 5px;">
-                    <img src="../img/icons/x.png" style="width: 25px; height: 25px; margin: 0" onclick="removeNotif('${n.id}')">
-                    <img src="../img/icons/right.png" style="width: 25px; height: 25px; margin: 0" onclick="window.location.href = '${data.url}'">
+                    <img src="/img/icons/x.png" style="width: 25px; height: 25px; margin: 0" onclick="removeNotif('${n.id}')">
+                    <img src="/img/icons/right.png" style="width: 25px; height: 25px; margin: 0" onclick="window.location.href = '${data.url}'">
                 </div>
             </div>`, () => { })
 
@@ -123,25 +136,25 @@ onAuthStateChanged(auth, async (user) => {
 
         })
 
-        sidebar.menu.addItem(new Item("Notifications", "../img/icons/notif.png", notifMenu))
+        sidebar.menu.addItem(new Item("Notifications", "/img/icons/notif.png", notifMenu))
         notifMenu.refresh()
         const email = await u.getEmail()
         if (!badges.includes("premium") && email.endsWith("@d214.org")) {
-            const upgrade = new Item("Upgrade", "../img/icons/hat.png", "../plans")
+            const upgrade = new Item("Upgrade", "/img/icons/hat.png", "/plans")
 
             upgrade.classList = ['upgrade']
             sidebar.menu.addItem(upgrade)
         }
 
 
-        // sidebar.menu.addItem(new Item("Host", "../img/icons/plus.png", "../host"))
+        // sidebar.menu.addItem(new Item("Host", "/img/icons/plus.png", "/host"))
 
         const moreMenu = new Menu(expand)
 
-        moreMenu.addItem(new Item("Log Out", "../img/icons/logout.png", () => {
+        moreMenu.addItem(new Item("Log Out", "/img/icons/logout.png", () => {
             signOut(auth).then(() => {
                 // Sign-out successful.
-                window.location.href = "../login?r=" + window.location.href
+                window.location.href = "/login?r=" + window.location.href
 
             }).catch((error) => {
                 // An error happened.
@@ -149,8 +162,8 @@ onAuthStateChanged(auth, async (user) => {
         }), true)
 
         if (badges.includes("premium") || badges.includes("admin")) {
-            moreMenu.addItem(new Item("Create Group", "../img/icons/addgroup.png", "../edit?createGroup=true"), true)
-            moreMenu.addItem(new Item("Organizer Guide", "../img/icons/doc.png", "../org-guide"), true)
+            moreMenu.addItem(new Item("Create Group", "/img/icons/addgroup.png", `/${window.getSchool()}/edit?createGroup=true`), true)
+            moreMenu.addItem(new Item("Organizer Guide", "/img/icons/doc.png", "/org-guide"), true)
         }
 
         let backAdded = false
@@ -163,15 +176,15 @@ onAuthStateChanged(auth, async (user) => {
 
                 if (!backAdded) {
 
-                    moreMenu.addItem(new Item("Back", "../img/icons/left.png", () => {
+                    moreMenu.addItem(new Item("Back", "/img/icons/left.png", () => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
-                    notifMenu.addItem(new Item("Back", "../img/icons/left.png", () => {
+                    notifMenu.addItem(new Item("Back", "/img/icons/left.png", () => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
-                    groupMenu.addItem(new Item("Back", "../img/icons/left.png", () => {
+                    groupMenu.addItem(new Item("Back", "/img/icons/left.png", () => {
                         expand.removeClass("showExpand")
                         Menu.clicked = false
                     }), true)
@@ -192,9 +205,9 @@ onAuthStateChanged(auth, async (user) => {
         resizeChecks()
 
 
-        sidebar.menu.addItem(new Item("More", "../img/icons/more.png", moreMenu), true)
+        sidebar.menu.addItem(new Item("More", "/img/icons/more.png", moreMenu), true)
 
-        const dName = new Item(pub.displayName, "../img/pfp.jpg", `../user/${username}`)
+        const dName = new Item(pub.displayName, "/img/pfp.jpg", `/${window.getSchool()}/user/${username}`)
 
         dName.img = await u.getPfp()
 
@@ -203,9 +216,9 @@ onAuthStateChanged(auth, async (user) => {
         sidebar.menu.addItem(dName, true)
 
 
-        sidebar.menu.addItem(new Item("Your Groups", "../img/icons/groups.png", groupMenu), true)
+        sidebar.menu.addItem(new Item("Your Groups", "/img/icons/groups.png", groupMenu), true)
 
-        const q = query(collection(db, "users"), where("badges", "array-contains", "group"))
+        const q = query(collection(db, "schools", window.getSchool(), "users"), where("badges", "array-contains", "group"))
 
         const groups = await getDocs(q)
 
@@ -221,7 +234,7 @@ onAuthStateChanged(auth, async (user) => {
                 const pub = await group.getData("public")
                 const username = await group.getUsername()
 
-                const item = new Item(pub.displayName, "../img/pfp.jpg", `../user/${username}`)
+                const item = new Item(pub.displayName, "/img/pfp.jpg", `/${window.getSchool()}/user/${username}`)
 
 
                 item.img = await group.getPfp()

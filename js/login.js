@@ -4,9 +4,6 @@ import { setDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.14
 import { Validation, CSS, User, log } from "./funcs.js";
 import "./jquery.js";
 
-CSS.loadFiles(["../css/login.css"])
-
-
 
 // elements
 // const googleButton = document.getElementById("google")
@@ -52,28 +49,29 @@ function generateUsername() {
     return (a[rA] + b[rB] + rC)
 }
 
-async function setUserData(user, email, username) {
+async function setUserData(user, email, username, school) {
 
-    await setDoc(doc(db, "usernames", user.uid), {
+    await setDoc(doc(db, "schools", school, "usernames", user.uid), {
         username: username.toLowerCase()
     });
 
-    await setDoc(doc(db, "emails", user.uid), {
+    await setDoc(doc(db, "schools", school, "emails", user.uid), {
         email: email
     });
 
-    await setDoc(doc(db, "uids", username.toLowerCase()), {
+    await setDoc(doc(db, "schools", school, "uids", username.toLowerCase()), {
         userId: user.uid
     })
 
-    await setDoc(doc(db, "users", user.uid, "data", "public"), {
+    await setDoc(doc(db, "schools", school, "users", user.uid, "data", "public"), {
         displayName: username,
         desc: "Set a description",
         timestamp: Timestamp.now(),
-        notifs: $('#notifs').is(':checked')
+        notifs: $('#notifs').is(':checked'),
+        school: school
     })
 
-    await setDoc(doc(db, "users", user.uid, "data", "private"), {
+    await setDoc(doc(db, "schools", school, "users", user.uid, "data", "private"), {
         prevRes: [],
         groupsCreated: 0
     })
@@ -96,12 +94,12 @@ async function setUserData(user, email, username) {
 
 }
 
-function redirect() {
+function redirect(school) {
     if (urlParams.get("r")) {
         window.location.href = urlParams.get("r")
     }
     else {
-        window.location.href = "../events"
+        window.location.href = `/${school}/events`
     }
 }
 
@@ -143,36 +141,40 @@ password.on("input", () => {
 })
 
 // normal sign up
-signUp.on("click", async () => {
-    let uName = email.val().split("@")[0]
+// signUp.on("click", async () => {
+//     if (!$("#school").val()) {
+//         alert("Please select your school.")
+//         return
+//     }
+//     let uName = email.val().split("@")[0]
 
-    if (await Validation.finalUsername(uName) !== true) {
-        uName += "-" + Math.floor(Math.random() * 1000);
-    }
+//     if (await Validation.finalUsername(uName) !== true) {
+//         uName += "-" + Math.floor(Math.random() * 1000);
+//     }
 
-    if (Validation.username(uName) !== true) {
-        console.log(Validation.username(uName));
-        uName = generateUsername();
-        return
-    }
+//     if (Validation.username(uName) !== true) {
+//         console.log(Validation.username(uName));
+//         uName = generateUsername();
+//         return
+//     }
 
-    if (!email.val().endsWith("@stu.d214.org") && !email.val().endsWith("@d214.org") && !email.val().endsWith("@lokalevents.com")) {
-        alert("That email isnt an authorized @stu.d214.org or @d214.org email address.")
-        return
-    }
+//     if (!email.val().endsWith("@stu.d214.org") && !email.val().endsWith("@d214.org") && !email.val().endsWith("@lokalevents.com")) {
+//         alert("That email isnt an authorized @stu.d214.org or @d214.org email address.")
+//         return
+//     }
 
-    createUserWithEmailAndPassword(auth, email.val(), password.val())
-        .then(async (userCredential) => {
-            // Signed up 
-            const user = userCredential.user;
+//     createUserWithEmailAndPassword(auth, email.val(), password.val())
+//         .then(async (userCredential) => {
+//             // Signed up 
+//             const user = userCredential.user;
 
 
-            await setUserData(user, email.val(), uName)
+//             await setUserData(user, email.val(), uName)
 
-            redirect()
+//             redirect()
 
-        })
-})
+//         })
+// })
 
 // normal sign in
 signIn.on("click", () => {
@@ -181,9 +183,13 @@ signIn.on("click", () => {
             localStorage.clear()
 
             // Signed in 
-            const user = userCredential.user;
+            const user = new User(userCredential.user.uid);
 
-            redirect()
+            const school = await user.getSchool()
+
+            console.log(school)
+
+            redirect(school)
 
             // ...
         })
@@ -192,8 +198,14 @@ signIn.on("click", () => {
         })
 })
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        redirect()
+onAuthStateChanged(auth, async (u) => {
+    if (u) {
+        const user = new User(u.uid);
+
+        const school = await user.getSchool()
+
+        console.log(school)
+
+        redirect(school)
     }
 })

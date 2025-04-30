@@ -88,7 +88,7 @@ export class Sidebar {
 
         this.heading = $("<h1/>").attr("id", "heading")
             .on("click", () => {
-                window.location.href = "../"
+                window.location.href = "/"
 
             })
 
@@ -277,7 +277,7 @@ export class Post {
         const postElem = $("<div/>")
             .addClass("event")
             .attr("id", this.id)
-            .html(`<img class="pfp border" src="../img/pfp.jpg">
+            .html(`<img class="pfp border" src="/img/pfp.jpg">
             <div class="col" style="width: 100%">
                 <div class="content-wrapper row">
                     <div class="event-content">
@@ -299,7 +299,7 @@ export class Post {
 
 
         postElem.find(".pfp").on("click", async () => {
-            window.location.href = "../user/" + username
+            window.location.href = `/${window.getSchool()}/user/` + username
         })
 
         if (creatorData.accentColor) {
@@ -385,7 +385,7 @@ export class Post {
     }
 
     async get() {
-        let p = await getDoc(doc(db, this.path, this.id))
+        let p = await getDoc(doc(db, "schools", window.getSchool(), this.path, this.id))
 
         if (!p.exists()) {
             console.error(`Could not load post with id: ${this.id} Path: ${this.path}/${this.id}`)
@@ -404,16 +404,16 @@ export class Post {
             creator: data.creator,
             created_from: Utils.getDeviceType()
         })
-        const p = await addDoc(collection(db, "posts"), data)
+        const p = await addDoc(collection(db, "schools", window.getSchool(), "posts"), data)
         return p.id;
     }
 
     async update(data) {
-        await setDoc(doc(db, this.path, this.id), data, { merge: true })
+        await setDoc(doc(db, "schools", window.getSchool(), this.path, this.id), data, { merge: true })
     }
 
     async delete() {
-        await deleteDoc(doc(db, this.path, this.id))
+        await deleteDoc(doc(db, "schools", window.getSchool(), this.path, this.id))
     }
 
     async pin(group) {
@@ -464,10 +464,10 @@ export class Event extends Post {
 
         ev.find(".content-wrapper").append(eventImage)
 
-        const open = $("<img/>").attr("src", "../img/icons/right.png")
+        const open = $("<img/>").attr("src", "/img/icons/right.png")
 
         open.on("click", () => {
-            window.location.href = "../event/" + this.id
+            window.location.href = `/${window.getSchool()}/event/` + this.id
         })
 
         ev.find(".tools").append(open)
@@ -483,15 +483,15 @@ export class Event extends Post {
 
 
     async getUData() {
-        return await getDocs(query(collection(db, "posts", this.id, "uData")))
+        return await getDocs(query(collection(db, "schools", window.getSchool(), "posts", this.id, "uData")))
     }
 
     async updateMemberUData(memberId, data) {
-        await setDoc(doc(db, "posts", this.id, "uData", memberId), data, { merge: true })
+        await setDoc(doc(db, "schools", window.getSchool(), "posts", this.id, "uData", memberId), data, { merge: true })
     }
 
     async getMemberUData(uid) {
-        let e = await getDoc(doc(db, "posts", this.id, "uData", uid))
+        let e = await getDoc(doc(db, "schools", window.getSchool(), "posts", this.id, "uData", uid))
 
         if (!e.exists()) {
             console.error("Could not user UData with id: " + this.id)
@@ -570,18 +570,18 @@ export class User {
     }
 
     async getPosts() {
-        return await getDocs(query(collection(db, "posts"), where("creator", "==", this.uid)))
+        return await getDocs(query(collection(db, "schools", window.getSchool(), "posts"), where("creator", "==", this.uid)))
     }
 
     async deleteMembers() {
-        const m = await getDocs(query(collection(db, "users", this.uid, "members")))
+        const m = await getDocs(query(collection(db, "schools", window.getSchool(), "users", this.uid, "members")))
 
 
         m.forEach(async (member) => {
             const id = member.id
 
-            await deleteDoc(doc(db, "users", this.uid, "members", id))
-            await deleteDoc(doc(db, "users", this.uid, "members", id, "readOnly", "data"))
+            await deleteDoc(doc(db, "schools", window.getSchool(), "users", this.uid, "members", id))
+            await deleteDoc(doc(db, "schools", window.getSchool(), "users", this.uid, "members", id, "readOnly", "data"))
 
         })
     }
@@ -592,7 +592,7 @@ export class User {
         e.forEach(async (event) => {
             const id = event.id
 
-            await deleteDoc(doc(db, "posts", id))
+            await deleteDoc(doc(db, "schools", window.getSchool(), "posts", id))
         })
     }
 
@@ -600,13 +600,13 @@ export class User {
         if (!confirm("Are you sure you want to delete this account?") || !confirm("THIS CANNOT BE UNDONE ARE YOU SURE YOU WANT TO DELETE IT?")) {
             return
         }
-        await deleteDoc(doc(db, "users", this.uid))
+        await deleteDoc(doc(db, "schools", window.getSchool(), "users", this.uid))
 
-        await deleteDoc(doc(db, "users", this.uid, "data", "public"))
-        await deleteDoc(doc(db, "users", this.uid, "data", "private"))
+        await deleteDoc(doc(db, "schools", window.getSchool(), "users", this.uid, "data", "public"))
+        await deleteDoc(doc(db, "schools", window.getSchool(), "users", this.uid, "data", "private"))
         const uname = await this.getUsername()
-        await deleteDoc(doc(db, "usernames", this.uid))
-        await deleteDoc(doc(db, "uids", uname))
+        await deleteDoc(doc(db, "schools", window.getSchool(), "usernames", this.uid))
+        await deleteDoc(doc(db, "schools", window.getSchool(), "uids", uname))
 
         await this.deletePosts()
         await this.deleteMembers()
@@ -618,7 +618,7 @@ export class User {
 
     async updateData(data, type) {
 
-        await setDoc(doc(db, "users", this.uid, "data", type), data, { merge: true })
+        await setDoc(doc(db, "schools", window.getSchool(), "users", this.uid, "data", type), data, { merge: true })
     }
 
     async getData(type = "public") {
@@ -626,10 +626,10 @@ export class User {
         let u = undefined
 
         if (type != "hidden") {
-            u = await getDoc(doc(db, "users", this.uid, "data", type))
+            u = await getDoc(doc(db, "schools", window.getSchool(), "users", this.uid, "data", type))
         }
         else {
-            u = await getDoc(doc(db, "users", this.uid))
+            u = await getDoc(doc(db, "schools", window.getSchool(), "users", this.uid))
         }
 
 
@@ -668,17 +668,17 @@ export class User {
     }
 
     async updateUsername(newUsername) {
-        await setDoc(doc(db, "usernames", this.uid), {
+        await setDoc(doc(db, "schools", window.getSchool(), "usernames", this.uid), {
             username: newUsername.toLowerCase()
         })
 
-        await setDoc(doc(db, "uids", newUsername.toLowerCase()), {
+        await setDoc(doc(db, "schools", window.getSchool(), "uids", newUsername.toLowerCase()), {
             userId: this.uid
         })
     }
 
     async getUsername() {
-        let usernameRef = await getDoc(doc(db, "usernames", this.uid))
+        let usernameRef = await getDoc(doc(db, "schools", window.getSchool(), "usernames", this.uid))
 
         if (!usernameRef.exists()) {
             console.error("Could not load username from uid: " + this.uid)
@@ -689,15 +689,15 @@ export class User {
     }
 
     async updateMember(memberId, data) {
-        await setDoc(doc(db, "users", this.uid, "members", memberId), data, { merge: true })
+        await setDoc(doc(db, "schools", window.getSchool(), "users", this.uid, "members", memberId), data, { merge: true })
     }
 
     async updateMemberReadOnly(memberId, data) {
-        await setDoc(doc(db, "users", this.uid, "members", memberId, "readOnly", "data"), data, { merge: true })
+        await setDoc(doc(db, "schools", window.getSchool(), "users", this.uid, "members", memberId, "readOnly", "data"), data, { merge: true })
     }
 
     async getMember(memberId) {
-        const ref = await getDoc(doc(db, "users", this.uid, "members", memberId))
+        const ref = await getDoc(doc(db, "schools", window.getSchool(), "users", this.uid, "members", memberId))
 
         if (!ref.exists()) {
             return {}
@@ -707,7 +707,7 @@ export class User {
     }
 
     async getMemberReadOnly(memberId) {
-        const ref = await getDoc(doc(db, "users", this.uid, "members", memberId, "readOnly", "data"))
+        const ref = await getDoc(doc(db, "schools", window.getSchool(), "users", this.uid, "members", memberId, "readOnly", "data"))
 
         if (!ref.exists()) {
             return {}
@@ -718,7 +718,7 @@ export class User {
 
     async getMembers() {
 
-        return await getDocs(query(collection(db, "users", this.uid, "members"), where("joined", "==", true)))
+        return await getDocs(query(collection(db, "schools", window.getSchool(), "users", this.uid, "members"), where("joined", "==", true)))
 
     }
 
@@ -742,12 +742,12 @@ export class User {
         const pfp = $("<img/>")
             .addClass("pfp")
             .addClass("border")
-            .attr("src", "../img/pfp.jpg")
+            .attr("src", "/img/pfp.jpg")
 
         pfp.attr("src", await uObj.getPfp())
 
         pfp.on("click", async () => {
-            window.location.href = "../user/" + await uObj.getUsername()
+            window.location.href = `/${window.getSchool()}/user/` + await uObj.getUsername()
         })
 
 
@@ -822,11 +822,11 @@ export class User {
 
 
         const open = $("<img/>")
-            .attr("src", "../img/icons/right.png")
+            .attr("src", "/img/icons/right.png")
             .addClass("action")
             .attr("id", "open")
             .on("click", function () {
-                window.location.href = "../user/" + uname;
+                window.location.href = `/${window.getSchool()}/user/` + uname;
             });
 
 
@@ -849,6 +849,17 @@ export class User {
         }
 
         return r.data().email
+    }
+
+    async getSchool() {
+        let r = await getDoc(doc(db, "emails", this.uid))
+
+        if (!r.exists()) {
+            console.error("Could not load school from uid: " + this.uid)
+            return
+        }
+
+        return r.data().school
     }
 
     async notify(subject, text, url, fromGroupId) {
@@ -935,7 +946,7 @@ export class User {
     }
 
     static async getUID(username) {
-        let userIdRef = await getDoc(doc(db, "uids", username))
+        let userIdRef = await getDoc(doc(db, "schools", window.getSchool(), "uids", username))
 
         if (!userIdRef.exists()) {
             console.error("Could not load uid from username: " + username)
@@ -947,7 +958,7 @@ export class User {
 
     static async createUser(username, pub = {}, priv = {}, meta = {}) {
 
-        const d = await addDoc(collection(db, "users"), meta)
+        const d = await addDoc(collection(db, "schools", window.getSchool(), "users"), meta)
 
         log("group_created", {
             uid: d.id,
@@ -1001,7 +1012,7 @@ export class Validation {
         // get exisitng usernames
         const usernames = []
 
-        const q = query(collection(db, "usernames"), where("username", "==", value));
+        const q = query(collection(db, "schools", window.getSchool(), "usernames"), where("username", "==", value));
 
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
@@ -1142,7 +1153,7 @@ export class MoreMenu {
         this.clicked = false
 
         this.button = $("<img/>")
-            .attr("src", "../img/icons/more.png")
+            .attr("src", "/img/icons/more.png")
             .css("width", 35)
             .css("height", 35)
             .on("click", async () => {
@@ -1240,7 +1251,7 @@ export class Calendar {
 
         const left = $("<img/>")
             .addClass("tool")
-            .attr("src", "../img/icons/left.png")
+            .attr("src", "/img/icons/left.png")
             .css("margin-right", "auto")
 
         top.append(left)
@@ -1259,7 +1270,7 @@ export class Calendar {
 
         const right = $("<img/>")
             .addClass("tool")
-            .attr("src", "../img/icons/right.png")
+            .attr("src", "/img/icons/right.png")
             .css("margin-left", "auto")
 
         top.append(right)
@@ -1515,7 +1526,7 @@ export class ImageViewer {
 
         const topBar = $("<div/>").addClass("tools")
 
-        const exit = $("<img/>").attr("src", "../img/icons/x.png")
+        const exit = $("<img/>").attr("src", "/img/icons/x.png")
 
         topBar.append(exit)
 
@@ -1531,7 +1542,7 @@ export class ImageViewer {
 
         topBar.append(row)
 
-        const download = $("<img/>").attr("src", "../img/icons/download.png")
+        const download = $("<img/>").attr("src", "/img/icons/download.png")
 
         row.append(download)
 
@@ -1547,7 +1558,7 @@ export class ImageViewer {
 
         const midRow = $("<div/>").addClass("row midrow")
 
-        const left = $("<img/>").attr("src", "../img/icons/left.png").addClass("tool").css("margin-right", "auto")
+        const left = $("<img/>").attr("src", "/img/icons/left.png").addClass("tool").css("margin-right", "auto")
 
         left.on("click", () => {
             this.moveLeft()
@@ -1555,7 +1566,7 @@ export class ImageViewer {
 
         this.image = $("<img/>").attr("src", photos[startIndex].url).addClass("image")
 
-        const right = $("<img/>").attr("src", "../img/icons/right.png").addClass("tool").css("margin-left", "auto")
+        const right = $("<img/>").attr("src", "/img/icons/right.png").addClass("tool").css("margin-left", "auto")
 
         right.on("click", () => {
             this.moveRight()
@@ -1769,7 +1780,7 @@ export class PostPopup extends Popup {
                         await e.bucket.uploadImage(this.file, "preview.jpg")
                     }
 
-                    window.location.href = "../event/" + postId;
+                    window.location.href = `/${window.getSchool()}/event/` + postId;
                 } else {
                     // create
                     data.timestamp = Timestamp.fromDate(new Date());
@@ -1781,9 +1792,9 @@ export class PostPopup extends Popup {
                         await new Event(id).bucket.uploadImage(this.file, "preview.jpg")
                     }
 
-                    await this.user.notifyAllMembers(`posted a new event -- ${data.title}`, data.desc, "https://lokalevents.com/event/" + id)
+                    await this.user.notifyAllMembers(`posted a new event -- ${data.title}`, data.desc, `https://lokalevents.com/${window.getSchool()}/event/` + id)
 
-                    window.location.href = "../event/" + id;
+                    window.location.href = `/${window.getSchool()}/event/` + id;
                 }
             }
             else if (this.v == "Update") {
@@ -1803,7 +1814,7 @@ export class PostPopup extends Popup {
                     data.creator = this.user.uid;
 
                     await Update.create(data)
-                    await this.user.notifyAllMembers(`posted a new update -- ${data.title}`, data.desc, "https://lokalevents.com/user/" + await this.user.getUsername())
+                    await this.user.notifyAllMembers(`posted a new update -- ${data.title}`, data.desc, `https://lokalevents.com/${window.getSchool()}/user/` + await this.user.getUsername())
 
 
                 }
@@ -1848,7 +1859,7 @@ export class PostPopup extends Popup {
                     for (const file of this.images) {
                         await new Media(id).bucket.uploadImage(file, file.name)
                     }
-                    await this.user.notifyAllMembers(`posted a new media post -- ${data.title}`, data.desc, "https://lokalevents.com/user/" + await this.user.getUsername())
+                    await this.user.notifyAllMembers(`posted a new media post -- ${data.title}`, data.desc, `https://lokalevents.com/${window.getSchool()}/user/` + await this.user.getUsername())
 
 
                 }
@@ -1962,7 +1973,7 @@ export class PostPopup extends Popup {
 
             const preview = $("<img/>", {
                 id: "preview",
-                src: "../img/placeholder.png",
+                src: "/img/placeholder.png",
             })
                 .css("place-self", "center");
             ;
@@ -2019,7 +2030,7 @@ export class PostPopup extends Popup {
             });
 
             const search = $("<img/>", {
-                src: "../img/icons/search.png",
+                src: "/img/icons/search.png",
                 css: {
                     width: "auto",
                     height: "calc(100% + 4px)",

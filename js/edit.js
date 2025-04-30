@@ -54,7 +54,7 @@ onAuthStateChanged(auth, async (user) => {
 
 
     if (urlParams.get("createGroup") && urlParams.get("u")) {
-        window.location.href = "../"
+        window.location.href = `/${window.getSchool()}/events`
         return
     }
 
@@ -68,7 +68,7 @@ onAuthStateChanged(auth, async (user) => {
 
     }
     else {
-        window.location.href = "../"
+        window.location.href = `/${window.getSchool()}/events`
 
         return
     }
@@ -174,10 +174,10 @@ addField("Border Color:", (row) => {
 
 addButton("Cancel", () => {
     if (urlParams.get("createGroup")) {
-        window.location.href = "../"
+        window.location.href = `/${window.getSchool()}/events`
         return
     }
-    window.location.href = "../user/" + oldUsername
+    window.location.href = `/${window.getSchool()} /user/` + oldUsername
 })
 
 
@@ -280,7 +280,7 @@ addButton("Done", async () => {
 
         if (priv.groupsCreated + 1 > 3) {
             alert("You already have 3 groups created, you'll have to delete one to make anymore.")
-            window.location.href = "../index.html"
+            window.location.href = `/${window.getSchool()}/events`
             return
         }
 
@@ -318,5 +318,5 @@ addButton("Done", async () => {
 
         await u.updateData(data, "public")
     }
-    window.location.href = "../user/index.html?u=" + usernameVal
+    window.location.href = `/${window.getSchool()}/user/` + usernameVal
 })

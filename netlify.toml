@@ -4,12 +4,28 @@ command = "rm -rf functions && rm .firebaserc && rm firebase.json && rm README.m
 
 [[redirects]]
 from = "/user/*"
-to = "/pages/user/index.html"
+to = "pages/user/index.html"
 status = 200
 
 [[redirects]]
 from = "/event/*"
-to = "/pages/event/index.html"
+to = "pages/event/index.html"
+status = 200
+
+[[redirects]]
+from = "/:school/:page"
+to = "pages/:page"
+status = 200
+
+
+[[redirects]]
+from = "/:school/user/*"
+to = "pages/user/index.html"
+status = 200
+
+[[redirects]]
+from = "/:school/event/*"
+to = "pages/event/index.html"
 status = 200
 
 [[redirects]]

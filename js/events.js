@@ -16,7 +16,7 @@ onAuthStateChanged(auth, async (u) => {
 
     $("#content").append(loading)
 
-    const groups = await getDocs(query(collection(db, "users"), where("badges", "array-contains", "group")))
+    const groups = await getDocs(query(collection(db, "schools", window.getSchool(), "users"), where("badges", "array-contains", "group")))
     let eventsArray = [];
 
     for (const g of groups.docs) {
@@ -34,7 +34,7 @@ onAuthStateChanged(auth, async (u) => {
             continue
         }
 
-        const events = await getDocs(query(collection(db, "posts"), orderBy("timestamp", "desc"), where("creator", "==", groupId), limit(100)))
+        const events = await getDocs(query(collection(db, "schools", window.getSchool(), "posts"), orderBy("timestamp", "desc"), where("creator", "==", groupId), limit(100)))
 
         // Collect events into an array
         for (const ev of events.docs) {

@@ -16,20 +16,10 @@ import {
 } from "./funcs.js";
 
 
-CSS.loadFiles(["../css/user.css"])
+CSS.loadFiles(["/css/user.css"])
 
 
 import "./jquery.js";
-
-
-const params = new URLSearchParams(window.location.search);
-
-if (params.has('u')) {
-    const username = params.get('u');
-    // Redirect to the new format /user/username
-    window.location.replace(`/user/${username}`);
-}
-
 
 
 const path = window.location.pathname;
@@ -51,7 +41,7 @@ const top = $("<div/>")
     .css("place-content", "start");
 
 const pfp = $("<img/>")
-    .attr("src", "../img/pfp.jpg")
+    .attr("src", "/img/pfp.jpg")
     .attr("id", "pfp")
     .addClass("border");
 
@@ -142,13 +132,13 @@ const user = new User(uid)
 async function attending(uid) {
     const attendingTab = $("#Attending")
 
-    const q = query(collection(db, "posts"))
+    const q = query(collection(db, "schools", window.getSchool(), "posts"))
 
     const get = await getDocs(q)
 
     get.forEach(async (event) => {
 
-        const uData = await getDoc(doc(db, "posts", event.id, "uData", uid))
+        const uData = await getDoc(doc(db, "schools", window.getSchool(), "posts", event.id, "uData", uid))
 
         const e = new Event(event.id)
 
@@ -165,7 +155,7 @@ async function attending(uid) {
 async function members(user) {
     const tab = $("#Members")
 
-    const q = query(collection(db, "users", user.uid, "members"), where("joined", "==", true), limit(25))
+    const q = query(collection(db, "schools", window.getSchool(), "users", user.uid, "members"), where("joined", "==", true), limit(25))
 
     const get = await getDocs(q)
 
@@ -244,9 +234,9 @@ async function members(user) {
 
                 const open = $("<img/>")
                     .addClass("action")
-                    .attr("src", "../img/icons/right.png")
+                    .attr("src", "/img/icons/right.png")
                     .on("click", function () {
-                        window.location.href = `../user?u=${username}`;
+                        window.location.href = `/${window.getSchool()}/user/${username}`;
                     });
 
                 if (auth.currentUser.uid !== personClass.uid) {
@@ -261,16 +251,11 @@ async function members(user) {
     refreshUsers()
 }
 
-// fetch new names everytime
-const nameExists = async (value) => {
-    const g = await user.getGallery()
-    g.some((folder) => folder.name === value)
-};
 
 async function groups(user) {
     const tab = $("#Groups")
 
-    const groupQ = query(collection(db, "users"), where("badges", "array-contains", "group"))
+    const groupQ = query(collection(db, "schools", window.getSchool(), "users"), where("badges", "array-contains", "group"))
 
     const groups = await getDocs(groupQ)
 
@@ -281,6 +266,7 @@ async function groups(user) {
 
         const pub = await group.getData("public")
         const meta = await group.getData("hidden")
+
         const mem = await group.getMember(user.uid)
 
 
@@ -294,7 +280,7 @@ async function groups(user) {
 async function requests(user) {
     const tab = $("#Requests")
 
-    const q = query(collection(db, "users", user.uid, "members"), where("pending", "==", true), limit(25))
+    const q = query(collection(db, "schools", window.getSchool(), "users", user.uid, "members"), where("pending", "==", true), limit(25))
 
     const get = await getDocs(q)
 
@@ -315,23 +301,23 @@ async function requests(user) {
 
         const reject = $("<img/>")
             .addClass("action")
-            .attr("src", "../img/icons/x.png")
+            .attr("src", "/img/icons/x.png")
             .on("click", async function () {
                 await user.updateMember(person.id, { pending: false, joined: false });
                 if (pub.notifs) {
-                    await user.notifyMember(personClass.uid, "has rejected you from their group...", "View their page on Lokal below", `https://lokalevents.com/user/${await user.getUsername()}`)
+                    await user.notifyMember(personClass.uid, "has rejected you from their group...", "View their page on Lokal below", `https://lokalevents.com/${window.getSchool()}/user/${await user.getUsername()}`)
                 }
                 actions.parent().remove();
             });
 
         const confirm = $("<img/>")
             .addClass("action")
-            .attr("src", "../img/icons/confirm.png")
+            .attr("src", "/img/icons/confirm.png")
             .on("click", async function () {
                 await user.updateMember(person.id, { pending: false, joined: true });
                 await user.updateMemberReadOnly(person.id, { accepted: true })
                 if (pub.notifs) {
-                    await user.notifyMember(personClass.uid, "has accepted you into their group!", "View their page on Lokal below", `https://lokalevents.com/user/${await user.getUsername()}`)
+                    await user.notifyMember(personClass.uid, "has accepted you into their group!", "View their page on Lokal below", `https://lokalevents.com/${window.getSchool()}/user/${await user.getUsername()}`)
                 }
                 actions.parent().remove();
             });
@@ -431,7 +417,7 @@ async function feed(uid) {
     }
 
     const posts = await getDocs(query(
-        collection(db, "posts"),
+        collection(db, "schools", window.getSchool(), "posts"),
         where("creator", "==", uid),
         orderBy("timestamp", "desc"),
         limit(25)
@@ -447,7 +433,7 @@ async function feed(uid) {
             if (!lastDoc) return; // Prevent querying if no more documents
 
             const q = await getDocs(query(
-                collection(db, "posts"),
+                collection(db, "schools", window.getSchool(), "posts"),
                 where("creator", "==", uid),
                 orderBy("timestamp", "desc"),
                 startAfter(lastDoc), // Start from the last loaded document
@@ -526,7 +512,7 @@ onAuthStateChanged(auth, async (u) => {
         }
 
         moreMenu.add("Edit Profile", () => {
-            window.location.href = "../edit?u=" + pageUser
+            window.location.href = `/${window.getSchool()}/edit?u=` + pageUser
         })
 
         if (bds.includes("group")) {
@@ -538,7 +524,7 @@ onAuthStateChanged(auth, async (u) => {
                     groupsCreated: priv.groupsCreated - 1
                 }, "private")
 
-                window.location.href = "../"
+                window.location.href = `/${window.getSchool()}/events`
 
             })
         }
