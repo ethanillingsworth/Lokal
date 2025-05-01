@@ -139,12 +139,12 @@ onAuthStateChanged(auth, async (user) => {
         sidebar.menu.addItem(new Item("Notifications", "/img/icons/notif.png", notifMenu))
         notifMenu.refresh()
         const email = await u.getEmail()
-        if (!badges.includes("premium") && email.endsWith("@d214.org")) {
-            const upgrade = new Item("Upgrade", "/img/icons/hat.png", "/plans")
+        // if (!badges.includes("premium") && email.endsWith("@d214.org")) {
+        //     const upgrade = new Item("Upgrade", "/img/icons/hat.png", "/plans")
 
-            upgrade.classList = ['upgrade']
-            sidebar.menu.addItem(upgrade)
-        }
+        //     upgrade.classList = ['upgrade']
+        //     sidebar.menu.addItem(upgrade)
+        // }
 
 
         // sidebar.menu.addItem(new Item("Host", "/img/icons/plus.png", "/host"))
